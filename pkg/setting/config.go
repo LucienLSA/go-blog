@@ -16,7 +16,7 @@ func NewConfig() (*Config, error) {
 	vp := viper.New()
 	vp.SetConfigName("config")
 	vp.SetConfigType("yaml")
-	vp.AddConfigPath(workDir + "/configs/")
+	vp.AddConfigPath(workDir + "/conf/")
 	vp.AddConfigPath(workDir)
 	err := vp.ReadInConfig()
 	if err != nil {

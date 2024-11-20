@@ -1,4 +1,4 @@
-package model
+package models
 
 import (
 	"blog-service/global"
@@ -12,7 +12,7 @@ import (
 )
 
 func DBEngine(databaseSetting *setting.DatabaseSettingS) (*gorm.DB, error) {
-	conn := "%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=%t&loc=Local"
+	conn := "%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=%t"
 	dsn := fmt.Sprintf(conn,
 		databaseSetting.UserName,
 		databaseSetting.Password,
@@ -22,7 +22,7 @@ func DBEngine(databaseSetting *setting.DatabaseSettingS) (*gorm.DB, error) {
 		databaseSetting.Charset,
 		databaseSetting.ParseTime,
 	)
-
+	fmt.Println(dsn)
 	var ormLogger logger.Interface
 	if global.ServerSetting.RunMode == "debug" {
 		ormLogger = logger.Default.LogMode(logger.Info)
@@ -36,7 +36,8 @@ func DBEngine(databaseSetting *setting.DatabaseSettingS) (*gorm.DB, error) {
 	}), &gorm.Config{
 		Logger: ormLogger,
 		NamingStrategy: schema.NamingStrategy{
-			SingularTable: true, // 表名不加s
+			TablePrefix:   "blog_", //表名前缀，`Tag` 的表名应该是 `blog_tag`
+			SingularTable: true,    // 表名不加s
 		},
 	})
 	if err != nil {

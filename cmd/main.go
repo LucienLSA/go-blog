@@ -2,9 +2,9 @@ package main
 
 import (
 	"blog-service/global"
-	"blog-service/internal/model"
-	"blog-service/internal/routers"
+	"blog-service/models"
 	"blog-service/pkg/setting"
+	"blog-service/routers"
 	"log"
 	"net/http"
 	"time"
@@ -17,6 +17,10 @@ func init() {
 	err := setupConfig()
 	if err != nil {
 		log.Fatalf("init.setupSetting err: %v", err)
+	}
+	err = setupDBEngine()
+	if err != nil {
+		log.Fatalf("init.setupDBEngine err: %v", err)
 	}
 }
 
@@ -60,13 +64,13 @@ func setupConfig() error {
 	return nil
 }
 
-func setupLogger() error {
+// func setupLogger() error {
 
-}
+// }
 
 func setupDBEngine() error {
 	var err error
-	global.DBEngine, err = model.DBEngine(global.DatabaseSetting)
+	global.DBEngine, err = models.DBEngine(global.DatabaseSetting)
 	if err != nil {
 		return err
 	}

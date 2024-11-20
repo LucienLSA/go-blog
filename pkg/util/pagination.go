@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// 求页数
 func GetPage(c *gin.Context) int {
 	result := 0
 	pageStr := c.Query("page")
