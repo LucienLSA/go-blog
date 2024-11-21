@@ -3,6 +3,7 @@ package main
 import (
 	"blog-service/global"
 	"blog-service/models"
+	"blog-service/pkg/logging"
 	"blog-service/pkg/setting"
 	"blog-service/routers"
 	"log"
@@ -18,6 +19,7 @@ func init() {
 	if err != nil {
 		log.Fatalf("init.setupSetting err: %v", err)
 	}
+	logging.InitLog()
 	err = setupDBEngine()
 	if err != nil {
 		log.Fatalf("init.setupDBEngine err: %v", err)

@@ -41,10 +41,10 @@ func GetTagTotal(maps interface{}) (count int64, err error) {
 // 判断标签名重复
 func ExitTagByName(name string) bool {
 	var tag Tag
-	global.DBEngine.Select("id").Where("name =?", name).First(&tag)
-	// if err != nil && err != gorm.ErrRecordNotFound {
-	// 	return false
-	// }
+	err := global.DBEngine.Select("id").Where("name =?", name).First(&tag).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return false
+	}
 	if tag.ID > 0 {
 		return true
 	}
@@ -52,13 +52,13 @@ func ExitTagByName(name string) bool {
 }
 
 // 新增标签
-func CreateTags(name string, state int, createdBy string) bool {
+func CreateTags(name string, state int, createdBy string) error {
 	global.DBEngine.Create(&Tag{
 		Name:      name,
 		State:     state,
 		CreatedBy: createdBy,
 	})
-	return true
+	return nil
 }
 
 // 根据ID判断是否存在标签
@@ -66,6 +66,7 @@ func ExistTagByID(id int) bool {
 	var tag Tag
 	err := global.DBEngine.Select("id").Where("id =?", id).First(&tag).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
+		// logging.LogrusObj.Infoln(err)
 		return false
 	}
 	if tag.ID > 0 {
@@ -78,6 +79,7 @@ func ExistTagByID(id int) bool {
 func UpdateTags(id int, data interface{}) bool {
 	err := global.DBEngine.Model(&Tag{}).Where("id =?", id).Updates(data).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
+		// logging.LogrusObj.Infoln(err)
 		return false
 	}
 	return true

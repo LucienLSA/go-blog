@@ -3,8 +3,8 @@ package v1
 import (
 	"blog-service/models"
 	"blog-service/pkg/e"
+	"blog-service/pkg/logging"
 	"blog-service/pkg/util"
-	"log"
 	"net/http"
 
 	"github.com/beego/beego/v2/core/validation"
@@ -43,16 +43,19 @@ func (au *Author) LoginAuthor(c *gin.Context) {
 			token, err := util.GenerateToken(username, password)
 			if err != nil {
 				code = e.ERROR_AUTH_TOKEN
+				logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
 			} else {
 				data["token"] = token
 				code = e.SUCCESS
 			}
 		} else {
 			code = e.ERROR_AUTH
+			logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
 		}
 	} else {
 		for _, err := range valid.Errors {
-			log.Fatalf("err.key: %s, err.message: %s", err.Key, err.Message)
+			logging.LogrusObj.Infoln(err) // 补充错误处理
+			// log.Fatalf("err.key: %s, err.message: %s", err.Key, err.Message)
 		}
 	}
 	c.JSON(http.StatusOK, gin.H{

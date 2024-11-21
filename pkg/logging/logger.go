@@ -1,72 +1,61 @@
 package logging
 
 import (
-	"fmt"
 	"log"
 	"os"
-	"path/filepath"
-	"runtime"
+	"path"
+	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
-type Level int
+var LogrusObj *logrus.Logger
 
-var (
-	F *os.File
-
-	DefaultPrefix      = ""
-	DefaultCallerDepth = 2
-
-	logger     *log.Logger
-	logPrefix  = ""
-	levelFlags = []string{"DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
-)
-
-const (
-	DEBUG Level = iota
-	INFO
-	WARNING
-	ERROR
-	FATAL
-)
-
-func init() {
-	filePath := getLogFileFullPath()
-	F = openLogFile(filePath)
-
-	logger = log.New(F, DefaultPrefix, log.LstdFlags)
-}
-
-func Debug(v ...interface{}) {
-	setPrefix(DEBUG)
-	logger.Println(v)
-}
-
-func Info(v ...interface{}) {
-	setPrefix(INFO)
-	logger.Println(v)
-}
-
-func Warn(v ...interface{}) {
-	setPrefix(WARNING)
-	logger.Println(v)
-}
-func setPrefix(level Level) {
-	_, file, line, ok := runtime.Caller(DefaultCallerDepth)
-	if ok {
-		logPrefix = fmt.Sprintf("[%s][%s:%d]", levelFlags[level], filepath.Base(file), line)
-	} else {
-		logPrefix = fmt.Sprintf("[%s]", levelFlags[level])
+func InitLog() {
+	if LogrusObj != nil {
+		src, _ := setOutPutFile()
+		LogrusObj.Out = src
+		return
 	}
-
-	logger.SetPrefix(logPrefix)
+	// 实例化
+	logger := logrus.New()
+	src, _ := setOutPutFile()
+	logger.Out = src                   // 设置输出
+	logger.SetLevel(logrus.DebugLevel) // 设置日志级别
+	logger.SetFormatter(&logrus.TextFormatter{
+		TimestampFormat: "2006-01-02 15:04:05",
+	})
+	LogrusObj = logger
 }
 
-func Error(v ...interface{}) {
-	setPrefix(ERROR)
-	logger.Println(v)
-}
-
-func Fatal(v ...interface{}) {
-	setPrefix(FATAL)
-	logger.Fatalln(v)
+func setOutPutFile() (*os.File, error) {
+	now := time.Now()
+	logFilePath := ""
+	if dir, err := os.Getwd(); err == nil { // 获取工作目录
+		logFilePath = path.Join(dir, "runtime", "logs") + string(os.PathSeparator)
+	}
+	_, err := os.Stat(logFilePath)
+	if os.IsNotExist(err) {
+		if err := os.MkdirAll(logFilePath, 0777); err != nil {
+			log.Println(err.Error())
+			return nil, err
+		}
+	}
+	logFileName := now.Format("2006-01-02") + ".log"
+	// 日志文件
+	fileName := path.Join(logFilePath, logFileName)
+	if _, err := os.Stat(fileName); err != nil {
+		if _, err := os.Create(fileName); err != nil {
+			log.Println(err.Error())
+			return nil, err
+		}
+	}
+	// 写入文件
+	src, err := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+	// src, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return src, nil
 }

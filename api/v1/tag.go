@@ -4,8 +4,8 @@ import (
 	"blog-service/global"
 	"blog-service/models"
 	"blog-service/pkg/e"
+	"blog-service/pkg/logging"
 	"blog-service/pkg/util"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -33,19 +33,22 @@ func (t *Tag) GetTags(c *gin.Context) {
 	if arg := c.Query("state"); arg != "" {
 		state, err = strconv.Atoi(arg)
 		if err != nil {
-			maps["state"] = state
+			logging.LogrusObj.Infoln(err) // 补充错误处理
 		}
+		maps["state"] = state
 	}
 	code := e.SUCCESS
 	// 获取标签列表
 	data["lists"], err = models.GetTags(util.GetPage(c), global.AppSetting.DefaultPageSize, maps)
 	if err != nil {
-		return
+		logging.LogrusObj.Infoln(err) // 补充错误处理
+		// return
 	}
 	// 获取标签总数
 	datas, err := models.GetTagTotal(maps)
 	if err != nil {
-		return
+		logging.LogrusObj.Infoln(err) // 补充错误处理
+		// return
 	}
 	data["total"] = datas
 
@@ -61,7 +64,7 @@ func (t *Tag) CreateTags(c *gin.Context) {
 	name := c.Query("name")
 	state, err := strconv.Atoi(c.DefaultQuery("state", "0"))
 	if err != nil {
-		return
+		logging.LogrusObj.Infoln(err) // 补充错误处理
 	}
 	createdBy := c.Query("created_by")
 	valid := validation.Validation{}
@@ -74,32 +77,36 @@ func (t *Tag) CreateTags(c *gin.Context) {
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
 		if !models.ExitTagByName(name) {
-			if models.CreateTags(name, state, createdBy) {
+			err = models.CreateTags(name, state, createdBy)
+			if err == nil {
 				code = e.SUCCESS
 			} else {
 				code = e.ERROR_ADD_TAG_FAIL
+				logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
 			}
 		} else {
 			code = e.ERROR_EXIST_TAG
-		}
-
-	} else {
-		for _, err := range valid.Errors {
-			log.Fatalf("err.key: %s, err.message: %s", err.Key, err.Message)
+			logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
 		}
 	}
+	for _, err := range valid.Errors {
+		logging.LogrusObj.Infoln(err)
+		// log.Fatalf("err.key: %s, err.message: %s", err.Key, err.Message)
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
 		"msg":  e.GetMsg(code),
 		"data": make(map[string]string),
 	})
+
 }
 
 // 更新标签
 func (t *Tag) UpdateTags(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return
+		logging.LogrusObj.Infoln(err)
 	}
 	name := c.Query("name")
 	modifiedBy := c.Query("modified_by")
@@ -108,12 +115,13 @@ func (t *Tag) UpdateTags(c *gin.Context) {
 	if arg := c.Query("state"); arg != "" {
 		state, err = strconv.Atoi(arg)
 		if err != nil {
-			return
+			logging.LogrusObj.Infoln(err)
 		}
 		valid.Range(state, 0, 1, "state").Message("状态只能为0或1")
 	}
 	valid.Required(id, "id").Message("ID不能为空")
 	valid.Required(modifiedBy, "modified_by").Message("修改人不能为空")
+	valid.Required(name, "name").Message("名称不能为空")
 	valid.MaxSize(modifiedBy, 50, "modified_by").Message("修改人长度不能超过50字符")
 	valid.MaxSize(name, 50, "name").Message("名称长度不能超过50字符")
 
@@ -132,10 +140,13 @@ func (t *Tag) UpdateTags(c *gin.Context) {
 			models.UpdateTags(id, data)
 		} else {
 			code = e.ERROR_NOT_EXIST_TAG
+			logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
 		}
+
 	} else {
 		for _, err := range valid.Errors {
-			log.Fatalf("err.key: %s, err.message: %s", err.Key, err.Message)
+			logging.LogrusObj.Infoln(err)
+			// log.Fatalf("err.key: %s, err.message: %s", err.Key, err.Message)
 		}
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -143,7 +154,6 @@ func (t *Tag) UpdateTags(c *gin.Context) {
 		"msg":  e.GetMsg(code),
 		"data": make(map[string]string),
 	})
-
 }
 
 // 删除标签
@@ -161,6 +171,7 @@ func (t *Tag) DeleteTags(c *gin.Context) {
 			models.DeleteTags(id)
 		} else {
 			code = e.ERROR_NOT_EXIST_TAG
+			logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
 		}
 	}
 	c.JSON(http.StatusOK, gin.H{

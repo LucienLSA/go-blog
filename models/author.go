@@ -28,9 +28,12 @@ func (Author) TableName() string {
 // 检查用户名和密码是否匹配
 func CheckAuthor(username, password string) bool {
 	var author Author
-	global.DBEngine.Select("id").
+	err := global.DBEngine.Select("id").
 		Where(Author{Username: username, Password: password}).
-		First(&author)
+		First(&author).Error
+	if err != nil {
+		return false
+	}
 	if author.ID > 0 {
 		return true
 	}

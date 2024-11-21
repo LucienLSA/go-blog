@@ -2,6 +2,7 @@ package models
 
 import (
 	"blog-service/global"
+	"blog-service/pkg/logging"
 )
 
 func migrate() {
@@ -12,6 +13,7 @@ func migrate() {
 			&Author{},
 		)
 	if err != nil {
+		logging.LogrusObj.Panicln(err)
 		panic(err)
 	}
 }
