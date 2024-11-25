@@ -1,10 +1,17 @@
 package routers
 
 import (
+	"blog-service/api"
 	v1 "blog-service/api/v1"
 	"blog-service/middleware"
+	"blog-service/pkg/upload"
+	"net/http"
+
+	_ "blog-service/docs"
 
 	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 func NewRouter() *gin.Engine {
@@ -17,13 +24,17 @@ func NewRouter() *gin.Engine {
 			"message": "pong",
 		})
 	})
+	r.GET("swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.POST("/upload", api.UploadImage)
+	r.StaticFS("/upload/images", http.Dir(upload.GetImageFullPath()))
 	article := v1.NewArticle()
 	tag := v1.NewTag()
-	author := v1.NewAuthor()
+	author := api.NewAuthor()
 	// 先只通过手动在数据库创建
 	// r.POST("/author/register", author.RegisterAuthor) // 注册用户
 	r.GET("/author/login", author.LoginAuthor) // 登录用户
 	apiv1 := r.Group("/api/v1")
+	// fmt.Println("JWT sercret:", global.AppSetting.JwtSecret)
 	apiv1.Use(middleware.JWT()) // JWT中间件
 	{
 		apiv1.POST("/tags", tag.CreateTags)       // 新增标签

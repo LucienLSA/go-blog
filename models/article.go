@@ -2,7 +2,6 @@ package models
 
 import (
 	"blog-service/global"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -29,12 +28,13 @@ func (a Article) TableName() string {
 // 新增文章
 func AddArticle(data map[string]interface{}) bool {
 	err := global.DBEngine.Create(&Article{
-		TagID:     data["tag_id"].(int), // 断言
-		Title:     data["title"].(string),
-		Desc:      data["desc"].(string),
-		Content:   data["content"].(string),
-		CreatedBy: data["created_by"].(string),
-		State:     data["state"].(int),
+		TagID:           data["tag_id"].(int), // 断言
+		Title:           data["title"].(string),
+		Desc:            data["desc"].(string),
+		Content:         data["content"].(string),
+		CreatedBy:       data["created_by"].(string),
+		State:           data["state"].(int),
+		Cover_image_url: data["cover_image_url"].(string),
 	}).Error
 	if err != nil {
 		return false
@@ -43,16 +43,16 @@ func AddArticle(data map[string]interface{}) bool {
 }
 
 // 由ID判断文章是否存在
-func ExistArticleByID(id int) bool {
+func ExistArticleByID(id int) (bool, error) {
 	var article Article
 	err := global.DBEngine.Select("id").Where("id =?", id).First(&article).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
-		return false
+		return false, err
 	}
 	if article.ID > 0 {
-		return true
+		return true, nil
 	}
-	return false
+	return false, err
 }
 
 // 获取文章总数
@@ -88,31 +88,40 @@ func GetArticle(id int) (article *Article, err error) {
 }
 
 // 更新文章
-func UpdateArticle(id int, data interface{}) bool {
+func UpdateArticle(id int, data interface{}) (bool, error) {
 	err := global.DBEngine.Model(&Article{}).Where("id =?", id).Updates(data).Error
 	if err != nil {
-		return false
+		return false, err
 	}
-	return true
+	return true, err
 }
 
-// 删除文章
-func DeleteArticle(id int) bool {
+// 删除文章 (软删除)
+func DeleteArticle(id int) (bool, error) {
 	err := global.DBEngine.Where("id =?", id).Delete(&Article{}).Error
 	if err != nil {
-		return false
+		return false, err
 	}
-	return true
+	return true, nil
 }
 
-func (article *Article) BeforeCreateA(tx *gorm.DB) error {
-	now := time.Now()
-	article.CreatedOn = &now
-	return nil
+// 硬删除
+func CleanAllArticle() (bool, error) {
+	err := global.DBEngine.Unscoped().Delete(&Article{}).Error
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
-func (article *Article) BeforeUpdateA(tx *gorm.DB) error {
-	now := time.Now()
-	article.ModifiedOn = &now
-	return nil
-}
+// func (article *Article) BeforeCreateA(tx *gorm.DB) error {
+// 	now := time.Now()
+// 	article.CreatedOn = &now
+// 	return nil
+// }
+
+// func (article *Article) BeforeUpdateA(tx *gorm.DB) error {
+// 	now := time.Now()
+// 	article.ModifiedOn = &now
+// 	return nil
+// }

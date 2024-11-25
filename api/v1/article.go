@@ -3,9 +3,11 @@ package v1
 import (
 	"blog-service/global"
 	"blog-service/models"
+	"blog-service/pkg/app"
 	"blog-service/pkg/e"
 	"blog-service/pkg/logging"
 	"blog-service/pkg/util"
+	"blog-service/service/article_service"
 	"net/http"
 	"strconv"
 
@@ -13,14 +15,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Article struct{}
+type Article struct {
+}
 
 func NewArticle() *Article {
 	return &Article{}
 }
 
-// 获取单个文章
-func (a *Article) GetArticle(c *gin.Context) {
+// @Summary 获取单篇文章详情
+// @Produce  json
+// @Param id path int true "ID"
+// @Success 200 {string} json "{"code":e.SUCCESS,"data":{},"msg":"ok"}"
+// @Failure 500 {string} json "{"code":e.ERROR,"data":{},"msg":"获取错误"}"
+// @Router /api/v1/articles/{id} [get]
+func GetArticle(c *gin.Context) {
+	appG := app.Gin{C: c}
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		logging.LogrusObj.Infoln(err)
@@ -28,88 +37,164 @@ func (a *Article) GetArticle(c *gin.Context) {
 	valid := validation.Validation{}
 	valid.Min(id, 1, "id").Message("id必须大于0")
 
-	code := e.INVALID_PARAMS
-	var data interface{}
-	if !valid.HasErrors() {
-		if models.ExistArticleByID(id) {
-			data, err = models.GetArticle(id)
-			if err != nil {
-				logging.LogrusObj.Infoln(err)
-			}
-			code = e.SUCCESS
-		} else {
-			code = e.ERROR_NOT_EXIST_ARTICLE
-			logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
-		}
-	} else {
-		for _, err := range valid.Errors {
-			logging.LogrusObj.Infoln(err)
-			// log.Fatalf("err.key: %s, err.message: %s", err.Key, err.Message)
-		}
+	if valid.HasErrors() {
+		app.MarkErrors(valid.Errors)
+		appG.Response(http.StatusOK, e.INVALID_PARAMS, nil)
+		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-		"data": data,
-		"msg":  e.GetMsg(code),
-	})
+	articleService := article_service.Article{ID: id}
+	exists, err := articleService.ExistByID()
+	if err != nil {
+		appG.Response(http.StatusOK, e.ERROR_CHECK_EXIST_ARTICLE_FAIL, nil)
+		return
+	}
+	if !exists {
+		appG.Response(http.StatusOK, e.ERROR_NOT_EXIST_ARTICLE, nil)
+		return
+	}
+	article, err := articleService.Get()
+	if err != nil {
+		appG.Response(http.StatusOK, e.ERROR_GET_ARTICLE_FAIL, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.SUCCESS, article)
 
+	// code := e.INVALID_PARAMS
+	// var data interface{}
+	// if !valid.HasErrors() {
+	// 	if models.ExistArticleByID(id) {
+	// 		data, err = models.GetArticle(id)
+	// 		if err != nil {
+	// 			logging.LogrusObj.Infoln(err)
+	// 		}
+	// 		code = e.SUCCESS
+	// 	} else {
+	// 		code = e.ERROR_NOT_EXIST_ARTICLE
+	// 		logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
+	// 	}
+	// } else {
+	// 	for _, err := range valid.Errors {
+	// 		logging.LogrusObj.Infoln(err)
+	// 		// log.Fatalf("err.key: %s, err.message: %s", err.Key, err.Message)
+	// 	}
+	// }
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"code": code,
+	// 	"data": data,
+	// 	"msg":  e.GetMsg(code),
+	// })
 }
 
-// 获取多个文章
-func (a *Article) ListArticles(c *gin.Context) {
-	data := make(map[string]interface{})
-	maps := make(map[string]interface{})
+// @Summary 获取所有文章列表
+// @Produce  json
+// @Param tag_id query int false "TagID"
+// @Param state query string false "State"
+// @Param created_by query string false "CreatedBy"
+// @Success 200 {string} json "{"code":e.SUCCESS,"data":{},"msg":"ok"}"
+// @Failure 500 {string} json "{"code":e.ERROR,"data":{},"msg":"获取错误"}"
+// @Router /api/v1/articles [get]
+func ListArticles(c *gin.Context) {
+	appG := app.Gin{C: c}
+	// data := make(map[string]interface{})
+	// maps := make(map[string]interface{})
 	valid := validation.Validation{}
 
-	// var state int = -1
-	if arg := c.Query("state"); arg != "" {
+	var state int = -1
+	if arg := c.PostForm("state"); arg != "" {
 		state, err := strconv.Atoi(arg)
 		if err != nil {
 			logging.LogrusObj.Infoln(err)
 		}
-		maps["state"] = state
 		valid.Range(state, 0, 1, "state").Message("state只能为0或1")
 	}
-
-	// var tagID int = -1
-	if arg := c.Query("tag_id"); arg != "" {
+	var tagID int = -1
+	if arg := c.PostForm("tag_id"); arg != "" {
 		tagId, err := strconv.Atoi(arg)
 		if err != nil {
 			logging.LogrusObj.Infoln(err)
 		}
-		maps["tag_id"] = tagId
 		valid.Min(tagId, 1, "tag_id").Message("tag_id必须大于0")
 	}
-
-	code := e.INVALID_PARAMS
-	if !valid.HasErrors() {
-		code = e.SUCCESS
-		datas, err := models.GetArticles(util.GetPage(c), global.AppSetting.DefaultPageSize, maps)
-		if err != nil {
-			logging.LogrusObj.Infoln(err) // 补充错误处理
-		}
-		data["articles"] = datas
-		totals, err := models.GetArticleTotal(maps)
-		if err != nil {
-			logging.LogrusObj.Infoln(err) // 补充错误处理
-		}
-		data["total"] = totals
-	} else {
-		for _, err := range valid.Errors {
-			logging.LogrusObj.Infoln(err)
-			// log.Fatalf("err.key: %s, err.message: %s", err.Key, err.Message)
-		}
+	if valid.HasErrors() {
+		app.MarkErrors(valid.Errors)
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, nil)
+		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-		"data": data,
-		"msg":  e.GetMsg(code),
-	})
+
+	articleService := article_service.Article{
+		TagID:    tagID,
+		State:    state,
+		PageNum:  util.GetPage(c),
+		PageSize: global.AppSetting.DefaultPageSize,
+	}
+
+	totol, err := articleService.Count()
+	if err != nil {
+		appG.Response(http.StatusBadRequest, e.ERROR_COUNT_ARTICLE_FAIL, nil)
+		return
+	}
+
+	articles, err := articleService.GetAll()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_ARTICLE_FAIL, nil)
+	}
+
+	data := make(map[string]interface{})
+	data["articles"] = articles
+	data["total"] = totol
+	appG.Response(http.StatusOK, e.SUCCESS, data)
+
+	// code := e.INVALID_PARAMS
+	// if !valid.HasErrors() {
+	// 	code = e.SUCCESS
+	// 	datas, err := models.GetArticles(util.GetPage(c), 10, maps)
+	// 	if err != nil {
+	// 		logging.LogrusObj.Infoln(err) // 补充错误处理
+	// 	}
+	// 	data["articles"] = datas
+	// 	totals, err := models.GetArticleTotal(maps)
+	// 	if err != nil {
+	// 		logging.LogrusObj.Infoln(err) // 补充错误处理
+	// 	}
+	// 	data["total"] = totals
+	// } else {
+	// 	for _, err := range valid.Errors {
+	// 		logging.LogrusObj.Infoln(err)
+	// 		// log.Fatalf("err.key: %s, err.message: %s", err.Key, err.Message)
+	// 	}
+	// }
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"code": code,
+	// 	"data": data,
+	// 	"msg":  e.GetMsg(code),
+	// })
 
 }
 
-// 新增文章
+type AddArticleForm struct {
+	TagID         int    `form:"tag_id" valid:"Required;Min(1)"`
+	Title         string `form:"title" valid:"Required;MaxSize(100)"`
+	Desc          string `form:"desc" valid:"Required;MaxSize(255)"`
+	Content       string `form:"content" valid:"Required;MaxSize(65535)"`
+	CreatedBy     string `form:"created_by" valid:"Required;MaxSize(100)"`
+	CoverImageUrl string `form:"cover_image_url" valid:"Required;MaxSize(255)"`
+	State         int    `form:"state" valid:"Range(0,1)"`
+}
+
+// @Summary 新增文章
+// @Produce  json
+// @Param tag_id query int true "TagID"
+// @Param title query string true "Title"
+// @Param desc query string true "Desc"
+// @Param content query string true "Content"
+// @Param created_by query string true "CreatedBy"
+// @Param state query int true "State"
+// @Param cover_image_url query string true "Cover_image_url"
+// @Success 200 {string} json "{"code":e.SUCCESS,"data":{},"msg":"ok"}"
+// @Failure 500 {string} json "{"code":e.ERROR,"data":{},"msg":"新增错误"}"
+// @Router /api/v1/articles [post]
 func (a *Article) CreateArticles(c *gin.Context) {
+
 	tagID, err := strconv.Atoi(c.Query("tag_id"))
 	if err != nil {
 		logging.LogrusObj.Infoln(err) // 补充错误处理
@@ -119,6 +204,7 @@ func (a *Article) CreateArticles(c *gin.Context) {
 	content := c.Query("content")
 	createdBy := c.Query("created_by")
 	state, err := strconv.Atoi(c.DefaultQuery("state", "0"))
+	coverImageUrl := c.Query("cover_image_url")
 	if err != nil {
 		logging.LogrusObj.Infoln(err) // 补充错误处理
 	}
@@ -128,18 +214,21 @@ func (a *Article) CreateArticles(c *gin.Context) {
 	valid.Required(desc, "desc").Message("描述不能为空")
 	valid.Required(content, "content").Message("内容不能为空")
 	valid.Required(createdBy, "created_by").Message("创建者不能为空")
+	valid.Required(coverImageUrl, "cover_image_url").Message("封面图片不能为空")
+	// valid.MaxSize(coverImageUrl, 255, "cover_image_url").Message("封面图片长度不能超过255字符")
 	valid.Range(state, 0, 1, "state").Message("状态只能为0或1")
 
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
 		if models.ExistTagByID(tagID) {
 			data := map[string]interface{}{
-				"tag_id":     tagID,
-				"title":      title,
-				"desc":       desc,
-				"content":    content,
-				"created_by": createdBy,
-				"state":      state,
+				"tag_id":          tagID,
+				"title":           title,
+				"desc":            desc,
+				"content":         content,
+				"created_by":      createdBy,
+				"state":           state,
+				"cover_image_url": coverImageUrl,
 			}
 			if models.AddArticle(data) {
 				code = e.SUCCESS
@@ -165,7 +254,19 @@ func (a *Article) CreateArticles(c *gin.Context) {
 	})
 }
 
-// 更新文章
+// @Summary 更新文章
+// @Produce  json
+// @Param id path int true "ID"
+// @Param tag_id body string false "TagID"
+// @Param title body string false "Title"
+// @Param desc body string false "Desc"
+// @Param content body string false "Content"
+// @Param modified_by body string true "ModifiedBy"
+// @Param state body int false "State"
+// @Param cover_image_url query string true "Cover_image_url"
+// @Success 200 {string} json "{"code":e.SUCCESS,"data":{},"msg":"ok"}"
+// @Failure 500 {string} json "{"code":e.ERROR,"data":{},"msg":"更新错误"}"package v1
+// @Router /api/v1/articles/{id} [put]
 func (a *Article) UpdateArticles(c *gin.Context) {
 	valid := validation.Validation{}
 
@@ -178,7 +279,10 @@ func (a *Article) UpdateArticles(c *gin.Context) {
 	desc := c.Query("desc")
 	content := c.Query("content")
 	modifiedBy := c.Query("modified_by")
-
+	coverImageUrl := c.Query("cover_image_url")
+	if err != nil {
+		logging.LogrusObj.Infoln(err)
+	}
 	// var state int = -1
 	if arg := c.Query("state"); arg != "" {
 		state, err := strconv.Atoi(arg)
@@ -189,8 +293,10 @@ func (a *Article) UpdateArticles(c *gin.Context) {
 	}
 	valid.Min(id, 1, "id").Message("id必须大于0")
 	valid.MaxSize(title, 100, "title").Message("标题长度不能超过100字符")
-	valid.MaxSize(desc, 255, "desc").Message("描述长度不能超过200字符")
+	valid.MaxSize(desc, 255, "desc").Message("描述长度不能超过255字符")
 	valid.MaxSize(content, 65535, "content").Message("内容长度不能超过65535字符")
+	// valid.MaxSize(coverImageUrl, 255, "cover_image_url").Message("封面图片长度不能超过255字符")
+	valid.Required(coverImageUrl, "cover_image_url").Message("封面图片不能为空")
 	valid.Required(modifiedBy, "modified_by").Message("修改者不能为空")
 	valid.MaxSize(modifiedBy, 100, "modified_by").Message("修改者长度不能超过100字符")
 
@@ -211,6 +317,7 @@ func (a *Article) UpdateArticles(c *gin.Context) {
 				if content != "" {
 					data["content"] = content
 				}
+
 				data["modified_by"] = modifiedBy
 				models.UpdateArticle(id, data)
 				code = e.SUCCESS
@@ -232,7 +339,12 @@ func (a *Article) UpdateArticles(c *gin.Context) {
 	})
 }
 
-// 删除文章
+// @Summary 删除文章
+// @Produce  json
+// @Param id path int true "ID"
+// @Success 200 {string} json "{"code":e.SUCCESS,"data":{},"msg":"ok"}"
+// @Failure 500 {string} json "{"code":e.ERROR,"data":{},"msg":"删除错误"}"package v1
+// @Router /api/v1/articles/{id} [delete]
 func (a *Article) DeleteArticles(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

@@ -1,0 +1,40 @@
+server:
+  runMode: debug
+  httpPort: 8000
+  readTimeout: 60
+  writeTimeout: 60
+
+app:
+  runtimeRootPath: runtime/
+  defaultPageSize: 10
+  maxPageSize: 100
+  imgSavePath: upload/images/
+  imagePrefixUrl: http://127.0.0.1:8000
+  imageMaxSize: 5
+  imageAllowExts: .jpg .png .jpeg .gif
+  logSavePath: logs/
+  logFileName: app
+  logFileExt: .log
+  jwtSecret: Lucien-go-blog-secret-jwt
+
+mysql: 
+    dBType: mysql
+    userName: root
+    password: 123456
+    host: 127.0.0.1
+    port: 3306
+    dBName: blog_service
+    tablePrefix: blog_
+    charset: utf8mb4
+    maxIdleConns: 10
+    maxOpenConns: 100
+
+redis:
+    host: 127.0.0.1
+    port: 6379
+    password: ""
+    dBName: 4
+    maxIdle: 10
+    maxActive: 100
+    idleTimeout: 180
+

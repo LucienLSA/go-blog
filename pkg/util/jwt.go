@@ -6,7 +6,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-var jwtSecret = []byte("Lucien-go-blog-JWT")
+// var jwtSecret = []byte(global.AppSetting.JwtSecret) // ? 为什么读不到
+
+var jwtSecret = []byte("Lucien-go-blog-secret-jwt")
 
 type Claims struct {
 	Username string `json:"username"`

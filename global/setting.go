@@ -1,10 +1,11 @@
 package global
 
-import "blog-service/pkg/setting"
+import "blog-service/conf"
 
 // 定义全局变量 配置信息
 var (
-	ServerSetting   *setting.ServerSettingS
-	AppSetting      *setting.AppSettingS
-	DatabaseSetting *setting.DatabaseSettingS
+	ServerSetting *conf.ServerSettingS
+	AppSetting    *conf.AppSettingS
+	MysqlSetting  *conf.MysqlSettingS
+	RedisSetting  *conf.RedisSettingS
 )

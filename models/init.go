@@ -1,9 +1,10 @@
 package models
 
 import (
+	"blog-service/conf"
 	"blog-service/global"
-	"blog-service/pkg/setting"
 	"fmt"
+	"strings"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -11,17 +12,19 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-func DBEngine(databaseSetting *setting.DatabaseSettingS) (*gorm.DB, error) {
-	conn := "%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=%t"
-	dsn := fmt.Sprintf(conn,
-		databaseSetting.UserName,
-		databaseSetting.Password,
-		databaseSetting.Host,
-		databaseSetting.Port,
-		databaseSetting.DBName,
-		databaseSetting.Charset,
-		databaseSetting.ParseTime,
-	)
+func InitMySQLEngine(mysqlSetting *conf.MysqlSettingS) (*gorm.DB, error) {
+	// conn := "%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true"
+	// dsn := fmt.Sprintf(conn,
+	// 	databaseSetting.UserName,
+	// 	databaseSetting.Password,
+	// 	databaseSetting.Host,
+	// 	databaseSetting.Port,
+	// 	databaseSetting.DBName,
+	// 	databaseSetting.Charset,
+	// )
+
+	dsn := strings.Join([]string{mysqlSetting.UserName, ":", mysqlSetting.Password, "@tcp(", mysqlSetting.Host, ":", mysqlSetting.Port,
+		")/", mysqlSetting.DBName, "?charset=", mysqlSetting.Charset, "&parseTime=true"}, "")
 	fmt.Println(dsn)
 	var ormLogger logger.Interface
 	if global.ServerSetting.RunMode == "debug" {
@@ -41,17 +44,12 @@ func DBEngine(databaseSetting *setting.DatabaseSettingS) (*gorm.DB, error) {
 		},
 	})
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	sqlDB, _ := db.DB()
-	sqlDB.SetMaxIdleConns(databaseSetting.MaxIdleConns)
-	sqlDB.SetMaxOpenConns(databaseSetting.MaxOpenConns)
+	sqlDB.SetMaxIdleConns(mysqlSetting.MaxIdleConns)
+	sqlDB.SetMaxOpenConns(mysqlSetting.MaxOpenConns)
 	global.DBEngine = db
 	migrate()
 	return db, nil
 }
-
-// func NewDBEngine(ctx context.Context) *gorm.DB {
-// 	db := global.DBEngine
-// 	return db.WithContext(ctx)
-// }

@@ -2,7 +2,6 @@ package models
 
 import (
 	"blog-service/global"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -85,7 +84,7 @@ func UpdateTags(id int, data interface{}) bool {
 	return true
 }
 
-// 删除标签
+// 删除标签 (软删除)
 func DeleteTags(id int) bool {
 	err := global.DBEngine.Model(&Tag{}).Where("id =?", id).Delete(&Tag{})
 	if err.Error != nil {
@@ -94,17 +93,26 @@ func DeleteTags(id int) bool {
 	return true
 }
 
-func (tag *Tag) BeforeCreateT(tx *gorm.DB) error {
-	now := time.Now()
-	tag.CreatedOn = &now
-	return nil
+// 删除标签（硬删除）
+func CleanAllTags() bool {
+	err := global.DBEngine.Unscoped().Delete(&Tag{}).Error
+	if err != nil {
+		return false
+	}
+	return true
 }
 
-func (tag *Tag) BeforeUpdateT(tx *gorm.DB) error {
-	now := time.Now()
-	tag.ModifiedOn = &now
-	return nil
-}
+// func (tag *Tag) BeforeCreateT(tx *gorm.DB) error {
+// 	now := time.Now()
+// 	tag.CreatedOn = &now
+// 	return nil
+// }
+
+// func (tag *Tag) BeforeUpdateT(tx *gorm.DB) error {
+// 	now := time.Now()
+// 	tag.ModifiedOn = &now
+// 	return nil
+// }
 
 // func (tag *Tag) BeforeCreate(scope *gorm.Scope) error {
 //     scope.SetColumn("CreatedOn", time.Now().Unix())

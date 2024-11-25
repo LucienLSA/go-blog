@@ -19,7 +19,13 @@ func NewTag() *Tag {
 	return &Tag{}
 }
 
-// 获取标签列表的具体逻辑
+// @Summary获取所有标签列表
+// @Produce  json
+// @Param name query string true "Name"
+// @Param state query int false "State"
+// @Success 200 {string} json "{"code":e.SUCCESS,"data":{},"msg":"ok"}"
+// @Failure 500 {string} json "{"code":e.ERROR,"data":{},"msg":"获取错误"}"
+// @Router /api/v1/tags [get]
 func (t *Tag) GetTags(c *gin.Context) {
 	name := c.Query("name")
 	maps := make(map[string]interface{})
@@ -59,7 +65,14 @@ func (t *Tag) GetTags(c *gin.Context) {
 	})
 }
 
-// 新增文章标签
+// @Summary 新增文章标签
+// @Produce  json
+// @Param name query string true "Name"
+// @Param state query int false "State"
+// @Param created_by query string false "CreatedBy"
+// @Success 200 {string} json "{"code":e.SUCCESS,"data":{},"msg":"ok"}"
+// @Failure 500 {string} json "{"code":e.ERROR,"data":{},"msg":"新增错误"}"
+// @Router /api/v1/tags [post]
 func (t *Tag) CreateTags(c *gin.Context) {
 	name := c.Query("name")
 	state, err := strconv.Atoi(c.DefaultQuery("state", "0"))
@@ -102,7 +115,15 @@ func (t *Tag) CreateTags(c *gin.Context) {
 
 }
 
-// 更新标签
+// @Summary 更新文章标签
+// @Produce  json
+// @Param id path int true "ID"
+// @Param name query string true "Name"
+// @Param state query int false "State"
+// @Param modified_by query string true "ModifiedBy"
+// @Success 200 {string} json "{"code":e,SUCCESS,"data":{},"msg":"ok"}"
+// @Failure 500 {string} json "{"code":e.ERROR,"data":{},"msg":"更新错误"}"
+// @Router /api/v1/tags/{id} [put]
 func (t *Tag) UpdateTags(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -156,7 +177,12 @@ func (t *Tag) UpdateTags(c *gin.Context) {
 	})
 }
 
-// 删除标签
+// @Summary 删除标签
+// @Produce  json
+// @Param id path int true "ID"
+// @Success 200 {string} json "{"code":e.SUCCESS,"data":{},"msg":"ok"}"
+// @Failure 500 {string} json "{"code":e.ERROR,"data":{},"msg":"删除错误"}"
+// @Router /api/v1/tags/{id} [delete]
 func (t *Tag) DeleteTags(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
