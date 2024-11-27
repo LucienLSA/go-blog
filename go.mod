@@ -13,6 +13,7 @@ require (
 	github.com/spf13/viper v1.19.0
 	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.16.4
+	github.com/tealeg/xlsx v1.0.5
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.12
 )

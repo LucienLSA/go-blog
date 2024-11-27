@@ -5,6 +5,7 @@ import (
 	"blog-service/global"
 	"blog-service/models"
 	"blog-service/pkg/file"
+	"blog-service/pkg/gredis"
 	"blog-service/pkg/logging"
 	"blog-service/routers"
 	"context"
@@ -77,6 +78,11 @@ func loading() {
 	err = setupMySQL()
 	if err != nil {
 		log.Fatalf("init.setupDBEngine err: %v", err)
+	}
+	// 初始化redis
+	err = gredis.RedisInit()
+	if err != nil {
+		log.Fatalf("init.setupRedis err: %v", err)
 	}
 }
 

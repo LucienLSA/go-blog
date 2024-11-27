@@ -21,8 +21,13 @@ func (t Tag) TableName() string {
 
 // 获取标签
 func GetTags(pageNum int, pageSize int, maps interface{}) (tags []Tag, err error) {
-	err = global.DBEngine.Where(maps).Offset(pageNum).Limit(pageSize).Find(&tags).Error
-	if err != nil {
+	if pageSize > 0 && pageNum > 0 {
+		err = global.DBEngine.Where(maps).Offset(pageNum).Limit(pageSize).Error
+	} else {
+		err = global.DBEngine.Where(maps).Find(&tags).Error
+	}
+
+	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, err
 	}
 	return tags, nil
@@ -38,16 +43,16 @@ func GetTagTotal(maps interface{}) (count int64, err error) {
 }
 
 // 判断标签名重复
-func ExitTagByName(name string) bool {
+func ExistTagByName(name string) (bool, error) {
 	var tag Tag
 	err := global.DBEngine.Select("id").Where("name =?", name).First(&tag).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
-		return false
+		return false, err
 	}
 	if tag.ID > 0 {
-		return true
+		return true, nil
 	}
-	return false
+	return false, nil
 }
 
 // 新增标签
@@ -61,36 +66,37 @@ func CreateTags(name string, state int, createdBy string) error {
 }
 
 // 根据ID判断是否存在标签
-func ExistTagByID(id int) bool {
+func ExistTagByID(id int) (bool, error) {
 	var tag Tag
+	// err := global.DBEngine.Select("id").Where("id =?", id).First(&tag).Error
 	err := global.DBEngine.Select("id").Where("id =?", id).First(&tag).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		// logging.LogrusObj.Infoln(err)
-		return false
+		return false, err
 	}
 	if tag.ID > 0 {
-		return true
+		return true, nil
 	}
-	return false
+	return false, err
 }
 
 // 更新标签
-func UpdateTags(id int, data interface{}) bool {
+func UpdateTags(id int, data interface{}) error {
 	err := global.DBEngine.Model(&Tag{}).Where("id =?", id).Updates(data).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		// logging.LogrusObj.Infoln(err)
-		return false
+		return err
 	}
-	return true
+	return nil
 }
 
 // 删除标签 (软删除)
-func DeleteTags(id int) bool {
-	err := global.DBEngine.Model(&Tag{}).Where("id =?", id).Delete(&Tag{})
-	if err.Error != nil {
-		return false
+func DeleteTags(id int) error {
+	err := global.DBEngine.Model(&Tag{}).Where("id =?", id).Delete(&Tag{}).Error
+	if err != nil {
+		return err
 	}
-	return true
+	return nil
 }
 
 // 删除标签（硬删除）

@@ -26,8 +26,11 @@ type AppSettingS struct {
 	ImgSavePath    string   `yaml:"imgSavePath"`
 	ImageMaxSize   int      `yaml:"imageMaxSize"`   // 图片最大大小（单位：MB）
 	ImageAllowExts []string `yaml:"imageAllowExts"` // 允许的图片扩展名
-	ImagePrefixUrl string   `yaml:"imagePrefixUrl"` // 图片URL前缀
-	JwtSecret      string   `yaml:"jwtSecret"`      // JWT 密钥
+
+	JwtSecret string `yaml:"jwtSecret"` // JWT 密钥
+
+	PrefixUrl      string `yaml:"prefixUrl"`      // URL前缀
+	ExportSavePath string `yaml:"exportSavePath"` // 导出文件保存路径
 }
 
 type MysqlSettingS struct {
@@ -44,13 +47,14 @@ type MysqlSettingS struct {
 }
 
 type RedisSettingS struct {
-	DBName      int    `yaml:"dBName"`      // Redis 数据库编号
-	Host        string `yaml:"host"`        // Redis 主机地址
-	Port        string `yaml:"port"`        // Redis 端口
-	Password    string `yaml:"password"`    // Redis 密码
-	MaxIdle     int    `yaml:"maxIdle"`     // 最大空闲连接数
-	MaxActive   int    `yaml:"maxActive"`   // 最大连接数
-	IdleTimeout int    `yaml:"idleTimeout"` // 空闲连接超时时间（秒）
+	DBName      int           `yaml:"dBName"`      // Redis 数据库编号
+	Host        string        `yaml:"host"`        // Redis 主机地址
+	Port        string        `yaml:"port"`        // Redis 端口
+	Password    string        `yaml:"password"`    // Redis 密码
+	MaxIdle     int           `yaml:"maxIdle"`     // 最大空闲连接数
+	MinIdle     int           `yaml:"minIdle"`     // 最小空闲连接数
+	MaxActive   int           `yaml:"maxActive"`   // 最大连接数
+	IdleTimeout time.Duration `yaml:"idleTimeout"` // 空闲连接超时时间（秒）
 }
 
 // type ServerSettingS struct {

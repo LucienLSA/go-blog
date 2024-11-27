@@ -54,5 +54,3 @@ func (model *Model) BeforeUpdate(tx *gorm.DB) (err error) {
 	}
 	return nil
 }
-
-// 软删除

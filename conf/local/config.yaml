@@ -9,13 +9,14 @@ app:
   defaultPageSize: 10
   maxPageSize: 100
   imgSavePath: upload/images/
-  imagePrefixUrl: http://127.0.0.1:8000
+  prefixUrl: http://127.0.0.1:8000
   imageMaxSize: 5
   imageAllowExts: .jpg .png .jpeg .gif
   logSavePath: logs/
   logFileName: app
   logFileExt: .log
   jwtSecret: Lucien-go-blog-secret-jwt
+  exportSavePath: export/
 
 mysql: 
     dBType: mysql
@@ -34,6 +35,7 @@ redis:
     port: 6379
     password: ""
     dBName: 4
+    minIdle: 1
     maxIdle: 10
     maxActive: 100
     idleTimeout: 180

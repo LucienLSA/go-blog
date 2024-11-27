@@ -6,6 +6,7 @@ var MsgFlags = map[int]string{
 	INVALID_PARAMS:                 "请求参数错误",
 	ERROR_EXIST_TAG:                "已存在该标签名称",
 	ERROR_NOT_EXIST_TAG:            "该标签不存在",
+	ERROR_EXPORT_TAG_FAIL:          "导出标签失败",
 	ERROR_NOT_EXIST_ARTICLE:        "该文章不存在",
 	ERROR_CHECK_EXIST_ARTICLE_FAIL: "检查文章是否存在失败",
 	ERROR_GET_ARTICLE_FAIL:         "获取文章失败",

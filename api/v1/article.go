@@ -2,12 +2,12 @@ package v1
 
 import (
 	"blog-service/global"
-	"blog-service/models"
 	"blog-service/pkg/app"
 	"blog-service/pkg/e"
 	"blog-service/pkg/logging"
 	"blog-service/pkg/util"
 	"blog-service/service/article_service"
+	"blog-service/service/tag_service"
 	"net/http"
 	"strconv"
 
@@ -15,12 +15,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Article struct {
-}
+// type Article struct {
+// }
 
-func NewArticle() *Article {
-	return &Article{}
-}
+// func NewArticle() *Article {
+// 	return &Article{}
+// }
 
 // @Summary 获取单篇文章详情
 // @Produce  json
@@ -193,65 +193,112 @@ type AddArticleForm struct {
 // @Success 200 {string} json "{"code":e.SUCCESS,"data":{},"msg":"ok"}"
 // @Failure 500 {string} json "{"code":e.ERROR,"data":{},"msg":"新增错误"}"
 // @Router /api/v1/articles [post]
-func (a *Article) CreateArticles(c *gin.Context) {
+func CreateArticles(c *gin.Context) {
+	var (
+		appG = app.Gin{C: c}
+		form AddArticleForm
+	)
+	httpCode, errCode := app.BindAndValid(c, &form)
 
-	tagID, err := strconv.Atoi(c.Query("tag_id"))
+	if errCode != e.SUCCESS {
+		appG.Response(httpCode, errCode, nil)
+		return
+	}
+
+	tagService := tag_service.Tag{ID: form.TagID}
+	exists, err := tagService.ExistByID()
 	if err != nil {
-		logging.LogrusObj.Infoln(err) // 补充错误处理
+		appG.Response(http.StatusOK, e.ERROR_EXIST_TAG_FAIL, nil)
+		return
 	}
-	title := c.Query("title")
-	desc := c.Query("desc")
-	content := c.Query("content")
-	createdBy := c.Query("created_by")
-	state, err := strconv.Atoi(c.DefaultQuery("state", "0"))
-	coverImageUrl := c.Query("cover_image_url")
-	if err != nil {
-		logging.LogrusObj.Infoln(err) // 补充错误处理
+	if !exists {
+		appG.Response(http.StatusOK, e.ERROR_NOT_EXIST_TAG, nil)
+		return
 	}
-	valid := validation.Validation{}
-	valid.Min(tagID, 1, "tag_id").Message("标签ID必须大于0")
-	valid.Required(title, "title").Message("标题不能为空")
-	valid.Required(desc, "desc").Message("描述不能为空")
-	valid.Required(content, "content").Message("内容不能为空")
-	valid.Required(createdBy, "created_by").Message("创建者不能为空")
-	valid.Required(coverImageUrl, "cover_image_url").Message("封面图片不能为空")
-	// valid.MaxSize(coverImageUrl, 255, "cover_image_url").Message("封面图片长度不能超过255字符")
-	valid.Range(state, 0, 1, "state").Message("状态只能为0或1")
 
-	code := e.INVALID_PARAMS
-	if !valid.HasErrors() {
-		if models.ExistTagByID(tagID) {
-			data := map[string]interface{}{
-				"tag_id":          tagID,
-				"title":           title,
-				"desc":            desc,
-				"content":         content,
-				"created_by":      createdBy,
-				"state":           state,
-				"cover_image_url": coverImageUrl,
-			}
-			if models.AddArticle(data) {
-				code = e.SUCCESS
-			} else {
-				code = e.ERROR_ADD_ARTICLE_FAIL
-				logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
-			}
-
-		} else {
-			code = e.ERROR_NOT_EXIST_TAG
-			logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
-		}
-	} else {
-		for _, err := range valid.Errors {
-			logging.LogrusObj.Infoln(err)
-			// log.Panicln("err.key: %s, err.message: %s", err.Key, err.Message)
-		}
+	articleService := article_service.Article{
+		TagID:         form.TagID,
+		Title:         form.Title,
+		Desc:          form.Desc,
+		Content:       form.Content,
+		CreatedBy:     form.CreatedBy,
+		CoverImageUrl: form.CoverImageUrl,
+		State:         form.State,
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-		"msg":  e.GetMsg(code),
-		"data": make(map[string]interface{}),
-	})
+	if err := articleService.Create(); err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_ADD_ARTICLE_FAIL, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.SUCCESS, nil)
+
+	// tagID, err := strconv.Atoi(c.Query("tag_id"))
+	// if err != nil {
+	// 	logging.LogrusObj.Infoln(err) // 补充错误处理
+	// }
+	// title := c.Query("title")
+	// desc := c.Query("desc")
+	// content := c.Query("content")
+	// createdBy := c.Query("created_by")
+	// state, err := strconv.Atoi(c.DefaultQuery("state", "0"))
+	// coverImageUrl := c.Query("cover_image_url")
+	// if err != nil {
+	// 	logging.LogrusObj.Infoln(err) // 补充错误处理
+	// }
+	// valid := validation.Validation{}
+	// valid.Min(tagID, 1, "tag_id").Message("标签ID必须大于0")
+	// valid.Required(title, "title").Message("标题不能为空")
+	// valid.Required(desc, "desc").Message("描述不能为空")
+	// valid.Required(content, "content").Message("内容不能为空")
+	// valid.Required(createdBy, "created_by").Message("创建者不能为空")
+	// valid.Required(coverImageUrl, "cover_image_url").Message("封面图片不能为空")
+	// // valid.MaxSize(coverImageUrl, 255, "cover_image_url").Message("封面图片长度不能超过255字符")
+	// valid.Range(state, 0, 1, "state").Message("状态只能为0或1")
+
+	// code := e.INVALID_PARAMS
+	// if !valid.HasErrors() {
+	// 	if models.ExistTagByID(tagID) {
+	// 		data := map[string]interface{}{
+	// 			"tag_id":          tagID,
+	// 			"title":           title,
+	// 			"desc":            desc,
+	// 			"content":         content,
+	// 			"created_by":      createdBy,
+	// 			"state":           state,
+	// 			"cover_image_url": coverImageUrl,
+	// 		}
+	// 		if models.AddArticle(data) {
+	// 			code = e.SUCCESS
+	// 		} else {
+	// 			code = e.ERROR_ADD_ARTICLE_FAIL
+	// 			logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
+	// 		}
+
+	// 	} else {
+	// 		code = e.ERROR_NOT_EXIST_TAG
+	// 		logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
+	// 	}
+	// } else {
+	// 	for _, err := range valid.Errors {
+	// 		logging.LogrusObj.Infoln(err)
+	// 		// log.Panicln("err.key: %s, err.message: %s", err.Key, err.Message)
+	// 	}
+	// }
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"code": code,
+	// 	"msg":  e.GetMsg(code),
+	// 	"data": make(map[string]interface{}),
+	// })
+}
+
+type UpdateArticleForm struct {
+	ID            int    `form:"id" valid:"Required;Min(1)"`
+	TagID         int    `form:"tag_id" valid:"Required;Min(1)"`
+	Title         string `form:"title" valid:"Required;MaxSize(100)"`
+	Desc          string `form:"desc" valid:"Required;MaxSize(255)"`
+	Content       string `form:"content" valid:"Required;MaxSize(65535)"`
+	ModifiedBy    string `form:"modified_by" valid:"Required;MaxSize(100)"`
+	CoverImageUrl string `form:"cover_image_url" valid:"Required;MaxSize(255)"`
+	State         int    `form:"state" valid:"Range(0,1)"`
 }
 
 // @Summary 更新文章
@@ -267,76 +314,126 @@ func (a *Article) CreateArticles(c *gin.Context) {
 // @Success 200 {string} json "{"code":e.SUCCESS,"data":{},"msg":"ok"}"
 // @Failure 500 {string} json "{"code":e.ERROR,"data":{},"msg":"更新错误"}"package v1
 // @Router /api/v1/articles/{id} [put]
-func (a *Article) UpdateArticles(c *gin.Context) {
-	valid := validation.Validation{}
-
+func UpdateArticles(c *gin.Context) {
+	var appG = app.Gin{C: c}
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		logging.LogrusObj.Infoln(err)
+		appG.Response(http.StatusInternalServerError, e.INVALID_PARAMS, nil)
 	}
-	tagID, err := strconv.Atoi(c.Query("tag_id"))
-	title := c.Query("title")
-	desc := c.Query("desc")
-	content := c.Query("content")
-	modifiedBy := c.Query("modified_by")
-	coverImageUrl := c.Query("cover_image_url")
+	var form = UpdateArticleForm{ID: id}
+	httpCode, errCode := app.BindAndValid(c, &form)
+	if errCode != e.SUCCESS {
+		appG.Response(httpCode, errCode, nil)
+		return
+	}
+
+	articleService := article_service.Article{
+		ID:            form.ID,
+		TagID:         form.TagID,
+		Title:         form.Title,
+		Desc:          form.Desc,
+		Content:       form.Content,
+		CoverImageUrl: form.CoverImageUrl,
+		ModifiedBy:    form.ModifiedBy,
+		State:         form.State,
+	}
+
+	exists, err := articleService.ExistByID()
 	if err != nil {
-		logging.LogrusObj.Infoln(err)
+		appG.Response(http.StatusInternalServerError, e.ERROR_CHECK_EXIST_ARTICLE_FAIL, nil)
+		return
 	}
-	// var state int = -1
-	if arg := c.Query("state"); arg != "" {
-		state, err := strconv.Atoi(arg)
-		if err != nil {
-			logging.LogrusObj.Infoln(err)
-		}
-		valid.Range(state, 0, 1, "state").Message("状态只能为0或1")
+	if !exists {
+		appG.Response(http.StatusOK, e.ERROR_NOT_EXIST_ARTICLE, nil)
+		return
 	}
-	valid.Min(id, 1, "id").Message("id必须大于0")
-	valid.MaxSize(title, 100, "title").Message("标题长度不能超过100字符")
-	valid.MaxSize(desc, 255, "desc").Message("描述长度不能超过255字符")
-	valid.MaxSize(content, 65535, "content").Message("内容长度不能超过65535字符")
-	// valid.MaxSize(coverImageUrl, 255, "cover_image_url").Message("封面图片长度不能超过255字符")
-	valid.Required(coverImageUrl, "cover_image_url").Message("封面图片不能为空")
-	valid.Required(modifiedBy, "modified_by").Message("修改者不能为空")
-	valid.MaxSize(modifiedBy, 100, "modified_by").Message("修改者长度不能超过100字符")
 
-	code := e.INVALID_PARAMS
-	if !valid.HasErrors() {
-		if models.ExistArticleByID(id) {
-			if models.ExistTagByID(tagID) {
-				data := make(map[string]interface{})
-				if tagID > 0 {
-					data["tag_id"] = tagID
-				}
-				if title != "" {
-					data["title"] = title
-				}
-				if desc != "" {
-					data["desc"] = desc
-				}
-				if content != "" {
-					data["content"] = content
-				}
-
-				data["modified_by"] = modifiedBy
-				models.UpdateArticle(id, data)
-				code = e.SUCCESS
-			} else {
-				code = e.ERROR_NOT_EXIST_ARTICLE
-				logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
-			}
-		}
-	} else {
-		for _, err := range valid.Errors {
-			logging.LogrusObj.Infoln(err)
-			// log.Fatalf("err.key: %s, err.message: %s", err.Key, err.Message)
-		}
+	tagService := tag_service.Tag{ID: form.TagID}
+	exists, err = tagService.ExistByID()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_EXIST_TAG_FAIL, nil)
+		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-		"msg":  e.GetMsg(code),
-		"data": make(map[string]interface{}),
-	})
+	if !exists {
+		appG.Response(http.StatusOK, e.ERROR_NOT_EXIST_TAG, nil)
+		return
+	}
+	err = articleService.Update()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_UPDATE_ARTICLE_FAIL, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.SUCCESS, nil)
+
+	// valid := validation.Validation{}
+
+	// id, err := strconv.Atoi(c.Param("id"))
+	// if err != nil {
+	// 	logging.LogrusObj.Infoln(err)
+	// }
+	// tagID, err := strconv.Atoi(c.Query("tag_id"))
+	// title := c.Query("title")
+	// desc := c.Query("desc")
+	// content := c.Query("content")
+	// modifiedBy := c.Query("modified_by")
+	// coverImageUrl := c.Query("cover_image_url")
+	// if err != nil {
+	// 	logging.LogrusObj.Infoln(err)
+	// }
+	// // var state int = -1
+	// if arg := c.Query("state"); arg != "" {
+	// 	state, err := strconv.Atoi(arg)
+	// 	if err != nil {
+	// 		logging.LogrusObj.Infoln(err)
+	// 	}
+	// 	valid.Range(state, 0, 1, "state").Message("状态只能为0或1")
+	// }
+	// valid.Min(id, 1, "id").Message("id必须大于0")
+	// valid.MaxSize(title, 100, "title").Message("标题长度不能超过100字符")
+	// valid.MaxSize(desc, 255, "desc").Message("描述长度不能超过255字符")
+	// valid.MaxSize(content, 65535, "content").Message("内容长度不能超过65535字符")
+	// // valid.MaxSize(coverImageUrl, 255, "cover_image_url").Message("封面图片长度不能超过255字符")
+	// valid.Required(coverImageUrl, "cover_image_url").Message("封面图片不能为空")
+	// valid.Required(modifiedBy, "modified_by").Message("修改者不能为空")
+	// valid.MaxSize(modifiedBy, 100, "modified_by").Message("修改者长度不能超过100字符")
+
+	// code := e.INVALID_PARAMS
+	// if !valid.HasErrors() {
+	// 	if models.ExistArticleByID(id) {
+	// 		if models.ExistTagByID(tagID) {
+	// 			data := make(map[string]interface{})
+	// 			if tagID > 0 {
+	// 				data["tag_id"] = tagID
+	// 			}
+	// 			if title != "" {
+	// 				data["title"] = title
+	// 			}
+	// 			if desc != "" {
+	// 				data["desc"] = desc
+	// 			}
+	// 			if content != "" {
+	// 				data["content"] = content
+	// 			}
+
+	// 			data["modified_by"] = modifiedBy
+	// 			models.UpdateArticle(id, data)
+	// 			code = e.SUCCESS
+	// 		} else {
+	// 			code = e.ERROR_NOT_EXIST_ARTICLE
+	// 			logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
+	// 		}
+	// 	}
+	// } else {
+	// 	for _, err := range valid.Errors {
+	// 		logging.LogrusObj.Infoln(err)
+	// 		// log.Fatalf("err.key: %s, err.message: %s", err.Key, err.Message)
+	// 	}
+	// }
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"code": code,
+	// 	"msg":  e.GetMsg(code),
+	// 	"data": make(map[string]interface{}),
+	// })
 }
 
 // @Summary 删除文章
@@ -345,32 +442,61 @@ func (a *Article) UpdateArticles(c *gin.Context) {
 // @Success 200 {string} json "{"code":e.SUCCESS,"data":{},"msg":"ok"}"
 // @Failure 500 {string} json "{"code":e.ERROR,"data":{},"msg":"删除错误"}"package v1
 // @Router /api/v1/articles/{id} [delete]
-func (a *Article) DeleteArticles(c *gin.Context) {
+func DeleteArticles(c *gin.Context) {
+	appG := app.Gin{C: c}
+	valid := validation.Validation{}
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		logging.LogrusObj.Infoln(err)
+		appG.Response(http.StatusInternalServerError, e.INVALID_PARAMS, nil)
 	}
-	valid := validation.Validation{}
 	valid.Min(id, 1, "id").Message("id必须大于0")
-
-	code := e.INVALID_PARAMS
-	if !valid.HasErrors() {
-		if models.ExistArticleByID(id) {
-			models.DeleteArticle(id)
-			code = e.SUCCESS
-		} else {
-			code = e.ERROR_NOT_EXIST_ARTICLE
-			logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
-		}
-	} else {
-		for _, err := range valid.Errors {
-			logging.LogrusObj.Infoln(err)
-			// log.Fatalf("err.key: %s, err.message: %s", err.Key, err.Message)
-		}
+	if valid.HasErrors() {
+		app.MarkErrors(valid.Errors)
+		appG.Response(http.StatusOK, e.INVALID_PARAMS, nil)
+		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-		"msg":  e.GetMsg(code),
-		"data": make(map[string]interface{}),
-	})
+	articleService := article_service.Article{ID: id}
+	exists, err := articleService.ExistByID()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_CHECK_EXIST_ARTICLE_FAIL, nil)
+		return
+	}
+	if !exists {
+		appG.Response(http.StatusOK, e.ERROR_NOT_EXIST_ARTICLE, nil)
+		return
+	}
+	err = articleService.Delete()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_DELETE_ARTICLE_FAIL, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.SUCCESS, nil)
+
+	// id, err := strconv.Atoi(c.Param("id"))
+	// if err != nil {
+	// 	logging.LogrusObj.Infoln(err)
+	// }
+	// valid := validation.Validation{}
+	// valid.Min(id, 1, "id").Message("id必须大于0")
+
+	// code := e.INVALID_PARAMS
+	// if !valid.HasErrors() {
+	// 	if models.ExistArticleByID(id) {
+	// 		models.DeleteArticle(id)
+	// 		code = e.SUCCESS
+	// 	} else {
+	// 		code = e.ERROR_NOT_EXIST_ARTICLE
+	// 		logging.LogrusObj.Infoln(e.GetMsg(code)) // 补充错误处理
+	// 	}
+	// } else {
+	// 	for _, err := range valid.Errors {
+	// 		logging.LogrusObj.Infoln(err)
+	// 		// log.Fatalf("err.key: %s, err.message: %s", err.Key, err.Message)
+	// 	}
+	// }
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"code": code,
+	// 	"msg":  e.GetMsg(code),
+	// 	"data": make(map[string]interface{}),
+	// })
 }

@@ -1,0 +1,4 @@
+time="2024-11-26 21:09:32" level=info msg="ID.Required. ID Can not be empty"
+time="2024-11-26 21:09:32" level=info msg="ID.Min. ID Minimum is 1"
+time="2024-11-26 21:20:13" level=info msg="unsupported data type: map[modified_by:gdsg name:dsgs state:0]: Table not set, please set it like: db.Model(&user) or db.Table(\"users\")"
+time="2024-11-26 21:21:57" level=info msg="WHERE conditions required"

@@ -26,7 +26,7 @@ func (a Article) TableName() string {
 }
 
 // 新增文章
-func AddArticle(data map[string]interface{}) bool {
+func AddArticle(data map[string]interface{}) error {
 	err := global.DBEngine.Create(&Article{
 		TagID:           data["tag_id"].(int), // 断言
 		Title:           data["title"].(string),
@@ -37,9 +37,9 @@ func AddArticle(data map[string]interface{}) bool {
 		Cover_image_url: data["cover_image_url"].(string),
 	}).Error
 	if err != nil {
-		return false
+		return err
 	}
-	return true
+	return nil
 }
 
 // 由ID判断文章是否存在
@@ -88,21 +88,21 @@ func GetArticle(id int) (article *Article, err error) {
 }
 
 // 更新文章
-func UpdateArticle(id int, data interface{}) (bool, error) {
+func UpdateArticle(id int, data interface{}) error {
 	err := global.DBEngine.Model(&Article{}).Where("id =?", id).Updates(data).Error
 	if err != nil {
-		return false, err
+		return err
 	}
-	return true, err
+	return nil
 }
 
 // 删除文章 (软删除)
-func DeleteArticle(id int) (bool, error) {
+func DeleteArticle(id int) error {
 	err := global.DBEngine.Where("id =?", id).Delete(&Article{}).Error
 	if err != nil {
-		return false, err
+		return err
 	}
-	return true, nil
+	return nil
 }
 
 // 硬删除

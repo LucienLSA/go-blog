@@ -26,16 +26,16 @@ func (Author) TableName() string {
 // }
 
 // 检查用户名和密码是否匹配
-func CheckAuthor(username, password string) bool {
+func CheckAuthor(username, password string) (bool, error) {
 	var author Author
 	err := global.DBEngine.Select("id").
 		Where(Author{Username: username, Password: password}).
 		First(&author).Error
 	if err != nil {
-		return false
+		return false, err
 	}
 	if author.ID > 0 {
-		return true
+		return true, nil
 	}
-	return false
+	return false, err
 }
