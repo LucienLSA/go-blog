@@ -1,0 +1,46 @@
+{"level":"DEBUG","time":"2025-01-03T21:48:51.799+0800","caller":"web_app/main.go:25","msg":"init logger success"}
+{"level":"DEBUG","time":"2025-01-03T21:48:51.839+0800","caller":"web_app/main.go:31","msg":"init mysql success"}
+{"level":"INFO","time":"2025-01-03T22:07:38.881+0800","caller":"web_app/main.go:37","msg":"init logger success"}
+{"level":"INFO","time":"2025-01-03T22:07:38.915+0800","caller":"web_app/main.go:46","msg":"init mysql success"}
+{"level":"INFO","time":"2025-01-03T22:07:38.920+0800","caller":"web_app/main.go:54","msg":"init redis success"}
+{"level":"INFO","time":"2025-01-03T22:08:05.444+0800","caller":"logger/logger.go:73","msg":"/","status":200,"method":"GET","path":"/","query":"","ip":"127.0.0.1","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0","errors":"","cost":0}
+{"level":"INFO","time":"2025-01-03T22:08:05.507+0800","caller":"logger/logger.go:73","msg":"/favicon.ico","status":404,"method":"GET","path":"/favicon.ico","query":"","ip":"127.0.0.1","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0","errors":"","cost":0}
+{"level":"INFO","time":"2025-01-03T22:08:11.004+0800","caller":"web_app/main.go:81","msg":"Shutdown Server ..."}
+{"level":"INFO","time":"2025-01-03T22:08:11.004+0800","caller":"web_app/main.go:89","msg":"Server exiting"}
+{"level":"INFO","time":"2025-01-03T22:08:46.466+0800","caller":"web_app/main.go:37","msg":"init logger success"}
+{"level":"INFO","time":"2025-01-03T22:08:46.481+0800","caller":"web_app/main.go:46","msg":"init mysql success"}
+{"level":"INFO","time":"2025-01-03T22:08:46.482+0800","caller":"web_app/main.go:54","msg":"init redis success"}
+{"level":"INFO","time":"2025-01-03T22:08:51.358+0800","caller":"web_app/main.go:81","msg":"Shutdown Server ..."}
+{"level":"INFO","time":"2025-01-03T22:08:51.359+0800","caller":"web_app/main.go:89","msg":"Server exiting"}
+{"level":"INFO","time":"2025-01-03T22:09:34.630+0800","caller":"web_app/main.go:37","msg":"init logger success"}
+{"level":"INFO","time":"2025-01-03T22:09:34.653+0800","caller":"web_app/main.go:46","msg":"init mysql success"}
+{"level":"INFO","time":"2025-01-03T22:09:34.653+0800","caller":"web_app/main.go:54","msg":"init redis success"}
+{"level":"INFO","time":"2025-01-03T22:09:42.120+0800","caller":"logger/logger.go:73","msg":"/","status":200,"method":"GET","path":"/","query":"","ip":"127.0.0.1","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0","errors":"","cost":0}
+{"level":"INFO","time":"2025-01-03T22:09:43.003+0800","caller":"logger/logger.go:73","msg":"/","status":200,"method":"GET","path":"/","query":"","ip":"127.0.0.1","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0","errors":"","cost":0}
+{"level":"INFO","time":"2025-01-03T22:09:45.995+0800","caller":"web_app/main.go:81","msg":"Shutdown Server ..."}
+{"level":"INFO","time":"2025-01-03T22:09:48.128+0800","caller":"web_app/main.go:89","msg":"Server exiting"}
+{"level":"INFO","time":"2025-01-04T16:50:04.613+0800","caller":"web_app/main.go:36","msg":"init logger success"}
+{"level":"INFO","time":"2025-01-04T16:50:04.691+0800","caller":"web_app/main.go:45","msg":"init mysql success"}
+{"level":"INFO","time":"2025-01-04T16:50:04.695+0800","caller":"web_app/main.go:53","msg":"init redis success"}
+{"level":"INFO","time":"2025-01-04T16:50:12.323+0800","caller":"web_app/main.go:80","msg":"Shutdown Server ..."}
+{"level":"INFO","time":"2025-01-04T16:50:12.323+0800","caller":"web_app/main.go:88","msg":"Server exiting"}
+{"level":"INFO","time":"2025-01-04T16:53:58.428+0800","caller":"web_app/main.go:36","msg":"init logger success"}
+{"level":"INFO","time":"2025-01-04T16:53:58.455+0800","caller":"web_app/main.go:45","msg":"init mysql success"}
+{"level":"INFO","time":"2025-01-04T16:53:58.457+0800","caller":"web_app/main.go:53","msg":"init redis success"}
+{"level":"INFO","time":"2025-01-04T16:54:21.055+0800","caller":"web_app/main.go:80","msg":"Shutdown Server ..."}
+{"level":"INFO","time":"2025-01-04T16:54:21.055+0800","caller":"web_app/main.go:88","msg":"Server exiting"}
+{"level":"INFO","time":"2025-01-05T09:45:01.761+0800","caller":"web_app/main.go:42","msg":"init logger success"}
+{"level":"INFO","time":"2025-01-05T09:45:01.818+0800","caller":"web_app/main.go:51","msg":"init mysql success"}
+{"level":"INFO","time":"2025-01-05T09:45:01.822+0800","caller":"web_app/main.go:59","msg":"init redis success"}
+{"level":"INFO","time":"2025-01-05T09:45:04.944+0800","caller":"web_app/main.go:86","msg":"Shutdown Server ..."}
+{"level":"INFO","time":"2025-01-05T09:45:04.944+0800","caller":"web_app/main.go:94","msg":"Server exiting"}
+{"level":"INFO","time":"2025-01-05T10:29:19.104+0800","caller":"web_app/main.go:50","msg":"init logger success"}
+{"level":"INFO","time":"2025-01-05T10:29:19.145+0800","caller":"web_app/main.go:59","msg":"init mysql success"}
+{"level":"INFO","time":"2025-01-05T10:29:19.146+0800","caller":"web_app/main.go:67","msg":"init redis success"}
+{"level":"INFO","time":"2025-01-05T10:29:20.186+0800","caller":"web_app/main.go:94","msg":"Shutdown Server ..."}
+{"level":"INFO","time":"2025-01-05T10:29:20.186+0800","caller":"web_app/main.go:102","msg":"Server exiting"}
+{"level":"INFO","time":"2025-01-05T10:50:04.535+0800","caller":"web_app/main.go:50","msg":"init logger success"}
+{"level":"INFO","time":"2025-01-05T10:50:04.562+0800","caller":"web_app/main.go:59","msg":"init mysql success"}
+{"level":"INFO","time":"2025-01-05T10:50:04.562+0800","caller":"web_app/main.go:67","msg":"init redis success"}
+{"level":"INFO","time":"2025-01-05T10:50:08.651+0800","caller":"web_app/main.go:94","msg":"Shutdown Server ..."}
+{"level":"INFO","time":"2025-01-05T10:50:08.652+0800","caller":"web_app/main.go:102","msg":"Server exiting"}
