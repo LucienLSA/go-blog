@@ -12,6 +12,7 @@ import (
 	"github.com/LucienLSA/go-blog/dao/mysql"
 	"github.com/LucienLSA/go-blog/dao/redis"
 	"github.com/LucienLSA/go-blog/logger"
+	"github.com/LucienLSA/go-blog/pkg/snowflake"
 	"github.com/LucienLSA/go-blog/routers"
 	"github.com/LucienLSA/go-blog/settings"
 	"github.com/spf13/viper"
@@ -53,10 +54,15 @@ func main() {
 	zap.L().Info("init redis success")
 	defer redis.Close()
 
-	// 5. 注册路由
+	// 5. 初始化雪花算法生成用户ID
+	if err := snowflake.InitSnowflake(settings.Conf.StartTime, settings.Conf.MachineID); err != nil {
+		fmt.Printf("init snowflake failed, err:%v\n", err)
+	}
+
+	// 6. 注册路由
 	r := routers.SetupRouter()
 
-	// 6. 启动服务（优雅关机）
+	// 7. 启动服务（优雅关机）
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", viper.GetInt("app.port")),
 		Handler: r,

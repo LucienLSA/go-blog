@@ -1,13 +1,15 @@
 app:
-  name: "web_app"
+  name: "bluebellApp"
   mode: "dev"
   port: 8081
   version : "1.0.0"
+  start_time: "2021-01-01"
+  machine_id: 1
 
 log:
   level: "debug"
   filepath: "./runtime/logs/"
-  filename: "web_app.log"
+  filename: "bluebell.log"
   max_size: 200
   max_age: 30
   max_backups: 7
@@ -17,7 +19,7 @@ mysql:
   port: 3306
   user: "root"
   password: "123456"
-  dbname: "web_app"
+  dbname: "bluebell"
   max_open_conns: 200
   max_idle_conns: 50
 
