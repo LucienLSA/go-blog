@@ -20,7 +20,7 @@ import (
 // 不建议在此使用全局的logger变量
 
 // InitLogger 初始化Logger
-func InitLogger(cfg *settings.LogConfig) (err error) {
+func InitLogger(cfg *settings.LogConfig, mode string) (err error) {
 	writeSyncer := getLogWriter(
 		// viper.GetString("log.filepath")+viper.GetString("log.filename"),
 		// viper.GetInt("log.max_size"),
@@ -37,7 +37,17 @@ func InitLogger(cfg *settings.LogConfig) (err error) {
 	if err != nil {
 		return
 	}
-	core := zapcore.NewCore(encoder, writeSyncer, l)
+	var core zapcore.Core
+	if mode == settings.Conf.Mode {
+		// 开发模式，日志输出到终端和日志文件中
+		consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+		core = zapcore.NewTee(
+			zapcore.NewCore(encoder, writeSyncer, l),
+			zapcore.NewCore(consoleEncoder, zapcore.Lock(os.Stdout), zapcore.DebugLevel),
+		)
+	} else {
+		core = zapcore.NewCore(encoder, writeSyncer, l)
+	}
 
 	lg := zap.New(core, zap.AddCaller())
 	// 替换zap包中全局的logger实例，后续在其他包中只需使用zap.L()调用即可

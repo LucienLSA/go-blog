@@ -13,6 +13,7 @@ import (
 	"github.com/LucienLSA/go-blog/dao/redis"
 	"github.com/LucienLSA/go-blog/logger"
 	"github.com/LucienLSA/go-blog/pkg/snowflake"
+	"github.com/LucienLSA/go-blog/pkg/translator"
 	"github.com/LucienLSA/go-blog/routers"
 	"github.com/LucienLSA/go-blog/settings"
 	"github.com/spf13/viper"
@@ -30,7 +31,7 @@ func main() {
 	zap.L().Info("init settings success")
 
 	// 2. 初始化日志
-	if err := logger.InitLogger(settings.Conf.LogConfig); err != nil {
+	if err := logger.InitLogger(settings.Conf.LogConfig, settings.Conf.Mode); err != nil {
 		fmt.Printf("init logger failed, err:%v\n", err)
 		return
 	}
@@ -54,13 +55,20 @@ func main() {
 	zap.L().Info("init redis success")
 	defer redis.Close()
 
-	// 5. 初始化雪花算法生成用户ID
-	if err := snowflake.InitSnowflake(settings.Conf.StartTime, settings.Conf.MachineID); err != nil {
+	// 5. 初始化雪花算法
+	if err := snowflake.InitSnowflake(settings.Conf.AppConfig.StartTime, settings.Conf.AppConfig.MachineID); err != nil {
 		fmt.Printf("init snowflake failed, err:%v\n", err)
+		return
 	}
+	zap.L().Info("init snowflake success")
 
 	// 6. 注册路由
-	r := routers.SetupRouter()
+	// 初始化gin框架内置的校验器 翻译校验错误信息
+	if err := translator.InitTrans("zh"); err != nil {
+		fmt.Printf("init validator translator failed, err:%v\n", err)
+		return
+	}
+	r := routers.SetupRouter(settings.Conf.Mode)
 
 	// 7. 启动服务（优雅关机）
 	srv := &http.Server{

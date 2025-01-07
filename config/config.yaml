@@ -2,7 +2,7 @@ app:
   name: "bluebellApp"
   mode: "dev"
   port: 8081
-  version : "1.0.0"
+  version: "1.0.0"
   start_time: "2021-01-01"
   machine_id: 1
 

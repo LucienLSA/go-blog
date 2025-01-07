@@ -9,7 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter() *gin.Engine {
+func SetupRouter(mode string) *gin.Engine {
+	if mode == gin.ReleaseMode {
+		// gin设置发布模式
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	r := gin.New()
 	r.Use(logger.GinLogger(), logger.GinRecovery(true))
 	r.GET("/ping", func(ctx *gin.Context) {
