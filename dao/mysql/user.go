@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"database/sql"
 	"errors"
 
 	"github.com/LucienLSA/go-blog/models"
@@ -12,6 +13,12 @@ import (
 
 const PasswordCost = 12
 
+var (
+	ErrorUserExist       = errors.New("用户已存在")
+	ErrorUserNotExist    = errors.New("用户不存在")
+	ErrorInvalidPassword = errors.New("密码错误")
+)
+
 // 检查指定用户名的用户是否存在
 func CheckUserExist(username string) (err error) {
 	sqlStr := "select count(user_id) from user where username = ?"
@@ -21,7 +28,7 @@ func CheckUserExist(username string) (err error) {
 	}
 	// fmt.Println(count)
 	if count > 0 {
-		return errors.New("用户已存在")
+		return ErrorUserExist
 	}
 	return nil
 }
@@ -40,6 +47,30 @@ func InsertUser(user *models.User) (err error) {
 	return err
 }
 
+// 用户登录 与数据库中用户信息比对
+func Login(user *models.User) (err error) {
+	// 记录用户输入的密码
+	userPassword := user.Password
+	// 执行SQL语句
+	sqlStr := "select user_id, username, password from user where username=?"
+	err = db.Get(user, sqlStr, user.Username)
+	if err == sql.ErrNoRows { // sql自带查询错误
+		return ErrorUserNotExist
+	}
+	if err != nil {
+		// 查询数据库失败
+		return err
+	}
+	// fmt.Println("用户输入密码", userPassword)
+	// fmt.Println("数据库中密码", user.Password)
+	// 判断密码是否正确
+	err = CheckPassword(user, userPassword)
+	if err != nil {
+		return ErrorInvalidPassword
+	}
+	return
+}
+
 // // 密码加密 旧版
 // func encryptPassword(oPassword string) string {
 // 	h := md5.New()
@@ -53,12 +84,16 @@ func SetPassword(user *models.User, password string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	// 将原密码进行加密
 	user.PasswordDigest = string(bytes)
 	return user.PasswordDigest, nil
 }
 
 // CheckPassword 校验密码
-func CheckPassword(user *models.User, password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(user.PasswordDigest), []byte(password))
-	return err == nil
+func CheckPassword(user *models.User, password string) error {
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return err
+	}
+	return nil
 }
