@@ -4,13 +4,14 @@ import (
 	"errors"
 	"time"
 
+	"github.com/LucienLSA/go-blog/settings"
 	"github.com/golang-jwt/jwt"
 )
 
-const (
-	AccessTokenExpireDuration  = time.Hour * 1
-	RefreshTokenExpireDuration = time.Second * 30
-)
+// const (
+// 	AccessTokenExpireDuration  = time.Hour * 1
+// 	RefreshTokenExpireDuration = time.Second * 30
+// )
 
 var MySecret = []byte("lucien-goblog-bluebell-jwt")
 
@@ -27,7 +28,7 @@ type MyClaims struct {
 // GenToken 生成JWT
 func GenToken(userID int64, username string) (string, error) {
 	nowTime := time.Now()
-	expireTime := nowTime.Add(AccessTokenExpireDuration)
+	expireTime := nowTime.Add(settings.Conf.AppConfig.JwtExpireTime * time.Hour)
 	// 创建一个自己的声明数据
 	claims := MyClaims{
 		UserID:   userID,

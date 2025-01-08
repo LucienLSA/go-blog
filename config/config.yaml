@@ -5,6 +5,7 @@ app:
   version: "1.0.0"
   start_time: "2021-01-01"
   machine_id: 1
+  jwt_expire_time: 24
 
 log:
   level: "debug"

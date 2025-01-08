@@ -3,6 +3,7 @@ package settings
 import (
 	"flag"
 	"fmt"
+	"time"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
@@ -18,12 +19,13 @@ type multipleConfig struct {
 }
 
 type AppConfig struct {
-	Name      string `mapstructure:"name"`
-	Mode      string `mapstructure:"mode"`
-	Version   string `mapstructure:"version"`
-	Port      string `mapstructure:"port"`
-	StartTime string `mapstructure:"start_time"`
-	MachineID int64  `mapstructure:"machine_id"`
+	Name          string        `mapstructure:"name"`
+	Mode          string        `mapstructure:"mode"`
+	Version       string        `mapstructure:"version"`
+	Port          string        `mapstructure:"port"`
+	StartTime     string        `mapstructure:"start_time"`
+	MachineID     int64         `mapstructure:"machine_id"`
+	JwtExpireTime time.Duration `mapstructure:"jwt_expire_time"`
 }
 
 type LogConfig struct {
