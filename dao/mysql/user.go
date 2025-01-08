@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"database/sql"
-	"errors"
 
 	"github.com/LucienLSA/go-blog/models"
 	"golang.org/x/crypto/bcrypt"
@@ -12,12 +11,6 @@ import (
 // 待service层业务需求进行调用
 
 const PasswordCost = 12
-
-var (
-	ErrorUserExist       = errors.New("用户已存在")
-	ErrorUserNotExist    = errors.New("用户不存在")
-	ErrorInvalidPassword = errors.New("密码错误")
-)
 
 // 检查指定用户名的用户是否存在
 func CheckUserExist(username string) (err error) {
