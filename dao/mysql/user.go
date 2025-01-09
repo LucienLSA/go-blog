@@ -64,6 +64,14 @@ func Login(user *models.User) (err error) {
 	return
 }
 
+// 根据作者/用户id获取信息
+func GetUserByID(uId int64) (user *models.User, err error) {
+	user = new(models.User)
+	sqlStr := `select user_id, username from user where user_id = ?`
+	err = db.Get(user, sqlStr, uId)
+	return
+}
+
 // // 密码加密 旧版
 // func encryptPassword(oPassword string) string {
 // 	h := md5.New()

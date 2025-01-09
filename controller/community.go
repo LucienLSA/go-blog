@@ -17,6 +17,7 @@ func CommunityHandler(c *gin.Context) {
 		zap.L().Error("service GetCommunityList failed", zap.Error(err))
 		// 不轻易将服务端报错暴露给外面
 		response.ResponseError(c, response.CodeServerBusy)
+		return
 	}
 	response.ResponseSuccessData(c, dataList)
 }
@@ -24,16 +25,21 @@ func CommunityHandler(c *gin.Context) {
 // 社区分类详细请求
 func CommunityDetailHandler(c *gin.Context) {
 	// 1. 获取社区ID
-	idStr := c.Param("id")
-	communityID, err := strconv.ParseInt(idStr, 10, 64)
+	cidStr := c.Param("community_id")
+	// 获取URL参数 并将其字符串参数转化为int64类型
+	communityID, err := strconv.ParseInt(cidStr, 10, 64)
 	if err != nil {
+		zap.L().Error("get community detail with invalid param", zap.Error(err))
 		response.ResponseError(c, response.CodeInvalidParam)
 		return
 	}
+	// 2. 调用服务层获取详情
 	dataList, err := service.GetCommunityDetailList(communityID)
+	// 3. 返回错误和数据
 	if err != nil {
 		zap.L().Error("service GetCommunityDetailList failed", zap.Error(err))
 		response.ResponseError(c, response.CodeServerBusy)
+		return
 	}
 	response.ResponseSuccessData(c, dataList)
 }

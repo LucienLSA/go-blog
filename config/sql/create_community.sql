@@ -1,8 +1,8 @@
 create table community
 (
-    id             int auto_increment
+    id             bigint(20) auto_increment
         primary key,
-    community_id   int unsigned                        not null,
+    community_id   bigint(20) unsigned                        not null,
     community_name varchar(128)                        not null,
     introduction   varchar(256)                        not null,
     create_time    timestamp default CURRENT_TIMESTAMP not null,
