@@ -1,11 +1,13 @@
 package middleware
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/LucienLSA/go-blog/pkg/jwt"
 	"github.com/LucienLSA/go-blog/pkg/response"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 const CtxtUserIDKey = "userID"
@@ -22,7 +24,8 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			// 	"code": 2003,
 			// 	"msg":  "请求头中auth为空",
 			// })
-			response.ResponseError(c, response.CodeJWTheaderAuthEmpty)
+			zap.L().Error("Request.Header.Get Authorization failed", zap.Error(errors.New("请求头中auth为空")))
+			response.ResponseError(c, response.CodeNeedLogin)
 			c.Abort()
 			return
 		}
@@ -33,7 +36,8 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			// 	"code": 2004,
 			// 	"msg":  "请求头中auth格式有误",
 			// })
-			response.ResponseError(c, response.CodeJWTheaderAuthError)
+			zap.L().Error("Request.Header.Get Authorization failed", zap.Error(errors.New("请求头中auth格式有误")))
+			response.ResponseError(c, response.CodeNeedLogin)
 			c.Abort()
 			return
 		}
@@ -44,7 +48,8 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			// 	"code": 2005,
 			// 	"msg":  "无效的Token",
 			// })
-			response.ResponseError(c, response.CodeJWTtokenInvalid)
+			zap.L().Error("jwt.ParseToken failed", zap.Error(errors.New("无效的Token")))
+			response.ResponseError(c, response.CodeTokenInvalid)
 			c.Abort()
 			return
 		}

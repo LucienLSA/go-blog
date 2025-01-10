@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/LucienLSA/go-blog/dao/mysql"
 	"github.com/LucienLSA/go-blog/models"
@@ -91,7 +92,7 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 	// 2. 业务处理
-	token, err := service.Login(p)
+	user, err := service.Login(p)
 	if err != nil {
 		zap.L().Error("service login failed", zap.String("username", p.Username), zap.Error(err))
 		// c.JSON(http.StatusOK, gin.H{
@@ -109,5 +110,9 @@ func LoginHandler(c *gin.Context) {
 	// c.JSON(http.StatusOK, gin.H{
 	// 	"msg": "登录成功",
 	// })
-	response.ResponseSuccessData(c, token)
+	response.ResponseSuccessData(c, gin.H{
+		"user_id":   strconv.FormatInt(user.UserID, 10), // id值大于1<<53-1, int64类型最大值为1<<63-1，转化为字符串
+		"user_name": user.Username,
+		"token":     user.Token,
+	})
 }

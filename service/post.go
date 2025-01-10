@@ -14,13 +14,50 @@ func CreatePost(p *models.Post) (err error) {
 	// 2. 保存到数据库
 	err = mysql.CreatePost(p)
 	// 3. 返回
+	if err != nil {
+		zap.L().Error("mysql CreatePost failed", zap.Error(err))
+		return
+	}
+	// 需要在redis记录帖子的创建时间
+	// redisCache.CreatePost(p.PostID)
 	return
 }
 
 // 查询帖子列表业务
-func GetPost() ([]*models.PostList, error) {
-	// 查询数据库，找到所有的post 并返回
-	return mysql.GetPost()
+func GetPostList(pageNum, pageSize int64) (data []*models.ApiPostDetail, err error) {
+	// 查询数据库，找到所有的post 并返回分页的内容
+	posts, err := mysql.GetPostList(pageNum, pageSize)
+	if err != nil {
+		zap.L().Error("mysql GetPostList failed", zap.Error(err))
+		return nil, err
+	}
+	data = make([]*models.ApiPostDetail, 0, len(posts)) // 初始化内存空间
+	for _, post := range posts {
+		// 根据作者id查询作者信息
+		user, err := mysql.GetUserByID(post.AuthorID)
+		if err != nil {
+			zap.L().Error("mysql GetUserByID failed",
+				zap.Int64("author_id", post.AuthorID),
+				zap.Error(err))
+			continue
+		}
+		community, err := mysql.GetCommunityDetailList(post.CommunityID)
+		if err != nil {
+			zap.L().Error("mysql GetCommunityDetailList failed",
+				zap.Int64("community_id", post.CommunityID),
+				zap.Error(err))
+			continue
+		}
+		postDetail := &models.ApiPostDetail{
+			AuthorName:      user.Username,
+			Post:            post,
+			CommunityDetail: community,
+		}
+		// fmt.Println(postDetail.Post)
+		// fmt.Println(postDetail.CommunityDetail)
+		data = append(data, postDetail)
+	}
+	return data, nil
 }
 
 // 查询帖子详情业务

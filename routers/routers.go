@@ -33,8 +33,10 @@ func SetupRouter(mode string) *gin.Engine {
 		v1.GET("/community/:community_id", controller.CommunityDetailHandler)
 		// 帖子
 		v1.POST("/post", controller.CreatePostHandler)
-		v1.GET("/post", controller.GetPostHandler)
+		v1.GET("/posts", controller.GetPostListHandler)
 		v1.GET("/post/:post_id", controller.GetPostDetailHandler)
+		// 帖子投票
+		v1.POST("/vote", controller.PostVoteHandler)
 	}
 	return r
 }

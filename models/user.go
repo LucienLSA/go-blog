@@ -8,4 +8,5 @@ type User struct {
 	Email          string `db:"email"`
 	PasswordDigest string
 	Gender         string `db:"gender"`
+	Token          string
 }

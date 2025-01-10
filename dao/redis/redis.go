@@ -1,4 +1,4 @@
-package redis
+package redisCache
 
 import (
 	"context"
@@ -10,11 +10,12 @@ import (
 
 // var 声明全局的rdb变量
 var rdb *redis.Client
+var RedisContext = context.Background()
 
 // 初始化连接
 func InitRedis(cfg *settings.RedisConfig) (err error) {
 	// 不可在返回error时，新定义变量 会出现空指针问题，因为已经定义了全局变量
-	rdb = redis.NewClient(&redis.Options{
+	rdb := redis.NewClient(&redis.Options{
 		// Addr: fmt.Sprintf("%s:%d",
 		// 	viper.GetString("redis.host"),
 		// 	viper.GetInt("redis.port")),
@@ -27,10 +28,11 @@ func InitRedis(cfg *settings.RedisConfig) (err error) {
 		PoolSize: cfg.PoolSize,
 	})
 
-	_, err = rdb.Ping(context.TODO()).Result()
+	_, err = rdb.Ping(RedisContext).Result()
 	if err != nil {
 		return err
 	}
+	// RedisClient = rdb
 	return nil
 }
 

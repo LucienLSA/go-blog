@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/LucienLSA/go-blog/dao/mysql"
-	"github.com/LucienLSA/go-blog/dao/redis"
+	redisCache "github.com/LucienLSA/go-blog/dao/redis"
 	"github.com/LucienLSA/go-blog/logger"
 	"github.com/LucienLSA/go-blog/pkg/snowflake"
 	"github.com/LucienLSA/go-blog/pkg/translator"
@@ -48,12 +48,12 @@ func main() {
 	defer mysql.Close()
 
 	// 4. 初始化Redis链接
-	if err := redis.InitRedis(settings.Conf.RedisConfig); err != nil {
+	if err := redisCache.InitRedis(settings.Conf.RedisConfig); err != nil {
 		fmt.Printf("init redis failed, err:%v\n", err)
 		return
 	}
 	zap.L().Info("init redis success")
-	defer redis.Close()
+	defer redisCache.Close()
 
 	// 5. 初始化雪花算法
 	if err := snowflake.InitSnowflake(settings.Conf.AppConfig.StartTime, settings.Conf.AppConfig.MachineID); err != nil {

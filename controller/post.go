@@ -31,9 +31,9 @@ func CreatePostHandler(c *gin.Context) {
 		return
 	}
 	// 从c 取到当前发请求的用户userid
-	userID, err := request.GetLoginUser(c)
+	userID, err := request.GetLoginUserID(c)
 	if err != nil {
-		response.ResponseError(c, response.CodeJWTheaderAuthError)
+		response.ResponseError(c, response.CodeNeedLogin)
 		return
 	}
 	p.AuthorID = userID
@@ -47,19 +47,26 @@ func CreatePostHandler(c *gin.Context) {
 	response.ResponseSuccessData(c, nil)
 }
 
-// 获取帖子列表
-func GetPostHandler(c *gin.Context) {
-	// 查询帖子以列表形式返回
-	dataList, err := service.GetPost()
+// 获取帖子列表分页展示
+func GetPostListHandler(c *gin.Context) {
+	// 获取分页参数
+	pageNum, pageSize, err := request.GetPageInfo(c)
 	if err != nil {
-		zap.L().Error("service GetPostHandler failed", zap.Error(err))
+		zap.L().Error("request GetPageInfo failed", zap.Error(err))
+		response.ResponseError(c, response.CodeServerBusy)
+		return
+	}
+	// 查询帖子以列表形式返回数据
+	dataList, err := service.GetPostList(pageNum, pageSize)
+	if err != nil {
+		zap.L().Error("service GetPostListHandler failed", zap.Error(err))
 		response.ResponseError(c, response.CodeServerBusy)
 		return
 	}
 	response.ResponseSuccessData(c, dataList)
 }
 
-// 获取帖子详情
+// 获取帖子分类详情
 func GetPostDetailHandler(c *gin.Context) {
 	// 1. 获取帖子ID
 	pIdStr := c.Param("post_id")
@@ -72,6 +79,7 @@ func GetPostDetailHandler(c *gin.Context) {
 	}
 	// 2. 调用服务层获取帖子详情
 	dataList, err := service.GetPostDetailList(postID)
+	// fmt.Println(dataList.Post.CreateTime, dataList.Post.UpdateTime)
 	// 3. 返回错误和数据
 	if err != nil {
 		zap.L().Error("service GetPostDetailList failed", zap.Error(err))
