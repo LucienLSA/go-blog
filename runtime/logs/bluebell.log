@@ -37,3 +37,10 @@
 {"level":"INFO","time":"2025-01-11T17:48:11.053+0800","caller":"go-blog-bluebell/main.go:47","msg":"init mysql success"}
 {"level":"INFO","time":"2025-01-11T17:48:11.054+0800","caller":"go-blog-bluebell/main.go:55","msg":"init redis success"}
 {"level":"INFO","time":"2025-01-11T17:48:11.054+0800","caller":"go-blog-bluebell/main.go:63","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-01-11T17:48:16.924+0800","caller":"go-blog-bluebell/main.go:38","msg":"init logger success"}
+{"level":"INFO","time":"2025-01-11T17:48:16.938+0800","caller":"go-blog-bluebell/main.go:47","msg":"init mysql success"}
+{"level":"INFO","time":"2025-01-11T17:48:16.938+0800","caller":"go-blog-bluebell/main.go:55","msg":"init redis success"}
+{"level":"INFO","time":"2025-01-11T17:48:16.938+0800","caller":"go-blog-bluebell/main.go:63","msg":"init snowflake success"}
+{"level":"DEBUG","time":"2025-01-11T17:48:24.803+0800","caller":"service/vote.go:13","msg":"PostVote","userID":531412185658691584,"PostID":533167449705549824,"Kind":1}
+{"level":"ERROR","time":"2025-01-11T17:48:24.804+0800","caller":"controller/vote.go:39","msg":"service.PostVote failed","error":"不允许重复投票"}
+{"level":"INFO","time":"2025-01-11T17:48:24.804+0800","caller":"logger/logger.go:87","msg":"/api/v1/vote","status":200,"method":"POST","path":"/api/v1/vote","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0010108}
