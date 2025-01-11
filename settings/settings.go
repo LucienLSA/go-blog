@@ -24,6 +24,8 @@ type AppConfig struct {
 	Version       string        `mapstructure:"version"`
 	Port          string        `mapstructure:"port"`
 	StartTime     string        `mapstructure:"start_time"`
+	PageNum       int64         `mapstructure:"page_num"`
+	PageSize      int64         `mapstructure:"page_size"`
 	MachineID     int64         `mapstructure:"machine_id"`
 	JwtExpireTime time.Duration `mapstructure:"jwt_expire_time"`
 }

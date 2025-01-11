@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/LucienLSA/go-blog/dao/mysql"
+	redisCache "github.com/LucienLSA/go-blog/dao/redis"
 	"github.com/LucienLSA/go-blog/models"
 	"github.com/LucienLSA/go-blog/pkg/snowflake"
 	"go.uber.org/zap"
@@ -13,14 +14,18 @@ func CreatePost(p *models.Post) (err error) {
 	p.PostID = int64(snowflake.GenID())
 	// 2. 保存到数据库
 	err = mysql.CreatePost(p)
-	// 3. 返回
 	if err != nil {
 		zap.L().Error("mysql CreatePost failed", zap.Error(err))
 		return
 	}
-	// 需要在redis记录帖子的创建时间
-	// redisCache.CreatePost(p.PostID)
-	return
+	//3.  需要在redis记录帖子的创建时间
+	err = redisCache.CreatePost(p.PostID)
+	if err != nil {
+		zap.L().Error("redisCache CreatePost failed", zap.Error(err))
+		return
+	}
+	// 3. 返回
+	return err
 }
 
 // 查询帖子列表业务
@@ -96,4 +101,61 @@ func GetPostDetailList(pid int64) (data *models.ApiPostDetail, err error) {
 		CommunityDetail: communityDetail,
 	}
 	return data, err
+}
+
+// 新版查询帖子业务，根据前端返回参数，创建时间或者分数进行排序
+func SearchPostList(p *models.ParamPostList) (data []*models.ApiPostDetail, err error) {
+	// 2. redis查询帖子id列表
+	ids, err := redisCache.SearchPostIDsByOrder(p)
+	if err != nil {
+		zap.L().Error("redisCache SearchPostIDsByOrder failed",
+			zap.Error(err))
+		return
+	}
+	if len(ids) == 0 {
+		zap.L().Warn("redisCache SearchPostIDsByOrder success, but empty")
+		return
+	}
+	// 3. 根据id去数据库查询帖子详细信息
+	// **返回的数据是按照给定的顺序
+	posts, err := mysql.SearchPostListByIDs(ids)
+	data = make([]*models.ApiPostDetail, 0, len(posts)) // 初始化内存空间
+	if err != nil {
+		zap.L().Error("mysql SearchPostListByIDs failed",
+			zap.Error(err))
+		return
+	}
+
+	// 提前查询好每条帖子的赞同数
+	voteAgreeData, err := redisCache.GetPostAgreeByIDs(ids)
+	if err != nil {
+		return
+	}
+
+	// 将贴子的作者和社区信息查询处理填充到帖子中
+	for index, post := range posts {
+		// 根据作者id查询作者信息
+		user, err := mysql.GetUserByID(post.AuthorID)
+		if err != nil {
+			zap.L().Error("mysql GetUserByID failed",
+				zap.Int64("author_id", post.AuthorID),
+				zap.Error(err))
+			continue
+		}
+		community, err := mysql.GetCommunityDetailList(post.CommunityID)
+		if err != nil {
+			zap.L().Error("mysql GetCommunityDetailList failed",
+				zap.Int64("community_id", post.CommunityID),
+				zap.Error(err))
+			continue
+		}
+		postDetail := &models.ApiPostDetail{
+			AuthorName:      user.Username,
+			VoteAgreeNum:    voteAgreeData[index],
+			Post:            post,
+			CommunityDetail: community,
+		}
+		data = append(data, postDetail)
+	}
+	return data, nil
 }

@@ -6,6 +6,9 @@ app:
   start_time: "2021-01-01"
   machine_id: 1
   jwt_expire_time: 3600
+
+  page_size: 5
+  page_num: 1
   
 
 log:

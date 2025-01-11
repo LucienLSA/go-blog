@@ -1,6 +1,13 @@
 package models
 
 // 定义请求的参数结构体
+
+// 根据请求的参数查询方式
+const (
+	OrderTime  = "time"
+	OrderScore = "score"
+)
+
 // 注册
 type ParamSignUp struct {
 	Age        uint8  `json:"age" binding:"gte=1,lte=130"`
@@ -22,6 +29,13 @@ type ParamLogin struct {
 // 投票数据
 type ParamVoteData struct {
 	// UserID 从请求中获取当前用户
-	PostID int64 `json:"post_id,string" binding:"required"`           // 帖子
-	Kind   int8  `json:"kind,string" binding:"required,oneof=1 0 -1"` // 赞成(1)\反对(-1)\取消投票(0)
+	PostID int64 `json:"post_id,string" binding:"required"`  // 帖子
+	Kind   int8  `json:"kind,string" binding:"oneof=1 0 -1"` // 赞成(1)\反对(-1)\取消投票(0)
+}
+
+// 获取帖子列表query string参数
+type ParamPostList struct {
+	PageNum  int64  `json:"page_num" form:"page_num"`
+	PageSize int64  `json:"page_size" form:"page_size"`
+	Order    string `json:"order" form:"order"`
 }

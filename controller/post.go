@@ -8,6 +8,7 @@ import (
 	"github.com/LucienLSA/go-blog/pkg/response"
 	"github.com/LucienLSA/go-blog/pkg/translator"
 	"github.com/LucienLSA/go-blog/service"
+	"github.com/LucienLSA/go-blog/settings"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
@@ -17,6 +18,7 @@ import (
 func CreatePostHandler(c *gin.Context) {
 	// 1. 获取参数 参数校验
 	p := new(models.Post)
+	// 如果请求中有json格式数据，才使用shouldbindjson
 	if err := c.ShouldBindJSON(&p); err != nil {
 		// 请求参数有误 直接返回响应
 		zap.L().Error("create post with invalid param", zap.Error(err))
@@ -33,6 +35,7 @@ func CreatePostHandler(c *gin.Context) {
 	// 从c 取到当前发请求的用户userid
 	userID, err := request.GetLoginUserID(c)
 	if err != nil {
+		zap.L().Error("request GetLoginUserID failed", zap.Error(err))
 		response.ResponseError(c, response.CodeNeedLogin)
 		return
 	}
@@ -83,6 +86,36 @@ func GetPostDetailHandler(c *gin.Context) {
 	// 3. 返回错误和数据
 	if err != nil {
 		zap.L().Error("service GetPostDetailList failed", zap.Error(err))
+		response.ResponseError(c, response.CodeServerBusy)
+		return
+	}
+	response.ResponseSuccessData(c, dataList)
+}
+
+// 新版查询帖子，根据前端传来的参数动态获取帖子列表
+// 按照创建时间或者分数排序
+// 1. 获取参数
+// GET请求参数：/api/v1/searchposts?page_num=1&page_size=5&order=time
+// 以Query获取参数
+// 2. redis查询id列表
+// 3. 根据id去数据库查询帖子详细信息
+func SearchPostListHandler(c *gin.Context) {
+	// 获取分页参数
+	// c.ShouldBind() //根据请求数据类型选择相应的方法获取数据
+	// 初始化结构体传入初始参数
+	p := models.ParamPostList{
+		PageNum:  settings.Conf.AppConfig.PageNum,
+		PageSize: settings.Conf.AppConfig.PageSize,
+		Order:    models.OrderTime,
+	}
+	if err := c.ShouldBindQuery(&p); err != nil {
+		zap.L().Error("SearchPostListHandler failed with invalid params", zap.Error(err))
+		response.ResponseError(c, response.CodeInvalidParam)
+		return
+	}
+	dataList, err := service.SearchPostList(&p)
+	if err != nil {
+		zap.L().Error("service SearchPostList failed", zap.Error(err))
 		response.ResponseError(c, response.CodeServerBusy)
 		return
 	}
