@@ -2,9 +2,12 @@ package routers
 
 import (
 	"github.com/LucienLSA/go-blog/controller"
+	_ "github.com/LucienLSA/go-blog/docs"
 	"github.com/LucienLSA/go-blog/logger"
 	"github.com/LucienLSA/go-blog/middleware"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	gs "github.com/swaggo/gin-swagger"
 )
 
 func SetupRouter(mode string) *gin.Engine {
@@ -14,8 +17,10 @@ func SetupRouter(mode string) *gin.Engine {
 	}
 
 	r := gin.New()
+	// 使用自定义的gin中间件
 	r.Use(logger.GinLogger(), logger.GinRecovery(true))
-
+	// 导入swag接口文档
+	r.GET("/swagger/*any", gs.WrapHandler(swaggerFiles.Handler))
 	v1 := r.Group("/api/v1")
 
 	// 注册业务路由
@@ -36,7 +41,10 @@ func SetupRouter(mode string) *gin.Engine {
 		v1.GET("/posts", controller.GetPostListHandler)
 		v1.GET("/post/:post_id", controller.GetPostDetailHandler)
 		// 帖子查询新版
+		// 参数动态获取帖子列表
 		v1.GET("/searchposts", controller.SearchPostListHandler)
+		// 根据社区查询帖子列表 整合到上一个hander中
+		// v1.GET("/communitysearchposts", controller.CommunityPostListHandler)
 		// 帖子投票
 		v1.POST("/vote", controller.PostVoteHandler)
 	}

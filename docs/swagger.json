@@ -1,0 +1,301 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a go-web project from https://www.bilibili.com/cheese/play/ep265306",
+        "title": "bluebell go-web",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "lucien",
+            "url": "none",
+            "email": "none"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "127.0.0.1:8081",
+    "basePath": "/api/v1/",
+    "paths": {
+        "/community": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "查询社区信息返回列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "社区接口"
+                ],
+                "summary": "查询社区信息接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller._ResponseCommunityList"
+                        }
+                    }
+                }
+            }
+        },
+        "/searchposts": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "可按社区按时间或分数排序查询帖子列表接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "帖子接口"
+                ],
+                "summary": "升级版帖子列表接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "社区id可以为空",
+                        "name": "community_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "score",
+                        "description": "排序方式 按照时间或者投票分数",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "description": "获取帖子列表的页码",
+                        "name": "page_num",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "获取帖子列表的数量",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller._ResponsePostList"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "controller._ResponseCommunityList": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务相应码",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.ResCode"
+                        }
+                    ]
+                },
+                "data": {
+                    "description": "数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Community"
+                    }
+                },
+                "message": {
+                    "description": "提示信息",
+                    "type": "string"
+                }
+            }
+        },
+        "controller._ResponsePostList": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务相应码",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.ResCode"
+                        }
+                    ]
+                },
+                "data": {
+                    "description": "数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ApiPostDetail"
+                    }
+                },
+                "message": {
+                    "description": "提示信息",
+                    "type": "string"
+                }
+            }
+        },
+        "models.ApiPostDetail": {
+            "type": "object",
+            "properties": {
+                "author_name": {
+                    "description": "帖子作者用户名",
+                    "type": "string"
+                },
+                "community": {
+                    "description": "嵌入社区信息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.CommunityDetail"
+                        }
+                    ]
+                },
+                "post": {
+                    "description": "嵌入帖子信息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Post"
+                        }
+                    ]
+                },
+                "vote_agree_num": {
+                    "description": "投票赞成数",
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Community": {
+            "type": "object",
+            "properties": {
+                "community_id": {
+                    "description": "社区id",
+                    "type": "integer"
+                },
+                "community_name": {
+                    "description": "社区名称",
+                    "type": "string"
+                }
+            }
+        },
+        "models.CommunityDetail": {
+            "type": "object",
+            "properties": {
+                "community_id": {
+                    "description": "社区id",
+                    "type": "integer"
+                },
+                "community_name": {
+                    "description": "社区名称",
+                    "type": "string"
+                },
+                "create_time": {
+                    "description": "社区创建时间",
+                    "type": "string"
+                },
+                "introduction": {
+                    "description": "社区介绍",
+                    "type": "string"
+                },
+                "update_time": {
+                    "description": "社区更新时间",
+                    "type": "string"
+                }
+            }
+        },
+        "models.Post": {
+            "type": "object",
+            "required": [
+                "community_id",
+                "content",
+                "title"
+            ],
+            "properties": {
+                "author_id": {
+                    "description": "帖子作者idid",
+                    "type": "string",
+                    "example": "0"
+                },
+                "community_id": {
+                    "description": "社区id",
+                    "type": "integer"
+                },
+                "content": {
+                    "description": "帖子内容",
+                    "type": "string"
+                },
+                "create_time": {
+                    "description": "帖子创建时间",
+                    "type": "string"
+                },
+                "post_id": {
+                    "description": "帖子id",
+                    "type": "string",
+                    "example": "0"
+                },
+                "status": {
+                    "description": "帖子状态",
+                    "type": "integer"
+                },
+                "title": {
+                    "description": "帖子标题",
+                    "type": "string"
+                },
+                "update_time": {
+                    "description": "帖子更新时间",
+                    "type": "string"
+                }
+            }
+        },
+        "response.ResCode": {
+            "type": "integer",
+            "enum": [
+                1000,
+                1001,
+                1002,
+                1003,
+                1004,
+                1005
+            ],
+            "x-enum-varnames": [
+                "CodeSuccess",
+                "CodeInvalidParam",
+                "CodeUserExist",
+                "CodeUserNotExist",
+                "CodeInvalidPassword",
+                "CodeServerBusy"
+            ]
+        }
+    }
+}

@@ -19,7 +19,7 @@ func CreatePost(p *models.Post) (err error) {
 		return
 	}
 	//3.  需要在redis记录帖子的创建时间
-	err = redisCache.CreatePost(p.PostID)
+	err = redisCache.CreatePost(p.PostID, p.CommunityID)
 	if err != nil {
 		zap.L().Error("redisCache CreatePost failed", zap.Error(err))
 		return
@@ -158,4 +158,78 @@ func SearchPostList(p *models.ParamPostList) (data []*models.ApiPostDetail, err 
 		data = append(data, postDetail)
 	}
 	return data, nil
+}
+
+// 根据社区id查询帖子的列表信息
+func CommunitySearchPostList(p *models.ParamPostList) (data []*models.ApiPostDetail, err error) {
+	// 2. redis查询帖子id列表
+	ids, err := redisCache.CommunityPostIDsByOrder(p)
+	if err != nil {
+		zap.L().Error("redisCache CommunityPostIDsByOrder failed",
+			zap.Error(err))
+		return
+	}
+	if len(ids) == 0 {
+		zap.L().Warn("redisCache CommunityPostIDsByOrder success, but empty")
+		return
+	}
+	// 3. 根据id去数据库查询帖子详细信息
+	// **返回的数据是按照给定的顺序
+	posts, err := mysql.SearchPostListByIDs(ids)
+	data = make([]*models.ApiPostDetail, 0, len(posts)) // 初始化内存空间
+	if err != nil {
+		zap.L().Error("mysql SearchPostListByIDs failed",
+			zap.Error(err))
+		return
+	}
+
+	// 提前查询好每条帖子的赞同数
+	voteAgreeData, err := redisCache.GetPostAgreeByIDs(ids)
+	if err != nil {
+		return
+	}
+
+	// 将贴子的作者和社区信息查询处理填充到帖子中
+	for index, post := range posts {
+		// 根据作者id查询作者信息
+		user, err := mysql.GetUserByID(post.AuthorID)
+		if err != nil {
+			zap.L().Error("mysql GetUserByID failed",
+				zap.Int64("author_id", post.AuthorID),
+				zap.Error(err))
+			continue
+		}
+		community, err := mysql.GetCommunityDetailList(post.CommunityID)
+		if err != nil {
+			zap.L().Error("mysql GetCommunityDetailList failed",
+				zap.Int64("community_id", post.CommunityID),
+				zap.Error(err))
+			continue
+		}
+		postDetail := &models.ApiPostDetail{
+			AuthorName:      user.Username,
+			VoteAgreeNum:    voteAgreeData[index],
+			Post:            post,
+			CommunityDetail: community,
+		}
+		data = append(data, postDetail)
+	}
+	return data, nil
+}
+
+// 封装整合查询帖子的业务 将SearchPostList和CommunitySearchPostList结合起来
+func GetPostListNew(p *models.ParamPostList) (data []*models.ApiPostDetail, err error) {
+	if p.CommunityID == 0 {
+		// 查询所有帖子
+		data, err = SearchPostList(p)
+
+	} else {
+		// 按照社区id查询帖子
+		data, err = CommunitySearchPostList(p)
+	}
+	if err != nil {
+		zap.L().Error("GetPostListNew failed", zap.Error(err))
+		return nil, err
+	}
+	return
 }

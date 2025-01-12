@@ -20,7 +20,20 @@ import (
 	"go.uber.org/zap"
 )
 
-// go web 开发通用的脚手架模板
+// @title bluebell go-web
+// @version 1.0
+// @description This is a go-web project from https://www.bilibili.com/cheese/play/ep265306
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name lucien
+// @contact.url none
+// @contact.email none
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host 127.0.0.1:8081
+// @BasePath /api/v1/
 
 func main() {
 	// 1. 加载配置

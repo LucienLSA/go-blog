@@ -92,6 +92,17 @@ func GetPostDetailHandler(c *gin.Context) {
 	response.ResponseSuccessData(c, dataList)
 }
 
+// SearchPostListHandler 升级版帖子列表接口
+// @Summary 升级版帖子列表接口
+// @Description 可按社区按时间或分数排序查询帖子列表接口
+// @Tags 帖子接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query models.ParamPostList false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /searchposts [get]
 // 新版查询帖子，根据前端传来的参数动态获取帖子列表
 // 按照创建时间或者分数排序
 // 1. 获取参数
@@ -107,17 +118,51 @@ func SearchPostListHandler(c *gin.Context) {
 		PageNum:  settings.Conf.AppConfig.PageNum,
 		PageSize: settings.Conf.AppConfig.PageSize,
 		Order:    models.OrderTime,
+		// CommunityID不初始化，根据有无查询的业务不一样
 	}
 	if err := c.ShouldBindQuery(&p); err != nil {
 		zap.L().Error("SearchPostListHandler failed with invalid params", zap.Error(err))
 		response.ResponseError(c, response.CodeInvalidParam)
 		return
 	}
-	dataList, err := service.SearchPostList(&p)
+	// dataList, err := service.SearchPostList(&p)
+	dataList, err := service.GetPostListNew(&p)
 	if err != nil {
-		zap.L().Error("service SearchPostList failed", zap.Error(err))
+		zap.L().Error("service GetPostListNew failed", zap.Error(err))
 		response.ResponseError(c, response.CodeServerBusy)
 		return
 	}
 	response.ResponseSuccessData(c, dataList)
 }
+
+// // 根据社区查询帖子信息 整合到一个handler中
+// func CommunityPostListHandler(c *gin.Context) {
+// 	// 与 SearchPostListHandler 类似
+// 	cIdStr := c.Param("community_id")
+// 	// 获取URL参数 并将其字符串参数转化为int64类型
+// 	communityID, err := strconv.ParseInt(cIdStr, 10, 64)
+// 	if err != nil {
+// 		zap.L().Error("get post detail with invalid param", zap.Error(err))
+// 		response.ResponseError(c, response.CodeInvalidParam)
+// 		return
+// 	}
+// 	p := &models.ParamCommunityPostList{
+// 		ParamPostList: &models.ParamPostList{
+// 			PageNum:  settings.Conf.AppConfig.PageNum,
+// 			PageSize: settings.Conf.AppConfig.PageSize,
+// 			Order:    models.OrderTime,
+// 		}, CommunityID: communityID,
+// 	}
+// 	if err := c.ShouldBindQuery(&p); err != nil {
+// 		zap.L().Error("CommunityPostListHandler failed with invalid params", zap.Error(err))
+// 		response.ResponseError(c, response.CodeInvalidParam)
+// 		return
+// 	}
+// 	dataList, err := service.CommunitySearchPostList(p)
+// 	if err != nil {
+// 		zap.L().Error("service CommunityPostList failed", zap.Error(err))
+// 		response.ResponseError(c, response.CodeServerBusy)
+// 		return
+// 	}
+// 	response.ResponseSuccessData(c, dataList)
+// }

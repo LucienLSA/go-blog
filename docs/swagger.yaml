@@ -1,0 +1,203 @@
+basePath: /api/v1/
+definitions:
+  controller._ResponseCommunityList:
+    properties:
+      code:
+        allOf:
+        - $ref: '#/definitions/response.ResCode'
+        description: 业务相应码
+      data:
+        description: 数据
+        items:
+          $ref: '#/definitions/models.Community'
+        type: array
+      message:
+        description: 提示信息
+        type: string
+    type: object
+  controller._ResponsePostList:
+    properties:
+      code:
+        allOf:
+        - $ref: '#/definitions/response.ResCode'
+        description: 业务相应码
+      data:
+        description: 数据
+        items:
+          $ref: '#/definitions/models.ApiPostDetail'
+        type: array
+      message:
+        description: 提示信息
+        type: string
+    type: object
+  models.ApiPostDetail:
+    properties:
+      author_name:
+        description: 帖子作者用户名
+        type: string
+      community:
+        allOf:
+        - $ref: '#/definitions/models.CommunityDetail'
+        description: 嵌入社区信息
+      post:
+        allOf:
+        - $ref: '#/definitions/models.Post'
+        description: 嵌入帖子信息
+      vote_agree_num:
+        description: 投票赞成数
+        type: integer
+    type: object
+  models.Community:
+    properties:
+      community_id:
+        description: 社区id
+        type: integer
+      community_name:
+        description: 社区名称
+        type: string
+    type: object
+  models.CommunityDetail:
+    properties:
+      community_id:
+        description: 社区id
+        type: integer
+      community_name:
+        description: 社区名称
+        type: string
+      create_time:
+        description: 社区创建时间
+        type: string
+      introduction:
+        description: 社区介绍
+        type: string
+      update_time:
+        description: 社区更新时间
+        type: string
+    type: object
+  models.Post:
+    properties:
+      author_id:
+        description: 帖子作者idid
+        example: "0"
+        type: string
+      community_id:
+        description: 社区id
+        type: integer
+      content:
+        description: 帖子内容
+        type: string
+      create_time:
+        description: 帖子创建时间
+        type: string
+      post_id:
+        description: 帖子id
+        example: "0"
+        type: string
+      status:
+        description: 帖子状态
+        type: integer
+      title:
+        description: 帖子标题
+        type: string
+      update_time:
+        description: 帖子更新时间
+        type: string
+    required:
+    - community_id
+    - content
+    - title
+    type: object
+  response.ResCode:
+    enum:
+    - 1000
+    - 1001
+    - 1002
+    - 1003
+    - 1004
+    - 1005
+    type: integer
+    x-enum-varnames:
+    - CodeSuccess
+    - CodeInvalidParam
+    - CodeUserExist
+    - CodeUserNotExist
+    - CodeInvalidPassword
+    - CodeServerBusy
+host: 127.0.0.1:8081
+info:
+  contact:
+    email: none
+    name: lucien
+    url: none
+  description: This is a go-web project from https://www.bilibili.com/cheese/play/ep265306
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: bluebell go-web
+  version: "1.0"
+paths:
+  /community:
+    get:
+      consumes:
+      - application/json
+      description: 查询社区信息返回列表
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller._ResponseCommunityList'
+      security:
+      - ApiKeyAuth: []
+      summary: 查询社区信息接口
+      tags:
+      - 社区接口
+  /searchposts:
+    get:
+      consumes:
+      - application/json
+      description: 可按社区按时间或分数排序查询帖子列表接口
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        type: string
+      - description: 社区id可以为空
+        in: query
+        name: community_id
+        type: integer
+      - description: 排序方式 按照时间或者投票分数
+        example: score
+        in: query
+        name: order
+        type: string
+      - description: 获取帖子列表的页码
+        example: 1
+        in: query
+        name: page_num
+        type: integer
+      - description: 获取帖子列表的数量
+        example: 5
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller._ResponsePostList'
+      security:
+      - ApiKeyAuth: []
+      summary: 升级版帖子列表接口
+      tags:
+      - 帖子接口
+swagger: "2.0"

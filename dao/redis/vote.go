@@ -3,6 +3,7 @@ package redisCache
 import (
 	"errors"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -38,7 +39,7 @@ var (
 	ErrVoteRepeated   = errors.New("不允许重复投票")
 )
 
-func CreatePost(postID int64) (err error) {
+func CreatePost(postID, community int64) (err error) {
 	// 事务操作
 	pipeline := rdb.TxPipeline()
 	// 帖子时间
@@ -51,6 +52,9 @@ func CreatePost(postID int64) (err error) {
 		Score:  float64(time.Now().Unix()),
 		Member: postID,
 	})
+	// 把帖子id加到社区的set
+	cKey := GetRedisKey(KeyCommunitySetPrefix + strconv.Itoa(int(community)))
+	pipeline.SAdd(rctx, cKey, postID)
 	_, err = pipeline.Exec(rctx)
 	// fmt.Println(err)
 	return err

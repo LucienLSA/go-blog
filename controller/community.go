@@ -9,6 +9,16 @@ import (
 	"go.uber.org/zap"
 )
 
+// CommunityHandler 查询社区信息
+// @Summary 查询社区信息接口
+// @Description 查询社区信息返回列表
+// @Tags 社区接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponseCommunityList
+// @Router /community [get]
 // 社区请求
 func CommunityHandler(c *gin.Context) {
 	// 查询到社区信息（community_id, community_name）以列表形式返回
