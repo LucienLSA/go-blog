@@ -14,7 +14,7 @@ import (
 	"github.com/LucienLSA/go-blog/logger"
 	"github.com/LucienLSA/go-blog/pkg/snowflake"
 	"github.com/LucienLSA/go-blog/pkg/translator"
-	"github.com/LucienLSA/go-blog/routers"
+	route "github.com/LucienLSA/go-blog/routers"
 	"github.com/LucienLSA/go-blog/settings"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -81,7 +81,7 @@ func main() {
 		fmt.Printf("init validator translator failed, err:%v\n", err)
 		return
 	}
-	r := routers.SetupRouter(settings.Conf.Mode)
+	r := route.SetupRouter(settings.Conf.Mode)
 
 	// 7. 启动服务（优雅关机）
 	srv := &http.Server{
