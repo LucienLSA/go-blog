@@ -21,6 +21,9 @@ func SetupRouter(mode string) *gin.Engine {
 	}
 
 	r := gin.New()
+	//处理异常
+	r.NoMethod(HandleNotFound)
+	r.NoRoute(HandleNotFound)
 	// 使用自定义的ginlogger中间件
 	r.Use(logger.GinLogger(), logger.GinRecovery(true))
 	// 使用跨域中间件
@@ -65,5 +68,13 @@ func SetupRouter(mode string) *gin.Engine {
 	}
 	// 注册pprof路由 服务型性能分析
 	pprof.Register(r)
+
 	return r
+}
+
+// 未找到资源
+func HandleNotFound(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"msg": "404",
+	})
 }
