@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/LucienLSA/go-blog/dao/mysql"
+	redisCache "github.com/LucienLSA/go-blog/dao/redis"
 	"github.com/LucienLSA/go-blog/models"
 	"github.com/LucienLSA/go-blog/pkg/jwt"
 	"github.com/LucienLSA/go-blog/pkg/snowflake"
@@ -61,5 +62,9 @@ func Login(p *models.ParamLogin) (user *models.User, err error) {
 		zap.L().Error("jwt GenToken failed", zap.Error(err))
 	}
 	user.Token = token
+	// 保存到redis中
+	if err = redisCache.StorgeUserIdToken(token, user.Username); err != nil {
+		zap.L().Error("redisCache.StorgeUserIdToken failed", zap.Error(err))
+	}
 	return
 }

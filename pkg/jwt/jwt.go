@@ -42,6 +42,7 @@ func GenToken(userID int64, username string) (string, error) {
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	// 使用指定的secret签名并获得完整的编码后的字符串token
 	token, err := tokenClaims.SignedString(MySecret)
+
 	return token, err
 }
 

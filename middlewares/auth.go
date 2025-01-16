@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 
+	redisCache "github.com/LucienLSA/go-blog/dao/redis"
 	"github.com/LucienLSA/go-blog/pkg/jwt"
 	"github.com/LucienLSA/go-blog/pkg/response"
 	"github.com/gin-gonic/gin"
@@ -50,6 +51,20 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			// })
 			zap.L().Error("jwt.ParseToken failed", zap.Error(errors.New("无效的Token")))
 			response.ResponseError(c, response.CodeTokenInvalid)
+			c.Abort()
+			return
+		}
+		// 从redis中获取token 并比较判断当前登录解析得到的token
+		token, err := redisCache.GetJwtToken(mc.Username)
+		// token不存在 需要重新登录
+		if err == redisCache.ErrNotExistToken {
+			response.ResponseError(c, response.CodeNeedLogin)
+			c.Abort()
+			return
+		}
+		// 	如果不一致，则说明在另一端登录
+		if parts[1] != token {
+			response.ResponseError(c, response.CodeLimitLogin)
 			c.Abort()
 			return
 		}

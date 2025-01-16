@@ -12,6 +12,7 @@ const (
 
 	CodeNeedLogin = 2000 + iota
 	CodeTokenInvalid
+	CodeLimitLogin
 )
 
 var codeMsgMap = map[ResCode]string{
@@ -23,4 +24,5 @@ var codeMsgMap = map[ResCode]string{
 	CodeServerBusy:      "服务出错",
 	CodeNeedLogin:       "需要登录",
 	CodeTokenInvalid:    "无效的Token",
+	CodeLimitLogin:      "已在另一台设备登录",
 }
