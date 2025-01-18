@@ -47,16 +47,16 @@ func SetupRouter(mode string) *gin.Engine {
 	v1.POST("/signup", controller.SignUpHandler)
 	// 登录
 	v1.POST("/login", controller.LoginHandler)
+	// 获取社区信息
+	v1.GET("/community", controller.CommunityHandler)
+	v1.GET("/community/:community_id", controller.CommunityDetailHandler)
+
+	// 查看帖子
+	v1.GET("/posts", controller.GetPostListHandler)
 
 	// JWT中间件认证
 	v1.Use(middlewares.JWTAuthMiddleware())
 	{
-		// 获取社区信息
-		v1.GET("/community", controller.CommunityHandler)
-		v1.GET("/community/:community_id", controller.CommunityDetailHandler)
-
-		// 查看帖子
-		v1.GET("/posts", controller.GetPostListHandler)
 		// 帖子查询新版
 		// 参数动态获取帖子列表
 		v1.GET("/searchposts", controller.SearchPostListHandler)
@@ -64,7 +64,7 @@ func SetupRouter(mode string) *gin.Engine {
 		// v1.GET("/communitysearchposts", controller.CommunityPostListHandler)
 		// 令牌桶填充速率2s， 容量1
 		v1.GET("/post/:post_id", middlewares.RateLimitMiddleware(2*time.Second, 1), controller.GetPostDetailHandler)
-		// 帖子
+		// 发布帖子
 		v1.POST("/post", controller.CreatePostHandler)
 
 		// 帖子投票

@@ -14,6 +14,16 @@ import (
 	"go.uber.org/zap"
 )
 
+// CreatePostHandler 发布帖子
+// @Summary 发布帖子
+// @Description 发布帖子
+// @Tags 帖子接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object body models.ParamPostCreate false "请求参数"
+// @Security ApiKeyAuth
+// @Router /post [post]
 // 发布帖子
 func CreatePostHandler(c *gin.Context) {
 	// 1. 获取参数 参数校验
@@ -50,6 +60,16 @@ func CreatePostHandler(c *gin.Context) {
 	response.ResponseSuccessData(c, nil)
 }
 
+// GetPostListHandler 获取帖子列表分页展示
+// @Summary 获取帖子列表分页展示接口
+// @Description 根据分页参数获取帖子列表分页展示
+// @Tags 帖子接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query models.ParamPostSearch false "请求参数"
+// @Success 200 {object} _ResponsePostList
+// @Router /posts [get]
 // 获取帖子列表分页展示
 func GetPostListHandler(c *gin.Context) {
 	// 获取分页参数
@@ -69,6 +89,17 @@ func GetPostListHandler(c *gin.Context) {
 	response.ResponseSuccessData(c, dataList)
 }
 
+// GetPostDetailHandler 获取帖子分类详情
+// @Summary 获取帖子分类详情接口
+// @Description 根据帖子id获取帖子分类详情接口
+// @Tags 帖子接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param post_id path models.ParamPostId true "帖子ID"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /post/{post_id} [get]
 // 获取帖子分类详情
 func GetPostDetailHandler(c *gin.Context) {
 	// 1. 获取帖子ID

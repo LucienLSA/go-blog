@@ -33,7 +33,30 @@ type ParamVoteData struct {
 	Kind   int8  `json:"kind,string" binding:"oneof=1 0 -1"` // 投票帖子赞成(1)\反对(-1)\取消投票(0)
 }
 
-// 获取帖子列表query string参数 社区id 整合后的
+// 社区分类查询 id
+type ParamCommunityId struct {
+	CommunityID int64 `json:"community_id" form:"community_id" example:"2" binding:"required"` // 社区id
+}
+
+// 帖子分类查询 id
+type ParamPostId struct {
+	PostID int64 `json:"post_id,string" form:"community_id" binding:"required"` // 帖子id
+}
+
+// 帖子发布参数
+type ParamPostCreate struct {
+	CommunityID int64  `json:"community_id" db:"community_id" binding:"required"` // 社区id
+	Title       string `json:"title" db:"title" binding:"required"`               // 帖子标题
+	Content     string `json:"content" db:"content" binding:"required"`           // 帖子内容
+}
+
+// 帖子分页查询
+type ParamPostSearch struct {
+	PageNum  int64 `json:"page_num" form:"page_num" example:"1"`   // 获取帖子列表的页码
+	PageSize int64 `json:"page_size" form:"page_size" example:"5"` // 获取帖子列表的数量
+}
+
+// 帖子列表query string参数 社区id 整合后的
 type ParamPostList struct {
 	PageNum  int64  `json:"page_num" form:"page_num" example:"1"`   // 获取帖子列表的页码
 	PageSize int64  `json:"page_size" form:"page_size" example:"5"` // 获取帖子列表的数量

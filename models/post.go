@@ -5,7 +5,7 @@ import "time"
 type Post struct {
 	PostID      int64     `json:"post_id,string" db:"post_id"`                       // 帖子id
 	CommunityID int64     `json:"community_id" db:"community_id" binding:"required"` // 社区id
-	AuthorID    int64     `json:"author_id,string" db:"author_id"`                   // 帖子作者idid
+	AuthorID    int64     `json:"author_id,string" db:"author_id"`                   // 帖子作者id
 	Status      int32     `json:"status" db:"status"`                                // 帖子状态
 	CreateTime  time.Time `json:"create_time" db:"create_time"`                      // 帖子创建时间
 	UpdateTime  time.Time `json:"update_time" db:"update_time"`                      // 帖子更新时间

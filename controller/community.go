@@ -15,8 +15,6 @@ import (
 // @Tags 社区接口
 // @Accept application/json
 // @Produce application/json
-// @Param Authorization header string false "Bearer 用户令牌"
-// @Security ApiKeyAuth
 // @Success 200 {object} _ResponseCommunityList
 // @Router /community [get]
 // 社区请求
@@ -32,6 +30,15 @@ func CommunityHandler(c *gin.Context) {
 	response.ResponseSuccessData(c, dataList)
 }
 
+// CommunityHandler 查询社区分类详情信息
+// @Summary 查询社区分类详情信息接口
+// @Description 查询社区分类详情信息返回列表
+// @Tags 社区接口
+// @Accept application/json
+// @Produce application/json
+// @Param community_id path models.ParamCommunityId true "社区ID"
+// @Success 200 {object} _ResponseCommunityDetailList
+// @Router /community/{community_id} [get]
 // 社区分类详细请求
 func CommunityDetailHandler(c *gin.Context) {
 	// 1. 获取社区ID

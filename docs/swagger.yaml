@@ -1,5 +1,20 @@
 basePath: /api/v1/
 definitions:
+  controller._ResponseCommunityDetailList:
+    properties:
+      code:
+        allOf:
+        - $ref: '#/definitions/response.ResCode'
+        description: 业务相应码
+      data:
+        description: 数据
+        items:
+          $ref: '#/definitions/models.CommunityDetail'
+        type: array
+      message:
+        description: 提示信息
+        type: string
+    type: object
   controller._ResponseCommunityList:
     properties:
       code:
@@ -26,6 +41,20 @@ definitions:
         items:
           $ref: '#/definitions/models.ApiPostDetail'
         type: array
+      message:
+        description: 提示信息
+        type: string
+    type: object
+  controller._ResponseUserLogin:
+    properties:
+      code:
+        allOf:
+        - $ref: '#/definitions/response.ResCode'
+        description: 业务相应码
+      data:
+        allOf:
+        - $ref: '#/definitions/models.UserLogin'
+        description: 数据
       message:
         description: 提示信息
         type: string
@@ -74,10 +103,87 @@ definitions:
         description: 社区更新时间
         type: string
     type: object
+  models.ParamLogin:
+    properties:
+      password:
+        description: 登录人密码
+        type: string
+      username:
+        description: 登录人姓名
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.ParamPostCreate:
+    properties:
+      community_id:
+        description: 社区id
+        type: integer
+      content:
+        description: 帖子内容
+        type: string
+      title:
+        description: 帖子标题
+        type: string
+    required:
+    - community_id
+    - content
+    - title
+    type: object
+  models.ParamSignUp:
+    properties:
+      age:
+        description: 注册人年龄
+        maximum: 130
+        minimum: 1
+        type: integer
+      email:
+        description: 注册人邮箱
+        type: string
+      gender:
+        description: 注册人性别
+        enum:
+        - 男
+        - 女
+        type: string
+      password:
+        description: 注册人密码
+        type: string
+      re_password:
+        description: 注册人重复密码
+        type: string
+      username:
+        description: 注册人用户名
+        type: string
+    required:
+    - email
+    - gender
+    - password
+    - re_password
+    - username
+    type: object
+  models.ParamVoteData:
+    properties:
+      kind:
+        description: 投票帖子赞成(1)\反对(-1)\取消投票(0)
+        enum:
+        - 1
+        - 0
+        - -1
+        example: "0"
+        type: string
+      post_id:
+        description: UserID 从请求中获取当前用户
+        example: "0"
+        type: string
+    required:
+    - post_id
+    type: object
   models.Post:
     properties:
       author_id:
-        description: 帖子作者idid
+        description: 帖子作者id
         example: "0"
         type: string
       community_id:
@@ -106,6 +212,18 @@ definitions:
     - community_id
     - content
     - title
+    type: object
+  models.UserLogin:
+    properties:
+      token:
+        description: access token
+        type: string
+      user_id:
+        description: 用户id
+        type: integer
+      user_name:
+        description: 用户名
+        type: string
     type: object
   response.ResCode:
     enum:
@@ -142,11 +260,6 @@ paths:
       consumes:
       - application/json
       description: 查询社区信息返回列表
-      parameters:
-      - description: Bearer 用户令牌
-        in: header
-        name: Authorization
-        type: string
       produces:
       - application/json
       responses:
@@ -154,11 +267,134 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controller._ResponseCommunityList'
-      security:
-      - ApiKeyAuth: []
       summary: 查询社区信息接口
       tags:
       - 社区接口
+  /community/{community_id}:
+    get:
+      consumes:
+      - application/json
+      description: 查询社区分类详情信息返回列表
+      parameters:
+      - description: 社区id
+        example: 2
+        in: path
+        name: community_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller._ResponseCommunityDetailList'
+      summary: 查询社区分类详情信息接口
+      tags:
+      - 社区接口
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: 根据所填用户名和密码进行登录
+      parameters:
+      - description: 用户登录
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.ParamLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller._ResponseUserLogin'
+      summary: 用户登录接口
+      tags:
+      - 用户接口
+  /post:
+    post:
+      consumes:
+      - application/json
+      description: 发布帖子
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        type: string
+      - description: 请求参数
+        in: body
+        name: object
+        schema:
+          $ref: '#/definitions/models.ParamPostCreate'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: 发布帖子
+      tags:
+      - 帖子接口
+  /post/{post_id}:
+    get:
+      consumes:
+      - application/json
+      description: 根据帖子id获取帖子分类详情接口
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        type: string
+      - description: 帖子id
+        example: "0"
+        in: path
+        name: post_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller._ResponsePostList'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取帖子分类详情接口
+      tags:
+      - 帖子接口
+  /posts:
+    get:
+      consumes:
+      - application/json
+      description: 根据分页参数获取帖子列表分页展示
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        type: string
+      - description: 获取帖子列表的页码
+        example: 1
+        in: query
+        name: page_num
+        type: integer
+      - description: 获取帖子列表的数量
+        example: 5
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller._ResponsePostList'
+      summary: 获取帖子列表分页展示接口
+      tags:
+      - 帖子接口
   /searchposts:
     get:
       consumes:
@@ -200,4 +436,44 @@ paths:
       summary: 升级版帖子列表接口
       tags:
       - 帖子接口
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: 根据用户所填信息进行注册
+      parameters:
+      - description: 用户注册
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.ParamSignUp'
+      produces:
+      - application/json
+      responses: {}
+      summary: 用户注册接口
+      tags:
+      - 用户接口
+  /vote:
+    post:
+      consumes:
+      - application/json
+      description: 根据帖子id进行投票
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        type: string
+      - description: 用户投票
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.ParamVoteData'
+      produces:
+      - application/json
+      responses: {}
+      summary: 用户投票接口
+      tags:
+      - 用户接口
 swagger: "2.0"
