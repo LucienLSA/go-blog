@@ -19,15 +19,20 @@ type multipleConfig struct {
 }
 
 type AppConfig struct {
-	Name          string        `mapstructure:"name"`
-	Mode          string        `mapstructure:"mode"`
-	Version       string        `mapstructure:"version"`
-	Port          string        `mapstructure:"port"`
-	StartTime     string        `mapstructure:"start_time"`
-	PageNum       int64         `mapstructure:"page_num"`
-	PageSize      int64         `mapstructure:"page_size"`
-	MachineID     int64         `mapstructure:"machine_id"`
-	JwtExpireTime time.Duration `mapstructure:"jwt_expire_time"`
+	Name             string        `mapstructure:"name"`
+	Mode             string        `mapstructure:"mode"`
+	Version          string        `mapstructure:"version"`
+	Port             string        `mapstructure:"port"`
+	StartTime        string        `mapstructure:"start_time"`
+	PageNum          int64         `mapstructure:"page_num"`
+	PageSize         int64         `mapstructure:"page_size"`
+	MachineID        int64         `mapstructure:"machine_id"`
+	JwtExpireTime    time.Duration `mapstructure:"jwt_expire_time"`
+	UploadModel      string        `mapstructure:"uploadModel"`
+	*PhotoPathConfig `mapstructure:"photoPath"`
+}
+
+type PhotoPathConfig struct {
 }
 
 type LogConfig struct {

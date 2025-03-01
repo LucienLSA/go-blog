@@ -1,14 +1,15 @@
 package models
 
 type User struct {
-	Age            uint8  `db:"age"`
-	UserID         int64  `db:"user_id"`
-	Username       string `db:"username"`
+	Age            uint8  `db:"age" json:"age"`
+	UserID         int64  `db:"user_id" json:"user_id"`
+	Username       string `db:"username" json:"user_name"`
 	Password       string `db:"password"`
-	Email          string `db:"email"`
+	Email          string `db:"email" json:"email"`
 	PasswordDigest string
-	Gender         string `db:"gender"`
+	Gender         string `db:"gender" json:"gender"`
 	Token          string
+	Avatar         string `db:"avatar" json:"avatar"`
 }
 
 type UserLogin struct {

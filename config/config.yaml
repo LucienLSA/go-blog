@@ -9,7 +9,13 @@ app:
 
   page_size: 5
   page_num: 1
-  
+
+  uploadModel: "local"
+
+
+  photoPath:
+    photoHost: http://127.0.0.1
+    AvatarPath: /static/img/avatar/
 
 log:
   level: "debug"
@@ -34,3 +40,9 @@ redis:
   password: ""
   db: 1
   pool_size: 100
+
+email:
+  VaildEmail: http://localhost:8082/#/vaild/email/
+  SmtpHost: smtp.163.com
+  SmtpEmail: 
+  SmtpPass: 

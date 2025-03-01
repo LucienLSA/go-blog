@@ -6,6 +6,7 @@ import (
 
 	"github.com/LucienLSA/go-blog/dao/mysql"
 	"github.com/LucienLSA/go-blog/models"
+	"github.com/LucienLSA/go-blog/pkg/request"
 	"github.com/LucienLSA/go-blog/pkg/response"
 	"github.com/LucienLSA/go-blog/pkg/translator"
 	"github.com/LucienLSA/go-blog/service"
@@ -21,7 +22,7 @@ import (
 // @Accept application/json
 // @Produce application/json
 // @Param object body models.ParamSignUp true "用户注册"
-// @Router /signup [post]
+// @Router /user/signup [post]
 // 注册请求
 func SignUpHandler(c *gin.Context) {
 	// 1. 获取参数和参数校验
@@ -84,7 +85,7 @@ func SignUpHandler(c *gin.Context) {
 // @Produce application/json
 // @Param object body models.ParamLogin true "用户登录"
 // @Success 200 {object} _ResponseUserLogin
-// @Router /login [post]
+// @Router /user/login [post]
 // 登录请求
 func LoginHandler(c *gin.Context) {
 	// 1. 获取参数和参数校验
@@ -132,4 +133,40 @@ func LoginHandler(c *gin.Context) {
 		"user_name": user.Username,
 		"token":     user.Token,
 	})
+}
+
+// 用户头像上传
+func UploadAvatarHandler(c *gin.Context) {
+	// 1. 获取上传的文件参数
+	file, fileHeader, _ := c.Request.FormFile("file")
+	if fileHeader == nil {
+		response.ResponseError(c, response.CodeUploadFile)
+		zap.L().Error("UpLoad file failed")
+		return
+	}
+	fileSize := fileHeader.Size
+	// 2. 用户校验
+	p := new(models.ParamAvatar)
+	if err := c.ShouldBind(p); err == nil {
+		// 获取登录用户的id
+		claimID, _ := request.GetLoginUserID(c)
+		resp, err := service.UploadAvatar(claimID, file, fileSize)
+		if err != nil {
+			zap.L().Error("service UploadAvatar failed, err:", zap.Error(err))
+			response.ResponseError(c, response.CodeServerBusy)
+			return
+		}
+		response.ResponseSuccessData(c, resp)
+	} else { // 3.请求参数有误 直接返回响应
+		zap.L().Error("Login with invalid param", zap.Error(err))
+		// 判断err是不是validator.ValidationErrors类型
+		errs, ok := err.(validator.ValidationErrors)
+		if !ok {
+			response.ResponseError(c, response.CodeInvalidParam)
+			return
+		}
+		response.ResponseErrorMsg(c, response.CodeInvalidParam,
+			translator.RemoveTopStruct(errs.Translate(translator.Trans)))
+		return
+	}
 }

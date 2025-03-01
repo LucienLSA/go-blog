@@ -16,7 +16,7 @@ import (
 // @Accept application/json
 // @Produce application/json
 // @Success 200 {object} _ResponseCommunityList
-// @Router /community [get]
+// @Router /show/community [get]
 // 社区请求
 func CommunityHandler(c *gin.Context) {
 	// 查询到社区信息（community_id, community_name）以列表形式返回
@@ -38,7 +38,7 @@ func CommunityHandler(c *gin.Context) {
 // @Produce application/json
 // @Param community_id path models.ParamCommunityId true "社区ID"
 // @Success 200 {object} _ResponseCommunityDetailList
-// @Router /community/{community_id} [get]
+// @Router /community/show/{community_id} [get]
 // 社区分类详细请求
 func CommunityDetailHandler(c *gin.Context) {
 	// 1. 获取社区ID

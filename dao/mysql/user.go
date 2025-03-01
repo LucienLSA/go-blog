@@ -40,6 +40,11 @@ func InsertUser(user *models.User) (err error) {
 	return err
 }
 
+// 向数据库更新用户信息
+func UpdateUser(uId int64, user *models.User) (err error) {
+
+}
+
 // 用户登录 与数据库中用户信息比对
 func Login(user *models.User) (err error) {
 	// 记录用户输入的密码

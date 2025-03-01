@@ -20,10 +20,16 @@ type ParamSignUp struct {
 	// Date string `json:"date" binding:"required,datetime=2006-01-02,checkDate"`
 }
 
-// 登录
+// 用户登录
 type ParamLogin struct {
-	Username string `json:"username" binding:"required"` // 登录人姓名
-	Password string `json:"password" binding:"required"` // 登录人密码
+	Username string `json:"username" binding:"required"`  // 登录人姓名
+	Password string ` json:"password" binding:"required"` // 登录人密码
+}
+
+// 用户头像上传
+type ParamAvatar struct {
+	UserName string `form:"username" json:"username"` // 用户名称
+	Password string `form:"password" json:"password"` // 用户密码
 }
 
 // 投票数据

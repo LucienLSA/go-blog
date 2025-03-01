@@ -2,12 +2,14 @@ package service
 
 import (
 	"fmt"
+	"mime/multipart"
 
 	"github.com/LucienLSA/go-blog/dao/mysql"
 	redisCache "github.com/LucienLSA/go-blog/dao/redis"
 	"github.com/LucienLSA/go-blog/models"
 	"github.com/LucienLSA/go-blog/pkg/jwt"
 	"github.com/LucienLSA/go-blog/pkg/snowflake"
+	"github.com/LucienLSA/go-blog/pkg/upload"
 	"go.uber.org/zap"
 )
 
@@ -65,6 +67,29 @@ func Login(p *models.ParamLogin) (user *models.User, err error) {
 	// 保存到redis中
 	if err = redisCache.StorgeUserIdToken(token, user.Username); err != nil {
 		zap.L().Error("redisCache.StorgeUserIdToken failed", zap.Error(err))
+	}
+	return
+}
+
+// 上传用户头像
+func UploadAvatar(uId int64, file multipart.File, fileSize int64) (resp interface{}, err error) {
+	var user *models.User
+	user, err = mysql.GetUserByID(uId)
+	if err != nil {
+		zap.L().Error("mysql GetUserByID failed", zap.Error(err))
+		return nil, err
+	}
+	// 保存到本地
+	path, err := upload.UploadAvatarToLocalStatic(file, uId, user.Username)
+	if err != nil {
+		zap.L().Error("upload UploadAvatarToLocalStatic failed", zap.Error(err))
+		return nil, err
+	}
+	user.Avatar = path
+	err = mysql.UpdateUser(uId, user)
+	if err != nil {
+		zap.L().Error("mysql UpdateUser failed", zap.Error(err))
+		return nil, err
 	}
 	return
 }

@@ -13,6 +13,8 @@ const (
 	CodeNeedLogin = 2000 + iota
 	CodeTokenInvalid
 	CodeLimitLogin
+
+	CodeUploadFile = 3000 + iota
 )
 
 var codeMsgMap = map[ResCode]string{
@@ -25,4 +27,5 @@ var codeMsgMap = map[ResCode]string{
 	CodeNeedLogin:       "需要登录",
 	CodeTokenInvalid:    "无效的Token",
 	CodeLimitLogin:      "已在另一台设备登录",
+	CodeUploadFile:      "上传文件失败",
 }

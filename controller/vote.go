@@ -19,7 +19,7 @@ import (
 // @Produce application/json
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param object body models.ParamVoteData true "用户投票"
-// @Router /vote [post]
+// @Router /posts/vote [post]
 // 用户投票
 func PostVoteHandler(c *gin.Context) {
 	// 参数校验

@@ -23,7 +23,7 @@ import (
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param object body models.ParamPostCreate false "请求参数"
 // @Security ApiKeyAuth
-// @Router /post [post]
+// @Router /posts/post [post]
 // 发布帖子
 func CreatePostHandler(c *gin.Context) {
 	// 1. 获取参数 参数校验
@@ -69,7 +69,7 @@ func CreatePostHandler(c *gin.Context) {
 // @Param Authorization header string false "Bearer 用户令牌"
 // @Param object query models.ParamPostSearch false "请求参数"
 // @Success 200 {object} _ResponsePostList
-// @Router /posts [get]
+// @Router /posts/show [get]
 // 获取帖子列表分页展示
 func GetPostListHandler(c *gin.Context) {
 	// 获取分页参数
@@ -99,7 +99,7 @@ func GetPostListHandler(c *gin.Context) {
 // @Param post_id path models.ParamPostId true "帖子ID"
 // @Security ApiKeyAuth
 // @Success 200 {object} _ResponsePostList
-// @Router /post/{post_id} [get]
+// @Router /posts/{post_id} [get]
 // 获取帖子分类详情
 func GetPostDetailHandler(c *gin.Context) {
 	// 1. 获取帖子ID
@@ -133,7 +133,7 @@ func GetPostDetailHandler(c *gin.Context) {
 // @Param object query models.ParamPostList false "查询参数"
 // @Security ApiKeyAuth
 // @Success 200 {object} _ResponsePostList
-// @Router /searchposts [get]
+// @Router /posts/search [get]
 // 新版查询帖子，根据前端传来的参数动态获取帖子列表
 // 按照创建时间或者分数排序
 // 1. 获取参数
