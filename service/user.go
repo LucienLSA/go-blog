@@ -91,5 +91,13 @@ func UploadAvatar(uId int64, file multipart.File, fileSize int64) (resp interfac
 		zap.L().Error("mysql UpdateUser failed", zap.Error(err))
 		return nil, err
 	}
-	return
+	resp = &models.ParamUserInfo{
+		UserID:   user.UserID,
+		Username: user.Username,
+		Gender:   user.Gender,
+		Avatar:   user.Avatar,
+		Email:    user.Email,
+		Age:      user.Age,
+	}
+	return resp, nil
 }

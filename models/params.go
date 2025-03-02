@@ -22,14 +22,23 @@ type ParamSignUp struct {
 
 // 用户登录
 type ParamLogin struct {
-	Username string `json:"username" binding:"required"`  // 登录人姓名
-	Password string ` json:"password" binding:"required"` // 登录人密码
+	Username string `json:"username" form:"username" binding:"required"`  // 登录人姓名
+	Password string ` json:"password" form:"password" binding:"required"` // 登录人密码
 }
 
 // 用户头像上传
 type ParamAvatar struct {
 	UserName string `form:"username" json:"username"` // 用户名称
 	Password string `form:"password" json:"password"` // 用户密码
+}
+
+type ParamUserInfo struct {
+	Age      uint8  `form:"age" json:"age"`
+	UserID   int64  `form:"user_id" json:"user_id"`
+	Username string `form:"username" json:"user_name"`
+	Email    string `form:"email" json:"email"`
+	Gender   string `form:"gender" json:"gender"`
+	Avatar   string `form:"avatar" json:"avatar"`
 }
 
 // 投票数据

@@ -12,10 +12,9 @@ app:
 
   uploadModel: "local"
 
-
   photoPath:
     photoHost: http://127.0.0.1
-    AvatarPath: /static/img/avatar/
+    avatarPath: /static/img/avatar/
 
 log:
   level: "debug"

@@ -33,6 +33,8 @@ type AppConfig struct {
 }
 
 type PhotoPathConfig struct {
+	PhotoHost  string `mapstructure:"photoHost"`
+	AvatarPath string `mapstructure:"avatarPath"`
 }
 
 type LogConfig struct {

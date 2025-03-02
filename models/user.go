@@ -13,7 +13,7 @@ type User struct {
 }
 
 type UserLogin struct {
-	UserID   int64  `json:"user_id" db:"user_id"`    // 用户id
-	Username string `json:"user_name" db:"username"` // 用户名
-	Token    string `json:"token" `                  // access token
+	UserID   int64  `json:"user_id" db:"user_id"`   // 用户id
+	Username string `json:"username" db:"username"` // 用户名
+	Token    string `json:"token" `                 // access token
 }

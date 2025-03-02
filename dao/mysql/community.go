@@ -24,6 +24,7 @@ func GetCommunityDetailList(cid int64) (community *models.CommunityDetail, err e
 	 from community where community_id = ?`
 	if err = db.Get(community, sqlStr, cid); err != nil {
 		if err == sql.ErrNoRows {
+			zap.L().Warn("there is no community in database")
 			err = ErrorInvalidID
 		}
 	}

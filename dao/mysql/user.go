@@ -40,9 +40,12 @@ func InsertUser(user *models.User) (err error) {
 	return err
 }
 
-// 向数据库更新用户信息
+// 向数据库更新用户头像
 func UpdateUser(uId int64, user *models.User) (err error) {
-
+	userAvatar := user.Avatar
+	sqlStr := `update user set avatar=? where user_id = ?`
+	_, err = db.Exec(sqlStr, userAvatar, uId)
+	return err
 }
 
 // 用户登录 与数据库中用户信息比对
