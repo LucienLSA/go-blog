@@ -60,10 +60,12 @@ func SetupRouter(mode string) *gin.Engine {
 		// 帖子查询新版
 		// 参数动态获取帖子列表
 		v1.GET("/posts/search", controller.SearchPostListHandler)
+
 		// 根据社区查询帖子列表 整合到上一个hander中
 		// v1.GET("/communitysearchposts", controller.CommunityPostListHandler)
 		// 令牌桶填充速率2s， 容量1
 		v1.GET("/posts/:post_id", middlewares.RateLimitMiddleware(2*time.Second, 1), controller.GetPostDetailHandler)
+
 		// 发布帖子
 		v1.POST("/posts/post", controller.CreatePostHandler)
 
@@ -72,6 +74,9 @@ func SetupRouter(mode string) *gin.Engine {
 
 		// 用户头像上传
 		v1.POST("/user/avatar", controller.UploadAvatarHandler)
+
+		// 用户信息更新
+		v1.POST("/user/update", controller.UpdateHandler)
 	}
 	// 注册pprof路由 服务型性能分析
 	pprof.Register(r)

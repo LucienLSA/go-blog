@@ -26,6 +26,20 @@ func CheckUserExist(username string) (err error) {
 	return nil
 }
 
+// 检查指定用户名的用户是否不存在
+func CheckUserNototExist(username string) (err error) {
+	sqlStr := "select count(user_id) from user where username = ?"
+	var count int
+	if err = db.Get(&count, sqlStr, username); err != nil {
+		return err
+	}
+	// fmt.Println(count)
+	if count <= 0 {
+		return ErrorUserNotExist
+	}
+	return nil
+}
+
 // 向数据库中插入一条用户信息
 func InsertUser(user *models.User) (err error) {
 	// 对密码进行加密
@@ -40,8 +54,21 @@ func InsertUser(user *models.User) (err error) {
 	return err
 }
 
-// 向数据库更新用户头像
 func UpdateUser(uId int64, user *models.User) (err error) {
+	sqlStr := `
+	update user 
+	set username=?,
+		password=?,
+		email=?,
+		age=?,
+		gender=?
+	where user_id = ?`
+	_, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password, user.Email, user.Age, user.Gender, uId)
+	return err
+}
+
+// 向数据库更新用户头像
+func UpdateAvatar(uId int64, user *models.User) (err error) {
 	userAvatar := user.Avatar
 	sqlStr := `update user set avatar=? where user_id = ?`
 	_, err = db.Exec(sqlStr, userAvatar, uId)
@@ -72,7 +99,7 @@ func Login(user *models.User) (err error) {
 	return
 }
 
-// 根据作者/用户id获取信息
+// 根据作者/用户id获取用户id和用户名
 func GetUserByID(uId int64) (user *models.User, err error) {
 	user = new(models.User)
 	sqlStr := `select user_id, username from user where user_id = ?`

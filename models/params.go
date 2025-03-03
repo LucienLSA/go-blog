@@ -19,6 +19,14 @@ type ParamSignUp struct {
 	// // 需要使用自定义校验方法checkDate做参数校验的字段Date
 	// Date string `json:"date" binding:"required,datetime=2006-01-02,checkDate"`
 }
+type ParamUpdate struct {
+	Age        uint8  `json:"age" binding:"gte=1,lte=130"`                     // 用户年龄
+	Gender     string `json:"gender" binding:"required,oneof=男 女"`             // 用户性别
+	Username   string `json:"username" binding:"required"`                     // 用户名
+	Password   string `json:"password" binding:"required"`                     // 用户密码
+	RePassword string `json:"re_password" binding:"required,eqfield=Password"` // 用户重复密码
+	Email      string `json:"email" binding:"required,email"`                  // 用户邮箱
+}
 
 // 用户登录
 type ParamLogin struct {
@@ -28,17 +36,9 @@ type ParamLogin struct {
 
 // 用户头像上传
 type ParamAvatar struct {
+	UserID   int64  `form:"user_id" json:"user_id"`   // 用户ID
 	UserName string `form:"username" json:"username"` // 用户名称
-	Password string `form:"password" json:"password"` // 用户密码
-}
-
-type ParamUserInfo struct {
-	Age      uint8  `form:"age" json:"age"`
-	UserID   int64  `form:"user_id" json:"user_id"`
-	Username string `form:"username" json:"user_name"`
-	Email    string `form:"email" json:"email"`
-	Gender   string `form:"gender" json:"gender"`
-	Avatar   string `form:"avatar" json:"avatar"`
+	Avatar   string `form:"avatar" json:"avatar"`     // 用户密头像
 }
 
 // 投票数据

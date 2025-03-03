@@ -1,41 +1,60 @@
-{"level":"INFO","time":"2025-03-02T22:05:40.998+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
-{"level":"INFO","time":"2025-03-02T22:05:41.011+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
-{"level":"INFO","time":"2025-03-02T22:05:41.011+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
-{"level":"INFO","time":"2025-03-02T22:05:41.011+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
-{"level":"ERROR","time":"2025-03-02T22:05:49.046+0800","caller":"controller/user.go:95","msg":"Login with invalid param","error":"invalid character '-' in numeric literal"}
-{"level":"INFO","time":"2025-03-02T22:05:49.046+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login","status":200,"method":"POST","path":"/api/v1/user/login","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0005502}
-{"level":"INFO","time":"2025-03-02T22:06:45.937+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
-{"level":"INFO","time":"2025-03-02T22:06:45.977+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
-{"level":"INFO","time":"2025-03-02T22:06:45.977+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
-{"level":"INFO","time":"2025-03-02T22:06:45.978+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
-{"level":"ERROR","time":"2025-03-02T22:06:47.183+0800","caller":"controller/user.go:95","msg":"Login with invalid param","error":"invalid character '-' in numeric literal"}
-{"level":"INFO","time":"2025-03-02T22:06:47.183+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login","status":200,"method":"POST","path":"/api/v1/user/login","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0005082}
-{"level":"ERROR","time":"2025-03-02T22:06:49.092+0800","caller":"controller/user.go:95","msg":"Login with invalid param","error":"invalid character '-' in numeric literal"}
-{"level":"INFO","time":"2025-03-02T22:06:49.092+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login","status":200,"method":"POST","path":"/api/v1/user/login","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0}
-{"level":"INFO","time":"2025-03-02T22:07:57.904+0800","caller":"logger/logger.go:87","msg":"/api/v1/login","status":200,"method":"POST","path":"/api/v1/login","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0005053}
-{"level":"INFO","time":"2025-03-02T22:10:29.014+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login","status":200,"method":"POST","path":"/api/v1/user/login","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.3435794}
-{"level":"INFO","time":"2025-03-02T22:11:03.813+0800","caller":"logger/logger.go:87","msg":"/api/v1/community","status":200,"method":"GET","path":"/api/v1/community","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0005047}
-{"level":"INFO","time":"2025-03-02T22:11:45.986+0800","caller":"logger/logger.go:87","msg":"/api/v1/community/show","status":200,"method":"GET","path":"/api/v1/community/show","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0025314}
-{"level":"INFO","time":"2025-03-02T22:12:01.826+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/avatar","status":200,"method":"POST","path":"/api/v1/user/avatar","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.020148}
-{"level":"INFO","time":"2025-03-02T22:24:56.709+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
-{"level":"INFO","time":"2025-03-02T22:24:56.725+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
-{"level":"INFO","time":"2025-03-02T22:24:56.725+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
-{"level":"INFO","time":"2025-03-02T22:24:56.725+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
-{"level":"INFO","time":"2025-03-02T22:24:58.335+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/avatar","status":200,"method":"POST","path":"/api/v1/user/avatar","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0039513}
-{"level":"INFO","time":"2025-03-02T22:25:54.244+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
-{"level":"INFO","time":"2025-03-02T22:25:54.259+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
-{"level":"INFO","time":"2025-03-02T22:25:54.259+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
-{"level":"INFO","time":"2025-03-02T22:25:54.259+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
-{"level":"INFO","time":"2025-03-02T22:27:06.975+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
-{"level":"INFO","time":"2025-03-02T22:27:06.989+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
-{"level":"INFO","time":"2025-03-02T22:27:06.989+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
-{"level":"INFO","time":"2025-03-02T22:27:06.989+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
-{"level":"INFO","time":"2025-03-02T22:27:27.017+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
-{"level":"INFO","time":"2025-03-02T22:27:27.031+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
-{"level":"INFO","time":"2025-03-02T22:27:27.031+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
-{"level":"INFO","time":"2025-03-02T22:27:27.032+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
-{"level":"INFO","time":"2025-03-02T22:27:27.137+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/avatar","status":200,"method":"POST","path":"/api/v1/user/avatar","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0036761}
-{"level":"INFO","time":"2025-03-02T22:35:11.665+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
-{"level":"INFO","time":"2025-03-02T22:35:11.677+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
-{"level":"INFO","time":"2025-03-02T22:35:11.677+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
-{"level":"INFO","time":"2025-03-02T22:35:11.678+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-03T17:50:29.959+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-03T17:50:29.964+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-03T17:50:29.965+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-03T17:50:29.965+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-03T17:50:36.259+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/avatar","status":200,"method":"POST","path":"/api/v1/user/avatar","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.2495481}
+{"level":"INFO","time":"2025-03-03T17:50:41.068+0800","caller":"logger/logger.go:87","msg":"/static/img/avatar/ssjjen2mm.hd-bkt.clouddn.comFvJRBrogAJ_t588R_e8VcO230QhS","status":200,"method":"GET","path":"/static/img/avatar/ssjjen2mm.hd-bkt.clouddn.comFvJRBrogAJ_t588R_e8VcO230QhS","query":"","ip":"127.0.0.1","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0","errors":"","cost":0}
+{"level":"INFO","time":"2025-03-03T17:50:41.128+0800","caller":"logger/logger.go:87","msg":"/favicon.ico","status":200,"method":"GET","path":"/favicon.ico","query":"","ip":"127.0.0.1","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0","errors":"","cost":0}
+{"level":"INFO","time":"2025-03-03T17:50:48.742+0800","caller":"logger/logger.go:87","msg":"/static/img/avatar/ssjjen2mm.hd-bkt.clouddn.comFvJRBrogAJ_t588R_e8VcO230QhS","status":200,"method":"GET","path":"/static/img/avatar/ssjjen2mm.hd-bkt.clouddn.comFvJRBrogAJ_t588R_e8VcO230QhS","query":"","ip":"127.0.0.1","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0","errors":"","cost":0}
+{"level":"INFO","time":"2025-03-03T17:50:48.797+0800","caller":"logger/logger.go:87","msg":"/favicon.ico","status":200,"method":"GET","path":"/favicon.ico","query":"","ip":"127.0.0.1","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0","errors":"","cost":0}
+{"level":"INFO","time":"2025-03-03T17:59:08.903+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-03T17:59:08.905+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-03T17:59:08.905+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-03T17:59:08.905+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-03T17:59:10.577+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/avatar","status":200,"method":"POST","path":"/api/v1/user/avatar","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.2872211}
+{"level":"INFO","time":"2025-03-03T17:59:39.258+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-03T17:59:39.260+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-03T17:59:39.261+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-03T17:59:39.261+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-03T17:59:40.789+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/avatar","status":200,"method":"POST","path":"/api/v1/user/avatar","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.2358158}
+{"level":"INFO","time":"2025-03-03T18:13:01.439+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-03T18:13:01.441+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-03T18:13:01.442+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-03T18:13:01.442+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-03T18:13:03.130+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/avatar","status":200,"method":"POST","path":"/api/v1/user/avatar","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.2378411}
+{"level":"INFO","time":"2025-03-03T18:13:23.213+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/avatar","status":200,"method":"POST","path":"/api/v1/user/avatar","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.1741378}
+{"level":"INFO","time":"2025-03-03T18:14:00.209+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/avatar","status":200,"method":"POST","path":"/api/v1/user/avatar","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0262514}
+{"level":"INFO","time":"2025-03-03T18:14:36.601+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-03T18:14:36.603+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-03T18:14:36.604+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-03T18:14:36.604+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-03T18:14:40.487+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-03T18:14:40.490+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-03T18:14:40.490+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-03T18:14:40.490+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-03T18:14:41.296+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/avatar","status":200,"method":"POST","path":"/api/v1/user/avatar","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0032882}
+{"level":"INFO","time":"2025-03-03T18:15:19.748+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-03T18:15:19.750+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-03T18:15:19.751+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-03T18:15:19.751+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-03T18:15:20.539+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/avatar","status":200,"method":"POST","path":"/api/v1/user/avatar","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0068248}
+{"level":"INFO","time":"2025-03-03T18:15:44.458+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-03T18:15:44.462+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-03T18:15:44.462+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-03T18:15:44.462+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-03T18:15:52.863+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/avatar","status":200,"method":"POST","path":"/api/v1/user/avatar","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0043657}
+{"level":"INFO","time":"2025-03-03T18:16:12.502+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-03T18:16:12.504+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-03T18:16:12.505+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-03T18:16:12.505+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-03T18:16:13.966+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/avatar","status":200,"method":"POST","path":"/api/v1/user/avatar","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0041562}
+{"level":"INFO","time":"2025-03-03T18:16:15.759+0800","caller":"logger/logger.go:87","msg":"/static/img/avatar/user531412185658691584/lucien.jpg","status":200,"method":"GET","path":"/static/img/avatar/user531412185658691584/lucien.jpg","query":"","ip":"127.0.0.1","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0","errors":"","cost":0.050119}
+{"level":"INFO","time":"2025-03-03T18:16:15.809+0800","caller":"logger/logger.go:87","msg":"/favicon.ico","status":200,"method":"GET","path":"/favicon.ico","query":"","ip":"127.0.0.1","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0","errors":"","cost":0}
+{"level":"INFO","time":"2025-03-03T18:19:07.392+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-03T18:19:07.393+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-03T18:19:07.393+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-03T18:19:07.393+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-03T18:19:08.497+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/avatar","status":200,"method":"POST","path":"/api/v1/user/avatar","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0068334}
+{"level":"INFO","time":"2025-03-03T18:19:10.880+0800","caller":"logger/logger.go:87","msg":"/static/img/avatar/user531412185658691584/lucien.jpg","status":200,"method":"GET","path":"/static/img/avatar/user531412185658691584/lucien.jpg","query":"","ip":"127.0.0.1","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0","errors":"","cost":0.0382355}
+{"level":"INFO","time":"2025-03-03T18:19:10.938+0800","caller":"logger/logger.go:87","msg":"/favicon.ico","status":200,"method":"GET","path":"/favicon.ico","query":"","ip":"127.0.0.1","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0","errors":"","cost":0}
+{"level":"INFO","time":"2025-03-03T18:20:00.626+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/avatar","status":200,"method":"POST","path":"/api/v1/user/avatar","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.2517936}

@@ -135,6 +135,39 @@ func LoginHandler(c *gin.Context) {
 	})
 }
 
+// UpdateHandler 用户信息更新
+func UpdateHandler(c *gin.Context) {
+	// 1. 获取参数和参数校验
+	p := new(models.ParamUpdate)
+	if err := c.ShouldBindJSON(&p); err != nil {
+		// 请求参数有误 直接返回响应
+		zap.L().Error("Updatewith invalid param", zap.Error(err))
+		// 判断err是不是validator.ValidationErrors类型
+		errs, ok := err.(validator.ValidationErrors)
+		if !ok {
+			response.ResponseError(c, response.CodeInvalidParam)
+			return
+		}
+		response.ResponseErrorMsg(c, response.CodeInvalidParam,
+			translator.RemoveTopStruct(errs.Translate(translator.Trans)))
+		return
+	}
+
+	// 2. 业务处理
+	claimsID, _ := request.GetLoginUserID(c)
+	if err := service.Update(claimsID, p); err != nil {
+		zap.L().Error("service update failed", zap.Error(err))
+		if errors.Is(err, mysql.ErrorUserNotExist) {
+			response.ResponseError(c, response.CodeUserNotExist)
+			return
+		}
+		response.ResponseError(c, response.CodeServerBusy)
+		return
+	}
+	// 3. 返回响应
+	response.ResponseSuccessData(c, nil)
+}
+
 // 用户头像上传
 func UploadAvatarHandler(c *gin.Context) {
 	// 1. 获取上传的文件参数
@@ -147,16 +180,16 @@ func UploadAvatarHandler(c *gin.Context) {
 	fileSize := fileHeader.Size
 	// 2. 用户校验
 	p := new(models.ParamAvatar)
-	if err := c.ShouldBind(p); err == nil {
+	if err := c.ShouldBind(&p); err == nil {
 		// 获取登录用户的id
 		claimID, _ := request.GetLoginUserID(c)
-		resp, err := service.UploadAvatar(claimID, file, fileSize)
+		paramAvatar, err := service.UploadAvatar(claimID, file, fileSize)
 		if err != nil {
 			zap.L().Error("service UploadAvatar failed, err:", zap.Error(err))
 			response.ResponseError(c, response.CodeServerBusy)
 			return
 		}
-		response.ResponseSuccessData(c, resp)
+		response.ResponseSuccessData(c, paramAvatar)
 	} else { // 3.请求参数有误 直接返回响应
 		zap.L().Error("Login with invalid param", zap.Error(err))
 		// 判断err是不是validator.ValidationErrors类型

@@ -10,6 +10,7 @@ import (
 	"github.com/LucienLSA/go-blog/pkg/jwt"
 	"github.com/LucienLSA/go-blog/pkg/snowflake"
 	"github.com/LucienLSA/go-blog/pkg/upload"
+	"github.com/LucienLSA/go-blog/settings"
 	"go.uber.org/zap"
 )
 
@@ -71,8 +72,26 @@ func Login(p *models.ParamLogin) (user *models.User, err error) {
 	return
 }
 
+// 用户信息修改
+func Update(uid int64, p *models.ParamUpdate) (err error) {
+	var user *models.User
+	// 1. 查询登录的用户ID，不用在数据库中查询是否存在，因为是已经登录过的
+	user, err = mysql.GetUserByID(uid)
+	if err != nil {
+		zap.L().Error("mysql GetUserByID failed", zap.Error(err))
+		return err
+	}
+	err = mysql.UpdateUser(uid, user)
+	if err != nil {
+		zap.L().Error("mysql UpdateUser failed", zap.Error(err))
+		return err
+	}
+	return err
+
+}
+
 // 上传用户头像
-func UploadAvatar(uId int64, file multipart.File, fileSize int64) (resp interface{}, err error) {
+func UploadAvatar(uId int64, file multipart.File, fileSize int64) (paramAvatar *models.ParamAvatar, err error) {
 	var user *models.User
 	user, err = mysql.GetUserByID(uId)
 	if err != nil {
@@ -80,24 +99,38 @@ func UploadAvatar(uId int64, file multipart.File, fileSize int64) (resp interfac
 		return nil, err
 	}
 	// 保存到本地
-	path, err := upload.UploadAvatarToLocalStatic(file, uId, user.Username)
+	var path string
+	if settings.Conf.AppConfig.UploadModel == settings.UploadModelLocal { // 兼容两种存储方式
+		path, err = upload.UploadAvatarToLocalStatic(file, uId, user.Username)
+	} else { //保存到七牛云oss
+		path, err = upload.UploadToQiNiu(file, fileSize)
+	}
+
 	if err != nil {
-		zap.L().Error("upload UploadAvatarToLocalStatic failed", zap.Error(err))
+		zap.L().Error("upload avatar failed", zap.Error(err))
 		return nil, err
 	}
 	user.Avatar = path
-	err = mysql.UpdateUser(uId, user)
+	err = mysql.UpdateAvatar(uId, user)
 	if err != nil {
 		zap.L().Error("mysql UpdateUser failed", zap.Error(err))
 		return nil, err
 	}
-	resp = &models.ParamUserInfo{
-		UserID:   user.UserID,
-		Username: user.Username,
-		Gender:   user.Gender,
-		Avatar:   user.Avatar,
-		Email:    user.Email,
-		Age:      user.Age,
+	// fmt.Println(user)
+	paramAvatar = &models.ParamAvatar{
+		UserID:   uId,
+		UserName: user.Username,
+		Avatar:   upload.AvatarURL() + user.Avatar,
 	}
-	return resp, nil
+	// if settings.Conf.AppConfig.UploadModel == settings.UploadModelLocal {
+	// 	paramAvatar.Avatar = upload.AvatarURL() + user.Avatar
+	// } else {
+	// 	paramAvatar = &models.ParamAvatar{
+	// 		Avatar:   upload.AvatarURL() + user.Avatar,
+	// 		UserID:   uId,
+	// 		UserName: user.Username,
+	// 	}
+	// }
+
+	return paramAvatar, nil
 }
