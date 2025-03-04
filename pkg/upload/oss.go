@@ -10,7 +10,7 @@ import (
 )
 
 // UploadToQiNiu 封装上传图片到七牛云然后返回状态和图片的url，单张
-func UploadToQiNiu(file multipart.File, fileSize int64) (path string, err error) {
+func UploadToQiNiuAvatar(file multipart.File, userName string, fileSize int64) (path string, err error) {
 	qConfig := settings.Conf.OssConfig
 	var AccessKey = qConfig.AccessKeyId
 	var SerectKey = qConfig.AccessKeySecret
@@ -29,10 +29,12 @@ func UploadToQiNiu(file multipart.File, fileSize int64) (path string, err error)
 	putExtra := storage.PutExtra{}
 	formUploader := storage.NewFormUploader(&cfg)
 	ret := storage.PutRet{}
-	err = formUploader.PutWithoutKey(context.Background(), &ret, upToken, file, fileSize, &putExtra)
+	key := "avatar/" + userName
+	// err = formUploader.PutWithoutKey(context.Background(), &ret, upToken, file, fileSize, &putExtra)
+	err = formUploader.Put(context.Background(), &ret, upToken, key, file, fileSize, &putExtra)
 	if err != nil {
 		return "", err
 	}
-	url := ImgUrl + "/" + ret.Key
+	url := ImgUrl + "/" + key
 	return url, nil
 }

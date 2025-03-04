@@ -157,6 +157,7 @@ func UpdateHandler(c *gin.Context) {
 	claimsID, _ := request.GetLoginUserID(c)
 	if err := service.Update(claimsID, p); err != nil {
 		zap.L().Error("service update failed", zap.Error(err))
+		// 理论上这个错误不会发生，因为是在登录情况下执行的，一定是存在的
 		if errors.Is(err, mysql.ErrorUserNotExist) {
 			response.ResponseError(c, response.CodeUserNotExist)
 			return
@@ -202,4 +203,34 @@ func UploadAvatarHandler(c *gin.Context) {
 			translator.RemoveTopStruct(errs.Translate(translator.Trans)))
 		return
 	}
+}
+
+// SendEmailHandler 发送邮箱验证码及信息
+func SendEmailHandler(c *gin.Context) {
+	p := new(models.ParamSendEmail)
+	if err := c.ShouldBindJSON(&p); err != nil {
+		// 请求参数有误 直接返回响应
+		zap.L().Error("SendEmail with invalid param", zap.Error(err))
+		// 判断err是不是validator.ValidationErrors类型
+		errs, ok := err.(validator.ValidationErrors)
+		if !ok {
+			response.ResponseError(c, response.CodeInvalidParam)
+			return
+		}
+		response.ResponseErrorMsg(c, response.CodeInvalidParam,
+			translator.RemoveTopStruct(errs.Translate(translator.Trans)))
+		return
+	}
+	claimsID, _ := request.GetLoginUserID(c)
+	if err := service.SendEmail(claimsID, p); err != nil {
+		zap.L().Error("service SendEmail failed", zap.Error(err))
+		if errors.Is(err, mysql.ErrorUserNotExist) {
+			response.ResponseError(c, response.CodeUserNotExist)
+			return
+		}
+		response.ResponseError(c, response.CodeServerBusy)
+		return
+	}
+	// 3. 返回响应
+	response.ResponseSuccessData(c, nil)
 }

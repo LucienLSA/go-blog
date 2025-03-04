@@ -15,6 +15,7 @@ app:
   photoPath:
     photoHost: http://127.0.0.1
     avatarPath: /static/img/avatar/
+    defaultAvatar: http://ssjjen2mm.hd-bkt.clouddn.com/avatar/user.png
 
 log:
   level: "debug"
@@ -42,9 +43,9 @@ redis:
 
 email:
   vaildEmail: http://localhost:8082/#/vaild/email/
-  smtpHost: smtp.163.com
-  smtpEmail: 
-  smtpPass: 
+  smtpHost: smtp.qq.com
+  smtpEmail: 1020263522@qq.com
+  smtpPass: asyommbmaepibeha
 
 
 oss:

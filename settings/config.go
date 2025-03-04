@@ -17,6 +17,7 @@ type multipleConfig struct {
 	*MySQLConfig `mapstructure:"mysql"`
 	*RedisConfig `mapstructure:"redis"`
 	*OssConfig   `mapstructure:"oss"`
+	*EmailConfig `mapstructure:"email"`
 }
 
 type AppConfig struct {
@@ -34,8 +35,9 @@ type AppConfig struct {
 }
 
 type PhotoPathConfig struct {
-	PhotoHost  string `mapstructure:"photoHost"`
-	AvatarPath string `mapstructure:"avatarPath"`
+	PhotoHost     string `mapstructure:"photoHost"`
+	AvatarPath    string `mapstructure:"avatarPath"`
+	DefaultAvatar string `mapstructure:"defaultAvatar"`
 }
 
 type LogConfig struct {
@@ -63,6 +65,13 @@ type RedisConfig struct {
 	Port     int    `mapstructure:"port"`
 	DB       int    `mapstructure:"db"`
 	PoolSize int    `mapstructure:"pool_size"`
+}
+
+type EmailConfig struct {
+	VaildEmail string `mapstructure:"vaildEmail"`
+	SmtpHost   string `mapstructure:"smtpHost"`
+	SmtpEmail  string `mapstructure:"smtpEmail"`
+	SmtpPass   string `mapstructure:"smtpPass"`
 }
 
 type OssConfig struct {

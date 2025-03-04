@@ -49,12 +49,16 @@ func InsertUser(user *models.User) (err error) {
 	}
 	// fmt.Println(user.Password)
 	// 执行SQL语句
-	sqlStr := `insert into user(user_id, username, password, email, age, gender) values(?,?,?,?,?,?)`
-	_, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password, user.Email, user.Age, user.Gender)
+	sqlStr := `insert into user(user_id, username, password, email, age, gender, avatar) values(?,?,?,?,?,?,?)`
+	_, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password, user.Email, user.Age, user.Gender, user.Avatar)
 	return err
 }
 
 func UpdateUser(uId int64, user *models.User) (err error) {
+	user.Password, err = SetPassword(user, user.Password)
+	if err != nil {
+		return err
+	}
 	sqlStr := `
 	update user 
 	set username=?,
@@ -63,7 +67,7 @@ func UpdateUser(uId int64, user *models.User) (err error) {
 		age=?,
 		gender=?
 	where user_id = ?`
-	_, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password, user.Email, user.Age, user.Gender, uId)
+	_, err = db.Exec(sqlStr, user.Username, user.Password, user.Email, user.Age, user.Gender, uId)
 	return err
 }
 

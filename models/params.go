@@ -11,21 +11,23 @@ const (
 // 注册
 type ParamSignUp struct {
 	Age        uint8  `json:"age" binding:"gte=1,lte=130"`                     // 注册人年龄
-	Gender     string `json:"gender" binding:"required,oneof=男 女"`             // 注册人性别
+	Gender     string `json:"gender" binding:"required,oneof=男 女 未知"`          // 注册人性别
 	Username   string `json:"username" binding:"required"`                     // 注册人用户名
 	Password   string `json:"password" binding:"required"`                     // 注册人密码
 	RePassword string `json:"re_password" binding:"required,eqfield=Password"` // 注册人重复密码
-	Email      string `json:"email" binding:"required,email"`                  // 注册人邮箱
+	Email      string `json:"email"`                                           // 注册人邮箱
 	// // 需要使用自定义校验方法checkDate做参数校验的字段Date
 	// Date string `json:"date" binding:"required,datetime=2006-01-02,checkDate"`
+	Avatar string `json:"avatar"` // 注册人默认头像
 }
 type ParamUpdate struct {
 	Age        uint8  `json:"age" binding:"gte=1,lte=130"`                     // 用户年龄
-	Gender     string `json:"gender" binding:"required,oneof=男 女"`             // 用户性别
+	Gender     string `json:"gender" binding:"required,oneof=男 女 未知"`          // 用户性别
 	Username   string `json:"username" binding:"required"`                     // 用户名
 	Password   string `json:"password" binding:"required"`                     // 用户密码
 	RePassword string `json:"re_password" binding:"required,eqfield=Password"` // 用户重复密码
-	Email      string `json:"email" binding:"required,email"`                  // 用户邮箱
+	Email      string `json:"email"`                                           // 用户邮箱
+	Avatar     string `json:"avatar"`                                          // 用户头像
 }
 
 // 用户登录
@@ -39,6 +41,12 @@ type ParamAvatar struct {
 	UserID   int64  `form:"user_id" json:"user_id"`   // 用户ID
 	UserName string `form:"username" json:"username"` // 用户名称
 	Avatar   string `form:"avatar" json:"avatar"`     // 用户密头像
+}
+
+// 用户邮箱发送验证码
+type ParamSendEmail struct {
+	OperationType int    `form:"operation_type" json:"operation_type" binding:"required"`
+	Email         string `form:"email" json:"email" binding:"required, email"`
 }
 
 // 投票数据

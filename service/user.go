@@ -28,7 +28,9 @@ func SignUp(p *models.ParamSignUp) (err error) {
 	// 2. 生成UID
 	userID := snowflake.GenID()
 	fmt.Println(userID)
-	// 构造一个user示例
+	// 3. 构造一个user示例
+	// 获取默认头像
+	defaultAvatar := settings.Conf.AppConfig.PhotoPathConfig
 	user := &models.User{
 		UserID:   userID,
 		Username: p.Username,
@@ -36,6 +38,7 @@ func SignUp(p *models.ParamSignUp) (err error) {
 		Email:    p.Email,
 		Password: p.Password,
 		Gender:   p.Gender,
+		Avatar:   defaultAvatar.DefaultAvatar,
 	}
 	fmt.Println(&user)
 	// 3. 保存到数据库
@@ -81,13 +84,20 @@ func Update(uid int64, p *models.ParamUpdate) (err error) {
 		zap.L().Error("mysql GetUserByID failed", zap.Error(err))
 		return err
 	}
+	user = &models.User{
+		UserID:   uid,
+		Username: p.Username,
+		Age:      p.Age,
+		Email:    p.Email,
+		Password: p.Password,
+		Gender:   p.Gender,
+	}
 	err = mysql.UpdateUser(uid, user)
 	if err != nil {
 		zap.L().Error("mysql UpdateUser failed", zap.Error(err))
 		return err
 	}
 	return err
-
 }
 
 // 上传用户头像
@@ -103,7 +113,7 @@ func UploadAvatar(uId int64, file multipart.File, fileSize int64) (paramAvatar *
 	if settings.Conf.AppConfig.UploadModel == settings.UploadModelLocal { // 兼容两种存储方式
 		path, err = upload.UploadAvatarToLocalStatic(file, uId, user.Username)
 	} else { //保存到七牛云oss
-		path, err = upload.UploadToQiNiu(file, fileSize)
+		path, err = upload.UploadToQiNiuAvatar(file, user.Username, fileSize)
 	}
 
 	if err != nil {
@@ -133,4 +143,38 @@ func UploadAvatar(uId int64, file multipart.File, fileSize int64) (paramAvatar *
 	// }
 
 	return paramAvatar, nil
+}
+
+// 用户发送邮箱验证码
+func SendEmail(uid int64, p *models.ParamSendEmail) (err error) {
+	var user *models.User
+	user, err = mysql.GetUserByID(uid)
+	var address string
+	token, err := jwt.GenerateEmailToken(p.OperationType, uid, user.Password, p.Email)
+	if err != nil {
+		zap.L().Error("jwt GenerateEmailToken failed", zap.Error(err))
+		return err
+	}
+	notice, err = mysql.GetNoticeById(p.OperationType)
+	// sender := email.NewEmailSender()
+	// address = settings.Conf.EmailConfig.VaildEmail + token
+	// mailStr := models.Notice.Text
+	// mailTex := strings.Replace(mailStr, "Email", address, -1)
+	// mailText := fmt.Sprintf(settings.EmailOperationMap[p.OperationType], address)
+	// if err = sender.Send(mailText, p.Email, "bluebell"); err != nil {
+	// 	zap.L().Error("sender Send failed", zap.Error(err))
+	// 	return err
+	// }
+	// m := mail.NewMessage()
+	// // m.SetHeader("From", settings.Conf.EmailConfig.SmtpEmail)
+	// m.SetHeader("To", settings.Conf.EmailConfig.SmtpEmail)
+	// m.SetHeader("Subject", "gin_mall")
+	// m.SetBody("text/html", mailText)
+	// d := mail.NewDialer(settings.Conf.EmailConfig.SmtpHost, 465, settings.Conf.EmailConfig.SmtpEmail, settings.Conf.EmailConfig.SmtpPass)
+	// d.StartTLSPolicy = mail.MandatoryStartTLS
+	// if err = d.DialAndSend(m); err != nil {
+	// 	zap.L().Error("DialAndSend failed", zap.Error(err))
+	// 	return err
+	// }
+	// return
 }
