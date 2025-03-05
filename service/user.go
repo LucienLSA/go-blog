@@ -1,12 +1,16 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"mime/multipart"
+	"strings"
+	"time"
 
 	"github.com/LucienLSA/go-blog/dao/mysql"
 	redisCache "github.com/LucienLSA/go-blog/dao/redis"
 	"github.com/LucienLSA/go-blog/models"
+	"github.com/LucienLSA/go-blog/pkg/email"
 	"github.com/LucienLSA/go-blog/pkg/jwt"
 	"github.com/LucienLSA/go-blog/pkg/snowflake"
 	"github.com/LucienLSA/go-blog/pkg/upload"
@@ -149,32 +153,77 @@ func UploadAvatar(uId int64, file multipart.File, fileSize int64) (paramAvatar *
 func SendEmail(uid int64, p *models.ParamSendEmail) (err error) {
 	var user *models.User
 	user, err = mysql.GetUserByID(uid)
+	if err != nil {
+		zap.L().Error("mysql GetUserByID failed", zap.Error(err))
+		return err
+	}
 	var address string
-	token, err := jwt.GenerateEmailToken(p.OperationType, uid, user.Password, p.Email)
+	// notice := new(models.Notice)
+	var notice *models.Notice
+	token, err := jwt.GenerateEmailToken(p.OperationType, uid, p.Email, user.Password)
 	if err != nil {
 		zap.L().Error("jwt GenerateEmailToken failed", zap.Error(err))
 		return err
 	}
 	notice, err = mysql.GetNoticeById(p.OperationType)
-	// sender := email.NewEmailSender()
-	// address = settings.Conf.EmailConfig.VaildEmail + token
-	// mailStr := models.Notice.Text
-	// mailTex := strings.Replace(mailStr, "Email", address, -1)
-	// mailText := fmt.Sprintf(settings.EmailOperationMap[p.OperationType], address)
-	// if err = sender.Send(mailText, p.Email, "bluebell"); err != nil {
-	// 	zap.L().Error("sender Send failed", zap.Error(err))
-	// 	return err
-	// }
+	if err != nil {
+		zap.L().Error("mysql GetNoticeById failed", zap.Error(err))
+		return err
+	}
+	address = settings.Conf.EmailConfig.VaildEmail + token
+	mailStr := notice.Text
+	mailTex := strings.Replace(mailStr, "Email", address, -1)
+	err = email.Send(mailTex, p.Email, settings.Conf.AppConfig.Name, settings.Conf.EmailConfig.SmtpEmail)
+	if err != nil {
+		zap.L().Error("email Send failed", zap.Error(err))
+		return err
+	}
 	// m := mail.NewMessage()
-	// // m.SetHeader("From", settings.Conf.EmailConfig.SmtpEmail)
-	// m.SetHeader("To", settings.Conf.EmailConfig.SmtpEmail)
-	// m.SetHeader("Subject", "gin_mall")
-	// m.SetBody("text/html", mailText)
+	// m.SetHeader("From", settings.Conf.EmailConfig.SmtpEmail)
+	// m.SetHeader("To", p.Email)
+	// m.SetHeader("Subject", "bluebell")
+	// m.SetBody("text/html", mailTex)
 	// d := mail.NewDialer(settings.Conf.EmailConfig.SmtpHost, 465, settings.Conf.EmailConfig.SmtpEmail, settings.Conf.EmailConfig.SmtpPass)
 	// d.StartTLSPolicy = mail.MandatoryStartTLS
 	// if err = d.DialAndSend(m); err != nil {
 	// 	zap.L().Error("DialAndSend failed", zap.Error(err))
 	// 	return err
 	// }
-	// return
+	return
+}
+
+func ValidEmail(c context.Context, token string) (err error) {
+	var operationType int
+	var uId int64
+	var user *models.User
+	var email string
+	// 1.校验参数
+	claims, err := jwt.ParseEmailToken(token)
+	if err != nil {
+		zap.L().Error("jwt ParseEmailToken failed", zap.Error(err))
+		return err
+	}
+	if time.Now().Unix() > claims.ExpiresAt {
+		zap.L().Error("check token timeout")
+		return err
+	}
+	uId = claims.UserID
+	email = claims.Email
+	operationType = claims.OperationType
+	user, err = mysql.GetUserByID(uId)
+	if err != nil {
+		zap.L().Error("mysql GetUserByID failed", zap.Error(err))
+		return err
+	}
+	if operationType == 1 {
+		user.Email = email
+	} else if operationType == 2 {
+		user.Email = " "
+	}
+	err = mysql.UpdateUserEmail(uId, user)
+	if err != nil {
+		zap.L().Error("mysql UpdateUserEmail failed", zap.Error(err))
+		return err
+	}
+	return
 }

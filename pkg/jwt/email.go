@@ -7,10 +7,10 @@ import (
 )
 
 type EmailClaims struct {
-	UserID        int64  `json:"user_id"`
-	Email         string `json:"email"`
-	Password      string `json:"password"`
-	OperationType int    `json:"operation_type"`
+	OperationType int    `json:"operation_type" form:"operation_type"`
+	UserID        int64  `json:"user_id" form:"user_id"`
+	Email         string `json:"email" form:"email"`
+	Password      string `json:"password" form:"password"`
 	jwt.StandardClaims
 }
 
@@ -31,4 +31,17 @@ func GenerateEmailToken(operation_type int, userID int64, email, password string
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token, err := tokenClaims.SignedString(MySecret)
 	return token, err
+}
+
+// 验证邮件token
+func ParseEmailToken(token string) (*EmailClaims, error) {
+	tokenEmailClaims, err := jwt.ParseWithClaims(token, &EmailClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return MySecret, nil
+	})
+	if tokenEmailClaims != nil {
+		if claims, ok := tokenEmailClaims.Claims.(*EmailClaims); ok && tokenEmailClaims.Valid {
+			return claims, nil
+		}
+	}
+	return nil, err
 }

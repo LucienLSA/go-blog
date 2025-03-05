@@ -234,3 +234,37 @@ func SendEmailHandler(c *gin.Context) {
 	// 3. 返回响应
 	response.ResponseSuccessData(c, nil)
 }
+
+// ValidEmailHandler用户验证邮箱
+func ValidEmailHandler(c *gin.Context) {
+	var p models.ParamVaildEmail
+	// p := new(models.ParamVaildEmail)
+	if err := c.ShouldBind(&p); err != nil {
+		// 2. 请求参数有误 直接返回响应
+		zap.L().Error("SendEmail with invalid param", zap.Error(err))
+		// 判断err是不是validator.ValidationErrors类型
+		errs, ok := err.(validator.ValidationErrors)
+		if !ok {
+			response.ResponseError(c, response.CodeInvalidParam)
+			return
+		}
+		response.ResponseErrorMsg(c, response.CodeInvalidParam,
+			translator.RemoveTopStruct(errs.Translate(translator.Trans)))
+		return
+	} else {
+		// 3. 成功返回数据
+		token := c.Query("token")
+		if token == " " {
+			zap.L().Error("get token failed", zap.Error(err))
+			response.ResponseError(c, response.CodeTokenInvalid)
+			return
+		}
+		err := service.ValidEmail(c.Request.Context(), token)
+		if err != nil {
+			zap.L().Error("service VaildEmail failed", zap.Error(err))
+			response.ResponseError(c, response.CodeServerBusy)
+			return
+		}
+		response.ResponseSuccessData(c, nil)
+	}
+}

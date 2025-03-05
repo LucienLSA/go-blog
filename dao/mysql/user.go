@@ -54,6 +54,7 @@ func InsertUser(user *models.User) (err error) {
 	return err
 }
 
+// 向数据库更新用户信息
 func UpdateUser(uId int64, user *models.User) (err error) {
 	user.Password, err = SetPassword(user, user.Password)
 	if err != nil {
@@ -76,6 +77,14 @@ func UpdateAvatar(uId int64, user *models.User) (err error) {
 	userAvatar := user.Avatar
 	sqlStr := `update user set avatar=? where user_id = ?`
 	_, err = db.Exec(sqlStr, userAvatar, uId)
+	return err
+}
+
+// 向数据库更新用户邮箱
+func UpdateUserEmail(uId int64, user *models.User) (err error) {
+	userEmail := user.Email
+	sqlStr := `update user set email=? where user_id = ?`
+	_, err = db.Exec(sqlStr, userEmail, uId)
 	return err
 }
 

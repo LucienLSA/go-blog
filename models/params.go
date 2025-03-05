@@ -20,6 +20,8 @@ type ParamSignUp struct {
 	// Date string `json:"date" binding:"required,datetime=2006-01-02,checkDate"`
 	Avatar string `json:"avatar"` // 注册人默认头像
 }
+
+// 用户信息更新
 type ParamUpdate struct {
 	Age        uint8  `json:"age" binding:"gte=1,lte=130"`                     // 用户年龄
 	Gender     string `json:"gender" binding:"required,oneof=男 女 未知"`          // 用户性别
@@ -46,7 +48,13 @@ type ParamAvatar struct {
 // 用户邮箱发送验证码
 type ParamSendEmail struct {
 	OperationType int    `form:"operation_type" json:"operation_type" binding:"required"`
-	Email         string `form:"email" json:"email" binding:"required, email"`
+	Email         string `form:"email" json:"email" binding:"required"`
+}
+
+// 用户验证邮箱
+type ParamVaildEmail struct {
+	UserName string `form:"username" json:"username"` // 用户名称
+	Email    string `form:"email" json:"email"`       // 用户邮箱
 }
 
 // 投票数据

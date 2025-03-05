@@ -8,7 +8,6 @@ import (
 	_ "github.com/LucienLSA/go-blog/docs"
 	"github.com/LucienLSA/go-blog/logger"
 	"github.com/LucienLSA/go-blog/middlewares"
-	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	gs "github.com/swaggo/gin-swagger"
@@ -81,9 +80,12 @@ func SetupRouter(mode string) *gin.Engine {
 
 		// 用户发送邮箱
 		v1.POST("/user/sendEmail", controller.SendEmailHandler)
+
+		// 用户验证邮箱
+		v1.GET("/user/validEmail", controller.ValidEmailHandler)
 	}
 	// 注册pprof路由 服务型性能分析
-	pprof.Register(r)
+	// pprof.Register(r)
 
 	return r
 }
