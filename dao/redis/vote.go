@@ -39,6 +39,7 @@ var (
 	ErrVoteRepeated   = errors.New("不允许重复投票")
 )
 
+// 创建帖子到redis中
 func CreatePost(postID, community int64) (err error) {
 	// 事务操作
 	pipeline := rdb.TxPipeline()

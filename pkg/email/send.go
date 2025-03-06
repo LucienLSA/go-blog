@@ -1,6 +1,9 @@
 package email
 
 import (
+	"math/rand"
+	"strconv"
+
 	"github.com/LucienLSA/go-blog/settings"
 	"go.uber.org/zap"
 	"gopkg.in/mail.v2"
@@ -20,4 +23,15 @@ func Send(mailTex, emailTo, subject, emailFrom string) error {
 		return err
 	}
 	return nil
+}
+
+// 生成随机验证码
+func GetConfirmCode() string {
+	var confirmCode int
+	for i := 0; i < 6; i++ {
+		confirmCode = confirmCode*10 + (rand.Intn(9) + 1) //随机函数获取值
+	}
+	// 转换成字符串
+	confirmCodeStr := strconv.Itoa(confirmCode)
+	return confirmCodeStr
 }

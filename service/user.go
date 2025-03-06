@@ -15,6 +15,7 @@ import (
 	"github.com/LucienLSA/go-blog/pkg/snowflake"
 	"github.com/LucienLSA/go-blog/pkg/upload"
 	"github.com/LucienLSA/go-blog/settings"
+	_ "github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
 )
 
@@ -77,6 +78,23 @@ func Login(p *models.ParamLogin) (user *models.User, err error) {
 		zap.L().Error("redisCache.StorgeUserIdToken failed", zap.Error(err))
 	}
 	return
+}
+
+// 用户邮箱验证码登录业务
+func SendEmailCode(p *models.ParamEmailCode) (user *models.User, err error) {
+	// 检查是否在3分钟内发送过邮件
+	redisCache.GetEmailCode
+
+	// 获取六位数邮箱验证码
+	code := email.GetConfirmCode()
+	// 将其存储至Redis中，由于Redis为KV键值对存储所以需要定义前缀方便使用
+	RedisClient.Set(context.Background(), "email:"+service.UserEmail, code, time.Minute*30)
+
+	// 发送邮件，此处为方便起见没有处理返回值
+	SendConfirmMessage(service.UserEmail, code)
+	// 设置每个邮箱发送邮件的时间 此处设置为3分钟，由于Redis为KV键值对存储所以需要定义前缀方便使用
+	RedisClient.Set(context.Background(), "send-email:"+service.UserEmail, code, time.Minute*3)
+
 }
 
 // 用户信息修改

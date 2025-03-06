@@ -20,39 +20,46 @@ func SetupRouter(mode string) *gin.Engine {
 	}
 
 	r := gin.New()
+
 	// 处理异常
 	r.NoMethod(HandleNotFound)
 	r.NoRoute(HandleNotFound)
+
 	// 使用自定义的ginlogger中间件
 	r.Use(logger.GinLogger(), logger.GinRecovery(true))
 	// // 存入cookie
 	// store := cookie.NewStore([]byte("something-very-secret"))
 	// r.Use(sessions.Sessions("mysession", store))
+
 	// 使用跨域中间件
 	r.Use(middlewares.Cors())
+
 	// 加载静态文件和html
 	r.LoadHTMLFiles("./templates/index.html")
 	r.Static("/static", "./static")
+
 	// 代入根目录的html
 	r.GET("/", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", nil)
 	})
+
 	// 导入swag接口文档
 	r.GET("/swagger/*any", gs.WrapHandler(swaggerFiles.Handler))
 	v1 := r.Group("/api/v1")
 
-	// 注册业务路由
 	// 注册
 	v1.POST("/user/signup", controller.SignUpHandler)
+
 	// 登录
 	v1.POST("/user/login", controller.LoginHandler)
-	// v1.POST("/user/login/email", controller.LoginEmailHandler)
+	v1.POST("/user/login/email", controller.LoginEmailHandler)
+
 	// 获取社区信息
 	v1.GET("/community/show", controller.CommunityHandler)
 	v1.GET("/community/show/:community_id", controller.CommunityDetailHandler)
 
 	// 查看帖子
-	v1.GET("/posts/show", controller.GetPostListHandler)
+	v1.GET("/posts/showAll", controller.GetPostListHandler)
 
 	// JWT中间件认证
 	v1.Use(middlewares.JWTAuthMiddleware())
@@ -63,6 +70,7 @@ func SetupRouter(mode string) *gin.Engine {
 
 		// 根据社区查询帖子列表 整合到上一个hander中
 		// v1.GET("/communitysearchposts", controller.CommunityPostListHandler)
+
 		// 令牌桶填充速率2s， 容量1
 		v1.GET("/posts/:post_id", middlewares.RateLimitMiddleware(2*time.Second, 1), controller.GetPostDetailHandler)
 
