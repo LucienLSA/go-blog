@@ -29,6 +29,11 @@ func SignUp(p *models.ParamSignUp) (err error) {
 		zap.L().Error("mysql CheckUserExist failed", zap.Error(err))
 		return err
 	}
+	if err = mysql.CheckUserEmail(p.Email); err != nil {
+		// 数据库查询错误
+		zap.L().Error("mysql CheckUserEmailfailed", zap.Error(err))
+		return err
+	}
 
 	// 2. 生成UID
 	userID := snowflake.GenID()
@@ -82,19 +87,77 @@ func Login(p *models.ParamLogin) (user *models.User, err error) {
 
 // 用户邮箱验证码登录业务
 func SendEmailCode(p *models.ParamEmailCode) (user *models.User, err error) {
-	// 检查是否在3分钟内发送过邮件
-	redisCache.GetEmailCode
+	// 检查是否在10分钟内发送过邮件
+	err = redisCache.EmailCodeExists(p.UserEmail)
+	if err != nil {
+		zap.L().Error("has email code from redis in 10 minutes")
+		fmt.Printf("has email code from redis in 10 minutes")
+		return nil, err
+	}
 
 	// 获取六位数邮箱验证码
 	code := email.GetConfirmCode()
 	// 将其存储至Redis中，由于Redis为KV键值对存储所以需要定义前缀方便使用
-	RedisClient.Set(context.Background(), "email:"+service.UserEmail, code, time.Minute*30)
+	err = redisCache.StorgeEmailCode(p.UserEmail, code)
+	if err != nil {
+		zap.L().Error("redisCache.StorgeEmailCode failed, err:%\v", zap.Error(err))
+		fmt.Printf("redisCache.StorgeEmailCode failed, err:%\v", err)
+		return nil, err
+	}
 
 	// 发送邮件，此处为方便起见没有处理返回值
-	SendConfirmMessage(service.UserEmail, code)
-	// 设置每个邮箱发送邮件的时间 此处设置为3分钟，由于Redis为KV键值对存储所以需要定义前缀方便使用
-	RedisClient.Set(context.Background(), "send-email:"+service.UserEmail, code, time.Minute*3)
-
+	// address = settings.Conf.EmailConfig.VaildEmail + token
+	var notice *models.Notice
+	notice, err = mysql.GetNoticeById(p.OperationType)
+	if err != nil {
+		zap.L().Error("mysql GetNoticeById failed", zap.Error(err))
+		return nil, err
+	}
+	mailStr := notice.Text
+	mailTex := strings.Replace(mailStr, "Email", code, -1)
+	err = email.Send(mailTex, p.UserEmail, settings.Conf.AppConfig.Name, settings.Conf.EmailConfig.SmtpEmail)
+	if err != nil {
+		zap.L().Error("email Send failed", zap.Error(err))
+		return nil, err
+	}
+	// 设置每个邮箱发送邮件的时间 此处设置为10分钟，由于Redis为KV键值对存储所以需要定义前缀方便使用
+	err = redisCache.SendEmailCode(p.UserEmail, code)
+	if err != nil {
+		zap.L().Error("redisCache.SendEmailCode failed, err:%\v", zap.Error(err))
+		fmt.Printf("redisCache.SendEmailCode failed, err:%\v", err)
+		return nil, err
+	}
+	// 校验验证码正确性
+	err = redisCache.CheckEmailCode(p.UserEmail)
+	if err != nil {
+		zap.L().Error("redisCache.CheckEmailCode failed, err:%\v", zap.Error(err))
+		fmt.Printf("redisCache.CheckEmailCode failed, err:%\v", err)
+		return nil, err
+	}
+	// 将用户登录输入的名称和密码信息传入dao层
+	// if err = mysql.CheckUserEmail(p.UserEmail); err != nil {
+	// 	// 传递的是指针，能拿到数据库中注册时原本生成的UserID和Username
+	// 	zap.L().Error("mysql CheckUserEmail failed", zap.Error(err))
+	// 	return nil, err
+	// }
+	// 从数据库中获取用户信息（用户名和id）
+	user, err = mysql.GetUserByEmail(p.UserEmail)
+	userInfo := &models.User{
+		UserID:   user.UserID,
+		Email:    p.UserEmail,
+		Username: user.Username,
+	}
+	// 生成JWT
+	token, err := jwt.GenToken(userInfo.UserID, userInfo.Username)
+	if err != nil {
+		zap.L().Error("jwt GenToken failed", zap.Error(err))
+	}
+	user.Token = token
+	// 保存到redis中
+	if err = redisCache.StorgeUserIdToken(token, userInfo.Email); err != nil {
+		zap.L().Error("redisCache.StorgeUserIdToken failed", zap.Error(err))
+	}
+	return
 }
 
 // 用户信息修改
@@ -210,6 +273,7 @@ func SendEmail(uid int64, p *models.ParamSendEmail) (err error) {
 	return
 }
 
+// 用户绑定邮箱和解绑邮箱业务
 func ValidEmail(c context.Context, token string) (err error) {
 	var operationType int
 	var uId int64

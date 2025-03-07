@@ -156,3 +156,22 @@
 {"level":"INFO","time":"2025-03-06T10:40:11.538+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
 {"level":"ERROR","time":"2025-03-06T10:40:12.382+0800","caller":"controller/user.go:144","msg":"Updatewith invalid param","error":"Key: 'ParamUpdate.email' Error:Field validation for 'email' failed on the 'email' tag"}
 {"level":"INFO","time":"2025-03-06T10:40:12.382+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/update","status":200,"method":"POST","path":"/api/v1/user/update","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0021323}
+{"level":"INFO","time":"2025-03-07T11:58:25.384+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-07T11:58:25.397+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-07T11:58:25.398+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-07T11:58:25.399+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"ERROR","time":"2025-03-07T11:58:54.959+0800","caller":"redis/email.go:34","msg":"Get email code from redis failed"}
+{"level":"ERROR","time":"2025-03-07T11:58:54.959+0800","caller":"service/user.go:93","msg":"not email code from redis in 10 minutes"}
+{"level":"ERROR","time":"2025-03-07T11:58:54.959+0800","caller":"controller/user.go:164","msg":"service login failed","UserEmail":"1020263522@qq.com","error":"邮箱验证码不存在"}
+{"level":"INFO","time":"2025-03-07T11:58:54.959+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0005062}
+{"level":"INFO","time":"2025-03-07T12:00:07.520+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-07T12:00:07.524+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-07T12:00:07.525+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-07T12:00:07.526+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-07T12:01:14.856+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-07T12:01:14.859+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-07T12:01:14.859+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-07T12:01:14.859+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"ERROR","time":"2025-03-07T12:01:27.678+0800","caller":"service/user.go:140","msg":"mysql CheckUserEmail failed","error":"用户已存在"}
+{"level":"ERROR","time":"2025-03-07T12:01:27.678+0800","caller":"controller/user.go:164","msg":"service login failed","UserEmail":"1020263522@qq.com","error":"用户已存在"}
+{"level":"INFO","time":"2025-03-07T12:01:27.679+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":1.0977144}

@@ -112,11 +112,53 @@ func Login(user *models.User) (err error) {
 	return
 }
 
+// 检查指定用户名的邮箱是否存在
+func CheckUserEmail(email string) (err error) {
+	sqlStr := "select count(user_id) from user where email = ?"
+	var count int
+	if err = db.Get(&count, sqlStr, email); err != nil {
+		return err
+	}
+	// fmt.Println(count)
+	if count > 0 {
+		return ErrorUserExist
+	}
+	return nil
+}
+
+// // 邮箱登录 与mysql中的用户邮箱比对
+// func LoginEmail(user *models.User) (err error) {
+// 	// 记录用户输入的密码
+// 	userEmail := user.Email
+// 	// 执行SQL语句
+// 	sqlStr := "select user_id from user where email=?"
+// 	err = db.Get(user, sqlStr, user.Email)
+// 	if err == sql.ErrNoRows { // sql自带查询错误
+// 		return ErrorUserNotExist
+// 	}
+// 	if err != nil {
+// 		// 查询数据库失败
+// 		return err
+// 	}
+// 	// fmt.Println("用户输入密码", userPassword)
+// 	// fmt.Println("数据库中密码", user.Password)
+// 	// 判断邮箱是否正确
+// 	return
+// }
+
 // 根据作者/用户id获取用户id和用户名
 func GetUserByID(uId int64) (user *models.User, err error) {
 	user = new(models.User)
 	sqlStr := `select user_id, username from user where user_id = ?`
 	err = db.Get(user, sqlStr, uId)
+	return
+}
+
+// 根据作者/用户邮箱获取用户id和用户名
+func GetUserByEmail(email string) (user *models.User, err error) {
+	user = new(models.User)
+	sqlStr := `select user_id, username from user where email = ?`
+	err = db.Get(user, sqlStr, email)
 	return
 }
 

@@ -5,7 +5,7 @@ app:
   version: "1.0.0"
   start_time: "2025-01-01"
   machine_id: 1
-  jwt_expire_time: 3600
+  jwt_expire_time: 360
 
   page_size: 5
   page_num: 1
@@ -46,6 +46,8 @@ email:
   smtpHost: smtp.qq.com
   smtpEmail: 1020263522@qq.com
   smtpPass: asyommbmaepibeha
+  emailCodeExpireTime: 10
+  emailCodeSaveTime: 360
 
 
 oss:

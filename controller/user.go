@@ -169,6 +169,12 @@ func LoginEmailHandler(c *gin.Context) {
 		response.ResponseError(c, response.CodeInvalidPassword)
 		return
 	}
+	response.ResponseSuccessData(c, gin.H{
+		"user_id":   strconv.FormatInt(user.UserID, 10), // id值大于1<<53-1, int64类型最大值为1<<63-1，转化为字符串
+		"user_name": user.Username,
+		"email":     user.Email,
+		"token":     user.Token,
+	})
 }
 
 // UpdateHandler 用户信息更新

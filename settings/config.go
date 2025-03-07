@@ -68,10 +68,12 @@ type RedisConfig struct {
 }
 
 type EmailConfig struct {
-	VaildEmail string `mapstructure:"vaildEmail"`
-	SmtpHost   string `mapstructure:"smtpHost"`
-	SmtpEmail  string `mapstructure:"smtpEmail"`
-	SmtpPass   string `mapstructure:"smtpPass"`
+	VaildEmail          string        `mapstructure:"vaildEmail"`
+	SmtpHost            string        `mapstructure:"smtpHost"`
+	SmtpEmail           string        `mapstructure:"smtpEmail"`
+	SmtpPass            string        `mapstructure:"smtpPass"`
+	EmailCodeExpireTime time.Duration `mapstructure:"emailCodeExpireTime"`
+	EmailCodeSaveTime   time.Duration `mapstructure:"mailCodeSaveTime"`
 }
 
 type OssConfig struct {

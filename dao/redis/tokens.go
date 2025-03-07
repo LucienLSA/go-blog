@@ -17,9 +17,10 @@ var (
 // Tokens存入redis
 func StorgeUserIdToken(token, username string) (err error) {
 	// 获取token的存活实践
-	duration := time.Duration(settings.Conf.JwtExpireTime * time.Hour)
+	duration := time.Duration(settings.Conf.AppConfig.JwtExpireTime * time.Hour)
+	key := GetRedisKey(KeyUserIDTokenSetPrefix)
 	// 存入redis
-	if err = rdb.Set(rctx, username, token, duration).Err(); err != nil {
+	if err = rdb.Set(rctx, key+username, token, duration).Err(); err != nil {
 		zap.L().Error("Insert username, token into redis failed, err:%v", zap.Error(err))
 		// zap.L().Debug("Insert username, token into redis failed, err:%v", zap.Error(err))
 		fmt.Printf("Insert username, token into redis failed, err:%v", zap.Error(err))
@@ -30,7 +31,8 @@ func StorgeUserIdToken(token, username string) (err error) {
 
 // 从redis取token
 func GetJwtToken(username string) (token string, err error) {
-	token, err = rdb.Get(rctx, username).Result()
+	key := GetRedisKey(KeyUserIDTokenSetPrefix)
+	token, err = rdb.Get(rctx, key+username).Result()
 	if err == redis.Nil {
 		return "", ErrNotExistToken
 	}

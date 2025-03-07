@@ -8,8 +8,11 @@ const (
 	KeyPostScoreZSet       = "post:score"  // zset; 帖子的投票分数
 	KeyPostVotedZSetPrefix = "post:voted:" // zset; 记录用户及投票类型；参数是post_id
 
-	KeyCommunitySetPrefix = "community:" // set; 保存社区下帖子的id
-	KeyEmailSetPrefix     = "email:"
+	KeyCommunitySetPrefix = "community:"  // set; 保存社区下帖子的id
+	KeyEmailSetPrefix     = "email:"      // set; 保存用户的邮箱
+	KeySendEmailSetPrefix = "send-email:" // set; 保存发送用户验证码的邮箱
+
+	KeyUserIDTokenSetPrefix = "user:" // set; 保存登录用户及token
 )
 
 // 给redis key加上前缀
