@@ -46,7 +46,7 @@ email:
   smtpHost: smtp.qq.com
   smtpEmail: 1020263522@qq.com
   smtpPass: asyommbmaepibeha
-  emailCodeExpireTime: 10
+  emailCodeExpireTime: 60
   emailCodeSaveTime: 360
 
 

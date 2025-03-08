@@ -85,24 +85,25 @@ func Login(p *models.ParamLogin) (user *models.User, err error) {
 	return
 }
 
-// 用户邮箱验证码登录业务
-func SendEmailCode(p *models.ParamEmailCode) (user *models.User, err error) {
-	// 检查是否在10分钟内发送过邮件
+// 登录发送邮箱验证码业务
+func SendEmailCode(p *models.ParamSendEmailCode) (err error) {
+	// 检查是否在1分钟内发送过邮件， 如果有发送过，需等待后才能发送
 	err = redisCache.EmailCodeExists(p.UserEmail)
 	if err != nil {
-		zap.L().Error("has email code from redis in 10 minutes")
-		fmt.Printf("has email code from redis in 10 minutes")
-		return nil, err
+		zap.L().Error("send email code from redis in 1 minutes")
+		fmt.Printf("send email code from redis in 1 minutes")
+		return err
 	}
 
 	// 获取六位数邮箱验证码
 	code := email.GetConfirmCode()
+
 	// 将其存储至Redis中，由于Redis为KV键值对存储所以需要定义前缀方便使用
 	err = redisCache.StorgeEmailCode(p.UserEmail, code)
 	if err != nil {
 		zap.L().Error("redisCache.StorgeEmailCode failed, err:%\v", zap.Error(err))
 		fmt.Printf("redisCache.StorgeEmailCode failed, err:%\v", err)
-		return nil, err
+		return err
 	}
 
 	// 发送邮件，此处为方便起见没有处理返回值
@@ -111,22 +112,31 @@ func SendEmailCode(p *models.ParamEmailCode) (user *models.User, err error) {
 	notice, err = mysql.GetNoticeById(p.OperationType)
 	if err != nil {
 		zap.L().Error("mysql GetNoticeById failed", zap.Error(err))
-		return nil, err
+		return err
 	}
 	mailStr := notice.Text
-	mailTex := strings.Replace(mailStr, "Email", code, -1)
+	sCode := string(code)
+	fmt.Println(sCode)
+	// mailTex := strings.Replace(mailStr, "Email", sCode, -1)
+	mailTex := mailStr + "\n" + sCode
+	// 第一个参数内容 第二个参数接收方 第三个标题 第四个发送方
 	err = email.Send(mailTex, p.UserEmail, settings.Conf.AppConfig.Name, settings.Conf.EmailConfig.SmtpEmail)
 	if err != nil {
 		zap.L().Error("email Send failed", zap.Error(err))
-		return nil, err
+		return err
 	}
-	// 设置每个邮箱发送邮件的时间 此处设置为10分钟，由于Redis为KV键值对存储所以需要定义前缀方便使用
+	// 设置每个邮箱发送邮件的时间 此处设置为1分钟，由于Redis为KV键值对存储所以需要定义前缀方便使用
 	err = redisCache.SendEmailCode(p.UserEmail, code)
 	if err != nil {
 		zap.L().Error("redisCache.SendEmailCode failed, err:%\v", zap.Error(err))
 		fmt.Printf("redisCache.SendEmailCode failed, err:%\v", err)
-		return nil, err
+		return err
 	}
+	return nil
+}
+
+// 用户邮箱验证码登录业务
+func LoginEmail(p *models.ParamLoginEmail) (user *models.User, err error) {
 	// 校验验证码正确性
 	err = redisCache.CheckEmailCode(p.UserEmail)
 	if err != nil {

@@ -73,7 +73,7 @@ type EmailConfig struct {
 	SmtpEmail           string        `mapstructure:"smtpEmail"`
 	SmtpPass            string        `mapstructure:"smtpPass"`
 	EmailCodeExpireTime time.Duration `mapstructure:"emailCodeExpireTime"`
-	EmailCodeSaveTime   time.Duration `mapstructure:"mailCodeSaveTime"`
+	EmailCodeSaveTime   time.Duration `mapstructure:"emailCodeSaveTime"`
 }
 
 type OssConfig struct {

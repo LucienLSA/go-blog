@@ -16,7 +16,7 @@ var (
 
 // 邮箱和验证码存入redis
 func StorgeEmailCode(email, code string) (err error) {
-	duration := time.Duration(settings.Conf.EmailConfig.EmailCodeSaveTime * time.Hour)
+	duration := time.Duration(settings.Conf.EmailConfig.EmailCodeSaveTime * time.Minute)
 	key := GetRedisKey(KeyEmailSetPrefix)
 	err = rdb.Set(rctx, key+email, code, duration).Err()
 	if err != nil {
@@ -40,7 +40,7 @@ func EmailCodeExists(email string) (err error) {
 
 // 发送邮箱和验证码存入redis，区别于StorgeEmailCode是为了验证发送验证码的时效
 func SendEmailCode(email, code string) (err error) {
-	duration := time.Duration(settings.Conf.EmailConfig.EmailCodeExpireTime * time.Minute)
+	duration := time.Duration(settings.Conf.EmailConfig.EmailCodeExpireTime * time.Second)
 	key := GetRedisKey(KeySendEmailSetPrefix)
 	err = rdb.Set(rctx, key+email, code, duration).Err()
 	if err != nil {

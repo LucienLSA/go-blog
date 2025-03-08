@@ -1,0 +1,16 @@
+{"level":"INFO","time":"2025-03-08T22:27:20.598+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-08T22:27:20.603+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-08T22:27:20.604+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-08T22:27:20.604+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-08T22:27:23.370+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0}
+{"level":"INFO","time":"2025-03-08T22:27:55.594+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/emailcode","status":200,"method":"POST","path":"/api/v1/user/login/emailcode","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":1.1389372}
+{"level":"INFO","time":"2025-03-08T22:33:58.111+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-08T22:33:58.114+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-08T22:33:58.115+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-08T22:33:58.116+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-08T22:34:01.082+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/emailcode","status":200,"method":"POST","path":"/api/v1/user/login/emailcode","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.9031644}
+{"level":"INFO","time":"2025-03-08T22:39:30.854+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-08T22:39:30.856+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-08T22:39:30.857+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-08T22:39:30.857+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-08T22:39:32.106+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/emailcode","status":200,"method":"POST","path":"/api/v1/user/login/emailcode","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.9995384}
