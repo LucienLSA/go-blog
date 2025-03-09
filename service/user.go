@@ -29,9 +29,10 @@ func SignUp(p *models.ParamSignUp) (err error) {
 		zap.L().Error("mysql CheckUserExist failed", zap.Error(err))
 		return err
 	}
-	if err = mysql.CheckUserEmail(p.Email); err != nil {
+	// 判断邮箱是否重复注册
+	if err = mysql.ExistUserEmail(p.Email); err != nil {
 		// 数据库查询错误
-		zap.L().Error("mysql CheckUserEmailfailed", zap.Error(err))
+		zap.L().Error("mysql ExistUserEmai failed", zap.Error(err))
 		return err
 	}
 
@@ -115,12 +116,12 @@ func SendEmailCode(p *models.ParamSendEmailCode) (err error) {
 		return err
 	}
 	mailStr := notice.Text
-	sCode := string(code)
-	fmt.Println(sCode)
-	// mailTex := strings.Replace(mailStr, "Email", sCode, -1)
-	mailTex := mailStr + "\n" + sCode
+	var builder strings.Builder
+	builder.WriteString(mailStr)
+	builder.Write([]byte(code))
+	// mailTex := strings.Replace(mailStr, "Email", code, -1)
 	// 第一个参数内容 第二个参数接收方 第三个标题 第四个发送方
-	err = email.Send(mailTex, p.UserEmail, settings.Conf.AppConfig.Name, settings.Conf.EmailConfig.SmtpEmail)
+	err = email.Send(builder.String(), p.UserEmail, settings.Conf.AppConfig.Name, settings.Conf.EmailConfig.SmtpEmail)
 	if err != nil {
 		zap.L().Error("email Send failed", zap.Error(err))
 		return err
@@ -137,8 +138,20 @@ func SendEmailCode(p *models.ParamSendEmailCode) (err error) {
 
 // 用户邮箱验证码登录业务
 func LoginEmail(p *models.ParamLoginEmail) (user *models.User, err error) {
+	// 检查mysql中邮箱是否存在
+	user = &models.User{
+		Email: p.UserEmail,
+	}
+	// 将用户邮箱登录输入的邮箱传入dao层mysql中进行判断是否存在
+	err = mysql.NotExistUserEmail(p.UserEmail)
+	// 如果不存在则错误
+	if err != nil {
+		zap.L().Error(" mysql.NotExistUserEmail failed, err:%\v", zap.Error(err))
+		fmt.Printf(" mysql.NotExistUserEmail failed, err:%\v", err)
+		return nil, err
+	}
 	// 校验验证码正确性
-	err = redisCache.CheckEmailCode(p.UserEmail)
+	// err = redisCache.CheckEmailCode(p.Code)
 	if err != nil {
 		zap.L().Error("redisCache.CheckEmailCode failed, err:%\v", zap.Error(err))
 		fmt.Printf("redisCache.CheckEmailCode failed, err:%\v", err)

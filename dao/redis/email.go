@@ -51,16 +51,16 @@ func SendEmailCode(email, code string) (err error) {
 	return
 }
 
-// 检验redis中邮箱验证码的正确性
-func CheckEmailCode(email string) (err error) {
-	key1 := GetRedisKey(KeyEmailSetPrefix)
-	key2 := GetRedisKey(KeySendEmailSetPrefix)
-	codeStroage := rdb.Get(rctx, key1+email).Val()
-	codeSend := rdb.Get(rctx, key2+email).Val()
-	if codeStroage != codeSend {
-		zap.L().Error("check email code failed")
-		fmt.Printf("check email code failed")
-		return ErrEmailCode
-	}
-	return
-}
+// // 检验redis中邮箱验证码的正确性
+// func CheckEmailCode(code int32) (err error) {
+// 	key1 := GetRedisKey(KeyEmailSetPrefix)
+// 	key2 := GetRedisKey(KeySendEmailSetPrefix)
+// 	codeStroage := rdb.Get(rctx, key1+email).Val()
+// 	codeSend := rdb.Get(rctx, key2+email).Val()
+// 	if codeStroage != codeSend {
+// 		zap.L().Error("check email code failed")
+// 		fmt.Printf("check email code failed")
+// 		return ErrEmailCode
+// 	}
+// 	return
+// }

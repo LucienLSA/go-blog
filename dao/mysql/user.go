@@ -113,17 +113,31 @@ func Login(user *models.User) (err error) {
 }
 
 // 检查指定用户名的邮箱是否存在
-func CheckUserEmail(email string) (err error) {
+func ExistUserEmail(email string) (err error) {
 	sqlStr := "select count(user_id) from user where email = ?"
 	var count int
-	if err = db.Get(&count, sqlStr, email); err != nil {
+	err = db.Get(&count, sqlStr, email)
+	if err != nil {
 		return err
 	}
-	// fmt.Println(count)
 	if count > 0 {
-		return ErrorUserExist
+		return ErrorEmailExist
 	}
-	return nil
+	return
+}
+
+// 检查指定用户名的邮箱不存在
+func NotExistUserEmail(email string) (err error) {
+	sqlStr := "select count(user_id) from user where email = ?"
+	var count int
+	err = db.Get(&count, sqlStr, email)
+	if err != nil {
+		return err
+	}
+	if count <= 0 {
+		return ErrorEmailNotExit
+	}
+	return
 }
 
 // // 邮箱登录 与mysql中的用户邮箱比对
