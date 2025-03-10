@@ -53,7 +53,7 @@ func SetupRouter(mode string) *gin.Engine {
 	// 登录
 	v1.POST("/user/login", controller.LoginHandler)
 	v1.POST("/user/login/emailcode", controller.SendEmailCodeHandler)
-	// v1.POST("/user/login/email", controller.LoginEmailHandler)
+	v1.POST("/user/login/email", controller.LoginEmailHandler)
 
 	// 获取社区信息
 	v1.GET("/community/show", controller.CommunityHandler)

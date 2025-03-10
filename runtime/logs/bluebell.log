@@ -1,16 +1,198 @@
-{"level":"INFO","time":"2025-03-08T22:27:20.598+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
-{"level":"INFO","time":"2025-03-08T22:27:20.603+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
-{"level":"INFO","time":"2025-03-08T22:27:20.604+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
-{"level":"INFO","time":"2025-03-08T22:27:20.604+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
-{"level":"INFO","time":"2025-03-08T22:27:23.370+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0}
-{"level":"INFO","time":"2025-03-08T22:27:55.594+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/emailcode","status":200,"method":"POST","path":"/api/v1/user/login/emailcode","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":1.1389372}
-{"level":"INFO","time":"2025-03-08T22:33:58.111+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
-{"level":"INFO","time":"2025-03-08T22:33:58.114+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
-{"level":"INFO","time":"2025-03-08T22:33:58.115+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
-{"level":"INFO","time":"2025-03-08T22:33:58.116+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
-{"level":"INFO","time":"2025-03-08T22:34:01.082+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/emailcode","status":200,"method":"POST","path":"/api/v1/user/login/emailcode","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.9031644}
-{"level":"INFO","time":"2025-03-08T22:39:30.854+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
-{"level":"INFO","time":"2025-03-08T22:39:30.856+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
-{"level":"INFO","time":"2025-03-08T22:39:30.857+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
-{"level":"INFO","time":"2025-03-08T22:39:30.857+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
-{"level":"INFO","time":"2025-03-08T22:39:32.106+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/emailcode","status":200,"method":"POST","path":"/api/v1/user/login/emailcode","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.9995384}
+{"level":"ERROR","time":"2025-03-10T08:32:47.127+0800","caller":"controller/user.go:33","msg":"SignUp with invalid param","error":"Key: 'ParamSignUp.email' Error:Field validation for 'email' failed on the 'email' tag"}
+{"level":"INFO","time":"2025-03-10T08:32:47.127+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0}
+{"level":"INFO","time":"2025-03-10T08:34:33.227+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T08:34:33.233+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T08:34:33.235+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T08:34:33.235+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"ERROR","time":"2025-03-10T08:34:36.578+0800","caller":"service/user.go:29","msg":"mysql CheckUserExist failed","error":"用户已存在"}
+{"level":"ERROR","time":"2025-03-10T08:34:36.578+0800","caller":"controller/user.go:61","msg":"service signup failed","error":"用户已存在"}
+{"level":"INFO","time":"2025-03-10T08:34:36.579+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0143302}
+{"level":"ERROR","time":"2025-03-10T08:35:04.990+0800","caller":"service/user.go:29","msg":"mysql CheckUserExist failed","error":"用户已存在"}
+{"level":"ERROR","time":"2025-03-10T08:35:04.990+0800","caller":"controller/user.go:61","msg":"service signup failed","error":"用户已存在"}
+{"level":"INFO","time":"2025-03-10T08:35:04.990+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.000621}
+{"level":"ERROR","time":"2025-03-10T08:35:08.496+0800","caller":"service/user.go:35","msg":"mysql ExistUserEmai failed","error":"邮箱已存在"}
+{"level":"ERROR","time":"2025-03-10T08:35:08.496+0800","caller":"controller/user.go:61","msg":"service signup failed","error":"邮箱已存在"}
+{"level":"INFO","time":"2025-03-10T08:35:08.496+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0005018}
+{"level":"INFO","time":"2025-03-10T08:38:37.850+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T08:38:37.853+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T08:38:37.854+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T08:38:37.854+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"ERROR","time":"2025-03-10T08:38:39.748+0800","caller":"service/user.go:35","msg":"mysql ExistUserEmai failed","error":"邮箱已存在"}
+{"level":"ERROR","time":"2025-03-10T08:38:39.748+0800","caller":"controller/user.go:61","msg":"service signup failed","error":"邮箱已存在"}
+{"level":"INFO","time":"2025-03-10T08:38:39.748+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0047659}
+{"level":"INFO","time":"2025-03-10T08:41:06.342+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T08:41:06.348+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T08:41:06.350+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T08:41:06.350+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"ERROR","time":"2025-03-10T08:41:06.866+0800","caller":"service/user.go:35","msg":"mysql ExistUserEmai failed","error":"邮箱已存在"}
+{"level":"ERROR","time":"2025-03-10T08:41:06.866+0800","caller":"controller/user.go:61","msg":"service signup failed","error":"邮箱已存在"}
+{"level":"INFO","time":"2025-03-10T08:41:06.866+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0049385}
+{"level":"INFO","time":"2025-03-10T08:41:36.264+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.2272865}
+{"level":"ERROR","time":"2025-03-10T08:41:43.917+0800","caller":"service/user.go:29","msg":"mysql CheckUserExist failed","error":"用户已存在"}
+{"level":"ERROR","time":"2025-03-10T08:41:43.917+0800","caller":"controller/user.go:61","msg":"service signup failed","error":"用户已存在"}
+{"level":"INFO","time":"2025-03-10T08:41:43.917+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0014459}
+{"level":"INFO","time":"2025-03-10T08:41:58.178+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.2215311}
+{"level":"INFO","time":"2025-03-10T09:37:01.907+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T09:37:01.909+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T09:37:01.910+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T09:37:01.910+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"ERROR","time":"2025-03-10T09:37:16.752+0800","caller":"service/user.go:29","msg":"mysql CheckUserExist failed","error":"用户已存在"}
+{"level":"ERROR","time":"2025-03-10T09:37:16.752+0800","caller":"controller/user.go:61","msg":"service signup failed","error":"用户已存在"}
+{"level":"INFO","time":"2025-03-10T09:37:16.752+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0046261}
+{"level":"ERROR","time":"2025-03-10T09:37:28.728+0800","caller":"service/user.go:35","msg":"email VerifyEmailFormat failed","error":"用户已存在"}
+{"level":"ERROR","time":"2025-03-10T09:37:28.728+0800","caller":"controller/user.go:61","msg":"service signup failed","error":"用户已存在"}
+{"level":"INFO","time":"2025-03-10T09:37:28.728+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0005035}
+{"level":"INFO","time":"2025-03-10T09:53:43.915+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T09:53:43.918+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T09:53:43.919+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T09:53:43.919+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T09:54:59.481+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/emailcode","status":200,"method":"POST","path":"/api/v1/user/login/emailcode","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":1.1053126}
+{"level":"ERROR","time":"2025-03-10T09:55:29.916+0800","caller":"controller/user.go:99","msg":"Login with invalid param","error":"Key: 'ParamLogin.username' Error:Field validation for 'username' failed on the 'required' tag\nKey: 'ParamLogin.password' Error:Field validation for 'password' failed on the 'required' tag"}
+{"level":"INFO","time":"2025-03-10T09:55:29.916+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login","status":200,"method":"POST","path":"/api/v1/user/login","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0}
+{"level":"INFO","time":"2025-03-10T09:55:58.586+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T09:55:58.588+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T09:55:58.588+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T09:55:58.588+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"ERROR","time":"2025-03-10T09:56:02.322+0800","caller":"controller/user.go:148","msg":"send email code with invalid param","error":"Key: 'ParamSendEmailCode.operation_type' Error:Field validation for 'operation_type' failed on the 'required' tag"}
+{"level":"INFO","time":"2025-03-10T09:56:02.322+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/emailcode","status":200,"method":"POST","path":"/api/v1/user/login/emailcode","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0}
+{"level":"INFO","time":"2025-03-10T09:56:29.130+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0}
+{"level":"INFO","time":"2025-03-10T09:56:38.557+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T09:56:38.560+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T09:56:38.562+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T09:56:38.562+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T09:56:41.001+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0067879}
+{"level":"INFO","time":"2025-03-10T09:57:22.505+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T09:57:22.507+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T09:57:22.508+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T09:57:22.508+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T09:57:23.049+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.003045}
+{"level":"INFO","time":"2025-03-10T09:57:28.493+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0010922}
+{"level":"INFO","time":"2025-03-10T09:57:34.869+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0028009}
+{"level":"INFO","time":"2025-03-10T09:58:31.546+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T09:58:31.548+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T09:58:31.549+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T09:58:31.549+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T09:58:33.220+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0039954}
+{"level":"INFO","time":"2025-03-10T10:00:02.797+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:00:02.799+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:00:02.799+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:00:02.799+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T10:00:05.852+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0054067}
+{"level":"ERROR","time":"2025-03-10T10:00:22.265+0800","caller":"service/user.go:153","msg":" mysql.NotExistUserEmail failed, err:%\u000b","error":"邮箱不存在"}
+{"level":"ERROR","time":"2025-03-10T10:00:22.265+0800","caller":"controller/user.go:189","msg":"service login failed","UserEmail":"102026352@qq.com","error":"邮箱不存在"}
+{"level":"INFO","time":"2025-03-10T10:00:22.265+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0009608}
+{"level":"INFO","time":"2025-03-10T10:00:35.806+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0034374}
+{"level":"INFO","time":"2025-03-10T10:00:58.944+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:00:58.951+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:00:58.953+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:00:58.954+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T10:01:02.089+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0091194}
+{"level":"INFO","time":"2025-03-10T10:01:59.806+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:01:59.808+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:01:59.809+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:01:59.809+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T10:02:02.899+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0047668}
+{"level":"INFO","time":"2025-03-10T10:02:57.525+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:02:57.527+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:02:57.527+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:02:57.528+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T10:02:58.462+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0021102}
+{"level":"INFO","time":"2025-03-10T10:04:46.226+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:04:46.228+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:04:46.228+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:04:46.228+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T10:05:38.941+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0010099}
+{"level":"INFO","time":"2025-03-10T10:06:43.569+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:06:43.572+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:06:43.572+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:06:43.572+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T10:06:49.330+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:06:49.332+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:06:49.333+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:06:49.333+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T10:06:50.421+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0042457}
+{"level":"INFO","time":"2025-03-10T10:07:09.420+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:07:09.425+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:07:09.426+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:07:09.426+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T10:07:09.841+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0016048}
+{"level":"INFO","time":"2025-03-10T10:07:50.356+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:07:50.358+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:07:50.358+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:07:50.358+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T10:07:51.762+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0017786}
+{"level":"INFO","time":"2025-03-10T10:09:13.269+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:09:13.271+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:09:13.272+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:09:13.272+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T10:09:14.242+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0024056}
+{"level":"INFO","time":"2025-03-10T10:09:54.774+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:09:54.777+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:09:54.778+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:09:54.778+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T10:09:55.096+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0020881}
+{"level":"INFO","time":"2025-03-10T10:09:59.262+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0011152}
+{"level":"INFO","time":"2025-03-10T10:10:34.230+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:10:34.233+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:10:34.233+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:10:34.233+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"ERROR","time":"2025-03-10T10:10:34.558+0800","caller":"redis/email.go:63","msg":"check email code failed"}
+{"level":"ERROR","time":"2025-03-10T10:10:34.558+0800","caller":"service/user.go:166","msg":"redisCache.CheckEmailCode failed, err:%\u000b","error":"邮箱验证码不正确"}
+{"level":"ERROR","time":"2025-03-10T10:10:34.558+0800","caller":"controller/user.go:189","msg":"service login failed","UserEmail":"1020263522@qq.com","error":"邮箱验证码不正确"}
+{"level":"INFO","time":"2025-03-10T10:10:34.558+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0025911}
+{"level":"INFO","time":"2025-03-10T10:11:29.187+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:11:29.189+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:11:29.190+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:11:29.190+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"ERROR","time":"2025-03-10T10:11:32.301+0800","caller":"redis/email.go:63","msg":"check email code failed"}
+{"level":"ERROR","time":"2025-03-10T10:11:32.302+0800","caller":"service/user.go:167","msg":"redisCache.CheckEmailCode failed, err:%\u000b","error":"邮箱验证码不正确"}
+{"level":"ERROR","time":"2025-03-10T10:11:32.302+0800","caller":"controller/user.go:189","msg":"service login failed","UserEmail":"1020263522@qq.com","error":"邮箱验证码不正确"}
+{"level":"INFO","time":"2025-03-10T10:11:32.302+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0033519}
+{"level":"INFO","time":"2025-03-10T10:12:14.751+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:12:14.754+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:12:14.755+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:12:14.755+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"ERROR","time":"2025-03-10T10:12:16.222+0800","caller":"redis/email.go:63","msg":"check email code failed"}
+{"level":"ERROR","time":"2025-03-10T10:12:16.222+0800","caller":"service/user.go:167","msg":"redisCache.CheckEmailCode failed, err:%\u000b","error":"邮箱验证码不正确"}
+{"level":"ERROR","time":"2025-03-10T10:12:16.222+0800","caller":"controller/user.go:189","msg":"service login failed","UserEmail":"1020263522@qq.com","error":"邮箱验证码不正确"}
+{"level":"INFO","time":"2025-03-10T10:12:16.223+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0010367}
+{"level":"ERROR","time":"2025-03-10T10:12:37.884+0800","caller":"service/user.go:153","msg":" mysql.NotExistUserEmail failed, err:%\u000b","error":"邮箱不存在"}
+{"level":"ERROR","time":"2025-03-10T10:12:37.884+0800","caller":"controller/user.go:189","msg":"service login failed","UserEmail":"102026322@qq.com","error":"邮箱不存在"}
+{"level":"INFO","time":"2025-03-10T10:12:37.885+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0005089}
+{"level":"INFO","time":"2025-03-10T10:13:25.093+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:13:25.096+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:13:25.096+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:13:25.096+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T10:13:25.335+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:13:25.339+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:13:25.339+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:13:25.339+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"ERROR","time":"2025-03-10T10:13:36.602+0800","caller":"redis/email.go:62","msg":"check email code failed"}
+{"level":"ERROR","time":"2025-03-10T10:13:36.602+0800","caller":"service/user.go:165","msg":"redisCache.CheckEmailCode failed, err:%\u000b","error":"邮箱验证码不正确"}
+{"level":"ERROR","time":"2025-03-10T10:13:36.602+0800","caller":"controller/user.go:189","msg":"service login failed","UserEmail":"1020263522@qq.com","error":"邮箱验证码不正确"}
+{"level":"INFO","time":"2025-03-10T10:13:36.602+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0027213}
+{"level":"INFO","time":"2025-03-10T10:14:59.300+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:14:59.302+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:14:59.303+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:14:59.303+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T10:15:18.419+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:15:18.421+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:15:18.422+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:15:18.422+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"ERROR","time":"2025-03-10T10:15:22.330+0800","caller":"redis/email.go:62","msg":"check email code failed"}
+{"level":"ERROR","time":"2025-03-10T10:15:22.331+0800","caller":"service/user.go:165","msg":"redisCache.CheckEmailCode failed, err:%\u000b","error":"邮箱验证码不正确"}
+{"level":"ERROR","time":"2025-03-10T10:15:22.331+0800","caller":"controller/user.go:189","msg":"service login failed","UserEmail":"1020263522@qq.com","error":"邮箱验证码不正确"}
+{"level":"INFO","time":"2025-03-10T10:15:22.331+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0034337}
+{"level":"INFO","time":"2025-03-10T10:15:52.326+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:15:52.328+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:15:52.330+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:15:52.330+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"ERROR","time":"2025-03-10T10:15:53.924+0800","caller":"redis/email.go:63","msg":"check email code failed"}
+{"level":"ERROR","time":"2025-03-10T10:15:53.924+0800","caller":"service/user.go:165","msg":"redisCache.CheckEmailCode failed, err:%\u000b","error":"邮箱验证码不正确"}
+{"level":"ERROR","time":"2025-03-10T10:15:53.924+0800","caller":"controller/user.go:189","msg":"service login failed","UserEmail":"1020263522@qq.com","error":"邮箱验证码不正确"}
+{"level":"INFO","time":"2025-03-10T10:15:53.924+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.000616}
+{"level":"INFO","time":"2025-03-10T10:17:01.862+0800","caller":"go-blog-bluebell/main.go:51","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-10T10:17:01.863+0800","caller":"go-blog-bluebell/main.go:60","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-10T10:17:01.864+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-10T10:17:01.864+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-10T10:17:03.595+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login/email","status":200,"method":"POST","path":"/api/v1/user/login/email","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0018221}

@@ -126,19 +126,19 @@ func ExistUserEmail(email string) (err error) {
 	return
 }
 
-// 检查指定用户名的邮箱不存在
-func NotExistUserEmail(email string) (err error) {
-	sqlStr := "select count(user_id) from user where email = ?"
-	var count int
-	err = db.Get(&count, sqlStr, email)
-	if err != nil {
-		return err
-	}
-	if count <= 0 {
-		return ErrorEmailNotExit
-	}
-	return
-}
+// // 检查指定用户名的邮箱不存在，存在则获取用户
+// func GetExistUserEmail(email string) (user *models.User, err error) {
+// 	sqlStr := "select count(user_id) from user where email = ?"
+// 	var count int
+// 	err = db.Get(&count, sqlStr, email)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	if count <= 0 {
+// 		return ErrorEmailNotExit
+// 	}
+// 	return
+// }
 
 // // 邮箱登录 与mysql中的用户邮箱比对
 // func LoginEmail(user *models.User) (err error) {
@@ -173,6 +173,13 @@ func GetUserByEmail(email string) (user *models.User, err error) {
 	user = new(models.User)
 	sqlStr := `select user_id, username from user where email = ?`
 	err = db.Get(user, sqlStr, email)
+	if err == sql.ErrNoRows { // sql自带查询错误
+		return nil, ErrorEmailNotExit
+	}
+	if err != nil {
+		// 查询数据库失败
+		return nil, err
+	}
 	return
 }
 

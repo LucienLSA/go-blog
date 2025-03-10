@@ -15,7 +15,7 @@ type ParamSignUp struct {
 	Username   string `json:"username" binding:"required"`                     // 注册人用户名
 	Password   string `json:"password" binding:"required"`                     // 注册人密码
 	RePassword string `json:"re_password" binding:"required,eqfield=Password"` // 注册人重复密码
-	Email      string `json:"email" binding:"email,omitempty"`                 // 注册人邮箱
+	Email      string `json:"email" binding:"omitempty"`                       // 注册人邮箱
 	// // 需要使用自定义校验方法checkDate做参数校验的字段Date
 	// Date string `json:"date" binding:"required,datetime=2006-01-02,checkDate"`
 	Avatar string `json:"avatar" binding:"omitempty"` // 注册人默认头像
@@ -28,7 +28,7 @@ type ParamUpdate struct {
 	Username   string `json:"username" binding:"required"`                     // 用户名
 	Password   string `json:"password" binding:"required"`                     // 用户密码
 	RePassword string `json:"re_password" binding:"required,eqfield=Password"` // 用户重复密码
-	Email      string `json:"email" binding:"email,omitempty"`                 // 用户邮箱
+	Email      string `json:"email" binding:"omitempty"`                       // 用户邮箱
 	Avatar     string `json:"avatar" binding:"omitempty"`                      // 用户头像
 }
 
@@ -51,10 +51,10 @@ type ParamSendEmail struct {
 	Email         string `form:"email" json:"email" binding:"required,email"`             // 用户邮箱
 }
 
-// 用户验证邮箱
+// 用户验证邮箱(绑定或解绑)
 type ParamVaildEmail struct {
-	UserName string `form:"username" json:"username"` // 用户名称
-	Email    string `form:"email" json:"email"`       // 用户邮箱
+	UserName string `form:"username" json:"username"  binding:"required"` // 用户名称
+	Email    string `form:"email" json:"email" binding:"required,email"`  // 用户邮箱
 }
 
 // 用户邮箱登录

@@ -7,10 +7,12 @@ const (
 	CodeInvalidParam
 	CodeUserExist
 	CodeUserNotExist
+
 	CodeInvalidPassword
 	CodeServerBusy
 
 	CodeEmailNotExist
+	CodeEmailExist
 
 	CodeNeedLogin = 2000 + iota
 	CodeTokenInvalid
@@ -31,4 +33,5 @@ var codeMsgMap = map[ResCode]string{
 	CodeLimitLogin:      "已在另一台设备登录",
 	CodeUploadFile:      "上传文件失败",
 	CodeEmailNotExist:   "邮箱不存在",
+	CodeEmailExist:      "邮箱已存在",
 }

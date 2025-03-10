@@ -1,7 +1,9 @@
 package email
 
 import (
+	"errors"
 	"math/rand"
+	"regexp"
 	"strconv"
 
 	"github.com/LucienLSA/go-blog/settings"
@@ -34,4 +36,18 @@ func GetConfirmCode() string {
 	// 转换成字符串
 	confirmCodeStr := strconv.Itoa(confirmCode)
 	return confirmCodeStr
+}
+
+var (
+	ErrorEmailFormat = errors.New("邮箱格式有误")
+)
+
+// 检验邮箱格式的正确性
+func VerifyEmailFormat(email string) (err error) {
+	pattern := `^[^\s@]+@[^\s@]+\.[^\s@]+$` //match email
+	reg := regexp.MustCompile(pattern)
+	if !reg.MatchString(email) {
+		return ErrorEmailFormat
+	}
+	return nil
 }

@@ -29,6 +29,13 @@ func SignUp(p *models.ParamSignUp) (err error) {
 		zap.L().Error("mysql CheckUserExist failed", zap.Error(err))
 		return err
 	}
+	// 判断邮箱格式是否正确
+	if err = email.VerifyEmailFormat(p.Email); err != nil {
+		// 邮箱格式不正确
+		zap.L().Error("email VerifyEmailFormat failed", zap.Error(err))
+		return err
+	}
+
 	// 判断邮箱是否重复注册
 	if err = mysql.ExistUserEmail(p.Email); err != nil {
 		// 数据库查询错误
@@ -138,37 +145,26 @@ func SendEmailCode(p *models.ParamSendEmailCode) (err error) {
 
 // 用户邮箱验证码登录业务
 func LoginEmail(p *models.ParamLoginEmail) (user *models.User, err error) {
-	// 检查mysql中邮箱是否存在
-	user = &models.User{
-		Email: p.UserEmail,
-	}
-	// 将用户邮箱登录输入的邮箱传入dao层mysql中进行判断是否存在
-	err = mysql.NotExistUserEmail(p.UserEmail)
+	// 将用户邮箱登录输入的邮箱传入dao层mysql中进行判断是否存在，并取出
+	// 从数据库中获取用户信息（用户名和id）
+	user, err = mysql.GetUserByEmail(p.UserEmail)
 	// 如果不存在则错误
 	if err != nil {
 		zap.L().Error(" mysql.NotExistUserEmail failed, err:%\v", zap.Error(err))
 		fmt.Printf(" mysql.NotExistUserEmail failed, err:%\v", err)
 		return nil, err
 	}
-	// 校验验证码正确性
-	// err = redisCache.CheckEmailCode(p.Code)
-	if err != nil {
-		zap.L().Error("redisCache.CheckEmailCode failed, err:%\v", zap.Error(err))
-		fmt.Printf("redisCache.CheckEmailCode failed, err:%\v", err)
-		return nil, err
-	}
-	// 将用户登录输入的名称和密码信息传入dao层
-	// if err = mysql.CheckUserEmail(p.UserEmail); err != nil {
-	// 	// 传递的是指针，能拿到数据库中注册时原本生成的UserID和Username
-	// 	zap.L().Error("mysql CheckUserEmail failed", zap.Error(err))
-	// 	return nil, err
-	// }
-	// 从数据库中获取用户信息（用户名和id）
-	user, err = mysql.GetUserByEmail(p.UserEmail)
 	userInfo := &models.User{
 		UserID:   user.UserID,
 		Email:    p.UserEmail,
 		Username: user.Username,
+	}
+	// 校验验证码正确性
+	err = redisCache.CheckEmailCode(p.UserEmail, userInfo.Email, p.Code)
+	if err != nil {
+		zap.L().Error("redisCache.CheckEmailCode failed, err:%\v", zap.Error(err))
+		fmt.Printf("redisCache.CheckEmailCode failed, err:%\v", err)
+		return nil, err
 	}
 	// 生成JWT
 	token, err := jwt.GenToken(userInfo.UserID, userInfo.Username)

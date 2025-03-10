@@ -3,6 +3,7 @@ package redisCache
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/LucienLSA/go-blog/settings"
@@ -51,16 +52,18 @@ func SendEmailCode(email, code string) (err error) {
 	return
 }
 
-// // 检验redis中邮箱验证码的正确性
-// func CheckEmailCode(code int32) (err error) {
-// 	key1 := GetRedisKey(KeyEmailSetPrefix)
-// 	key2 := GetRedisKey(KeySendEmailSetPrefix)
-// 	codeStroage := rdb.Get(rctx, key1+email).Val()
-// 	codeSend := rdb.Get(rctx, key2+email).Val()
-// 	if codeStroage != codeSend {
-// 		zap.L().Error("check email code failed")
-// 		fmt.Printf("check email code failed")
-// 		return ErrEmailCode
-// 	}
-// 	return
-// }
+// 检验redis中邮箱验证码的正确性
+func CheckEmailCode(pEmail, uEmail string, code int32) (err error) {
+	key1 := GetRedisKey(KeyEmailSetPrefix)
+	// key2 := GetRedisKey(KeySendEmailSetPrefix)
+	// fmt.Println(key1+uEmail, key2+pEmail)
+	codeStroage, _ := rdb.Get(rctx, key1+uEmail).Result()
+	// fmt.Println(codeStroage)
+	// fmt.Println(code)
+	if codeStroage != strconv.Itoa(int(code)) {
+		zap.L().Error("check email code failed")
+		fmt.Printf("check email code failed")
+		return ErrEmailCode
+	}
+	return
+}

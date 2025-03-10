@@ -67,6 +67,10 @@ func SignUpHandler(c *gin.Context) {
 			response.ResponseError(c, response.CodeUserExist)
 			return
 		}
+		if errors.Is(err, mysql.ErrorEmailExist) {
+			response.ResponseError(c, response.CodeEmailExist)
+			return
+		}
 		response.ResponseError(c, response.CodeServerBusy)
 		return
 	}
@@ -135,11 +139,11 @@ func LoginHandler(c *gin.Context) {
 	})
 }
 
-// SendEmailCodeHandler // 用户登录时给邮箱发送验证码
+// SendEmailCodeHandler 用户登录时给邮箱发送验证码
 func SendEmailCodeHandler(c *gin.Context) {
 	// 1. 获取参数和参数校验
 	p := new(models.ParamSendEmailCode)
-	if err := c.ShouldBindJSON(p); err != nil {
+	if err := c.ShouldBindJSON(&p); err != nil {
 		// 请求参数有误 直接返回响应
 		zap.L().Error("send email code with invalid param", zap.Error(err))
 		// 判断err是不是validator.ValidationErrors类型
@@ -166,7 +170,7 @@ func SendEmailCodeHandler(c *gin.Context) {
 func LoginEmailHandler(c *gin.Context) {
 	// 1. 获取参数和参数校验
 	p := new(models.ParamLoginEmail)
-	if err := c.ShouldBindJSON(p); err != nil {
+	if err := c.ShouldBindJSON(&p); err != nil {
 		// 请求参数有误 直接返回响应
 		zap.L().Error("Login with invalid param", zap.Error(err))
 		// 判断err是不是validator.ValidationErrors类型
@@ -187,13 +191,13 @@ func LoginEmailHandler(c *gin.Context) {
 			response.ResponseError(c, response.CodeEmailNotExist)
 			return
 		}
-		response.ResponseError(c, response.CodeInvalidPassword)
+		response.ResponseError(c, response.CodeInvalidParam)
 		return
 	}
 	response.ResponseSuccessData(c, gin.H{
 		"user_id":   strconv.FormatInt(user.UserID, 10), // id值大于1<<53-1, int64类型最大值为1<<63-1，转化为字符串
 		"user_name": user.Username,
-		"email":     user.Email,
+		"email":     p.UserEmail,
 		"token":     user.Token,
 	})
 }
