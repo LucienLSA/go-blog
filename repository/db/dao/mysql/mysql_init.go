@@ -58,8 +58,8 @@ func InitMysql(cfg *settings.MySQLConfig) (err error) {
 	_ = _db.Use(dbresolver.
 		Register(dbresolver.Config{
 			// `db2` 作为 sources，`db3`、`db4` 作为 replicas
-			Sources:  []gorm.Dialector{mysql.Open(pathRead)},                         // 写操作
-			Replicas: []gorm.Dialector{mysql.Open(pathWrite), mysql.Open(pathWrite)}, // 读操作
+			Sources:  []gorm.Dialector{mysql.Open(pathRead)},                         // 读操作
+			Replicas: []gorm.Dialector{mysql.Open(pathWrite), mysql.Open(pathWrite)}, // 写操作
 			Policy:   dbresolver.RandomPolicy{},                                      // sources/replicas 负载均衡策略
 		}))
 	_db = _db.Set("gorm:table_options", "charset=utf8mb4")

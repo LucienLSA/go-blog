@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/LucienLSA/go-blog/pkg/e"
 	"github.com/LucienLSA/go-blog/pkg/email"
 	"github.com/LucienLSA/go-blog/pkg/snowflake"
 	"github.com/LucienLSA/go-blog/repository/db/dao/mysql"
@@ -39,45 +40,64 @@ func ResetUserSrv() {
 
 // 注册业务
 func (s *UserSrv) UserSignUp(ctx context.Context, req *types.UserSignUpReq) (err error) {
-	userDao := dao.NewUserDao(ctx)
+	userDao := mysql.NewUserDao(ctx)
 	// 1. 判断用户是否存在
-	if err = mysql.CheckUserExist(p.Username); err != nil {
+	_, exist, err := userDao.CheckUserExist(req.UserName)
+	if err != nil {
 		// 数据库查询错误
-		zap.L().Error("mysql CheckUserExist failed", zap.Error(err))
+		zap.L().Error("userDao CheckUserExist failed", zap.Error(err))
 		return err
 	}
-	// 判断邮箱格式是否正确
-	if err = email.VerifyEmailFormat(p.Email); err != nil {
-		// 邮箱格式不正确
-		zap.L().Error("email VerifyEmailFormat failed", zap.Error(err))
-		return err
+	if exist {
+		// 用户存在
+		zap.L().Error("userDao CheckUserExist failed", zap.Error(err))
+		return e.ErrorUserExist
+	}
+	fmt.Println(req.Email)
+	if req.Email != "" {
+		// 判断邮箱格式是否正确
+		if err = email.VerifyEmailFormat(req.Email); err != nil {
+			// 邮箱格式不正确
+			zap.L().Error("email VerifyEmailFormat failed", zap.Error(err))
+			return err
+		}
 	}
 
 	// 判断邮箱是否重复注册
-	if err = mysql.ExistUserEmail(p.Email); err != nil {
+	_, exist, err = userDao.ExistUserEmail(req.Email)
+	if err != nil {
 		// 数据库查询错误
 		zap.L().Error("mysql ExistUserEmai failed", zap.Error(err))
 		return err
 	}
-
+	if exist {
+		// 邮箱存在
+		zap.L().Error("userDao CheckUserExist failed", zap.Error(err))
+		return e.ErrorEmailExist
+	}
 	// 2. 生成UID
 	userID := snowflake.GenID()
-	fmt.Println(userID)
+	// fmt.Println(userID)
+
 	// 3. 构造一个user示例
 	// 获取默认头像
 	defaultAvatar := settings.Conf.AppConfig.PhotoPathConfig
 	user := &models.User{
 		UserID:   userID,
-		Username: p.Username,
-		Age:      p.Age,
-		Email:    p.Email,
-		Password: p.Password,
-		Gender:   p.Gender,
+		UserName: req.UserName,
+		Age:      req.Age,
+		Email:    req.Email,
+		Password: req.Password,
+		Gender:   req.Gender,
 		Avatar:   defaultAvatar.DefaultAvatar,
 	}
-	fmt.Println(&user)
-	// 3. 保存到数据库
-	err = mysql.InsertUser(user)
+	// 4. 加密密码
+	if err = user.SetPassword(req.Password); err != nil {
+		zap.L().Error("user.SetPassword failed", zap.Error(err))
+		return
+	}
+	// 5. 保存到数据库
+	err = userDao.InsertUser(user)
 	if err != nil {
 		zap.L().Error("mysql InsertUser failed", zap.Error(err))
 	}

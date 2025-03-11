@@ -3,9 +3,9 @@ package controller
 import (
 	"errors"
 
-	"github.com/LucienLSA/go-blog/pkg/response"
+	"github.com/LucienLSA/go-blog/pkg/e"
+	"github.com/LucienLSA/go-blog/pkg/email"
 	"github.com/LucienLSA/go-blog/pkg/translator"
-	"github.com/LucienLSA/go-blog/repository/db/dao/mysql"
 	"github.com/LucienLSA/go-blog/service"
 	"github.com/LucienLSA/go-blog/types"
 	"github.com/gin-gonic/gin"
@@ -37,13 +37,13 @@ func SignUpHandler() gin.HandlerFunc {
 				// c.JSON(http.StatusOK, gin.H{
 				// 	"msg": err.Error(),
 				// })
-				response.ResponseError(c, response.CodeInvalidParam)
+				e.ResponseError(c, e.CodeInvalidParam)
 				return
 			}
 			// c.JSON(http.StatusOK, gin.H{
 			// 	"msg": translator.RemoveTopStruct(errs.Translate(translator.Trans)),
 			// })
-			response.ResponseErrorMsg(c, response.CodeInvalidParam,
+			e.ResponseErrorMsg(c, e.CodeInvalidParam,
 				translator.RemoveTopStruct(errs.Translate(translator.Trans)))
 			return
 		}
@@ -65,19 +65,23 @@ func SignUpHandler() gin.HandlerFunc {
 			// 	"msg": "注册失败",
 			// 	// "error": err,
 			// })
-			if errors.Is(err, mysql.ErrorUserExist) {
-				response.ResponseError(c, response.CodeUserExist)
+			if errors.Is(err, e.ErrorUserExist) {
+				e.ResponseError(c, e.CodeUserExist)
 				return
 			}
-			if errors.Is(err, mysql.ErrorEmailExist) {
-				response.ResponseError(c, response.CodeEmailExist)
+			if errors.Is(err, e.ErrorEmailExist) {
+				e.ResponseError(c, e.CodeEmailExist)
 				return
 			}
-			response.ResponseError(c, response.CodeServerBusy)
+			if errors.Is(err, email.ErrorEmailFormat) {
+				e.ResponseError(c, e.CodeEmailFormat)
+				return
+			}
+			e.ResponseError(c, e.CodeServerBusy)
 			return
 		}
 		// 3. 返回响应
-		response.ResponseSuccessData(c, nil)
+		e.ResponseSuccessData(c, nil)
 		// c.JSON(http.StatusOK, gin.H{
 		// 	"msg": "注册成功",
 		// })

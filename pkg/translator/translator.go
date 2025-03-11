@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LucienLSA/go-blog/repository/db/models"
+	"github.com/LucienLSA/go-blog/types"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/locales/zh"
@@ -34,7 +34,7 @@ func InitTrans(locale string) (err error) {
 		})
 
 		// 为SignUpParam注册自定义校验方法
-		v.RegisterStructValidation(SignUpParamStructLevelValidation, models.ParamSignUp{})
+		v.RegisterStructValidation(SignUpParamStructLevelValidation, types.UserSignUpReq{})
 
 		// 在校验器注册自定义的校验方法
 		if err := v.RegisterValidation("checkDate", customFuncDate); err != nil {
@@ -95,7 +95,7 @@ func RemoveTopStruct(fields map[string]string) map[string]string {
 
 // SignUpParamStructLevelValidation 自定义SignUpParam结构体校验函数
 func SignUpParamStructLevelValidation(sl validator.StructLevel) {
-	su := sl.Current().Interface().(models.ParamSignUp)
+	su := sl.Current().Interface().(types.UserSignUpReq)
 
 	if su.Password != su.RePassword {
 		// 输出错误提示信息，最后一个参数就是传递的param

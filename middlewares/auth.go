@@ -4,8 +4,8 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/LucienLSA/go-blog/pkg/e"
 	"github.com/LucienLSA/go-blog/pkg/jwt"
-	"github.com/LucienLSA/go-blog/pkg/response"
 	redisCache "github.com/LucienLSA/go-blog/repository/db/dao/redis"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -26,7 +26,7 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			// 	"msg":  "请求头中auth为空",
 			// })
 			zap.L().Error("Request.Header.Get Authorization failed", zap.Error(errors.New("请求头中auth为空")))
-			response.ResponseError(c, response.CodeNeedLogin)
+			e.ResponseError(c, e.CodeNeedLogin)
 			c.Abort()
 			return
 		}
@@ -38,7 +38,7 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			// 	"msg":  "请求头中auth格式有误",
 			// })
 			zap.L().Error("Request.Header.Get Authorization failed", zap.Error(errors.New("请求头中auth格式有误")))
-			response.ResponseError(c, response.CodeNeedLogin)
+			e.ResponseError(c, e.CodeNeedLogin)
 			c.Abort()
 			return
 		}
@@ -50,7 +50,7 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			// 	"msg":  "无效的Token",
 			// })
 			zap.L().Error("jwt.ParseToken failed", zap.Error(errors.New("无效的Token")))
-			response.ResponseError(c, response.CodeTokenInvalid)
+			e.ResponseError(c, e.CodeTokenInvalid)
 			c.Abort()
 			return
 		}
@@ -58,13 +58,13 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 		token, err := redisCache.GetJwtToken(mc.Username)
 		// token不存在 需要重新登录
 		if err == redisCache.ErrNotExistToken {
-			response.ResponseError(c, response.CodeNeedLogin)
+			e.ResponseError(c, e.CodeNeedLogin)
 			c.Abort()
 			return
 		}
 		// 	如果不一致，则说明在另一端登录
 		if parts[1] != token {
-			response.ResponseError(c, response.CodeLimitLogin)
+			e.ResponseError(c, e.CodeLimitLogin)
 			c.Abort()
 			return
 		}

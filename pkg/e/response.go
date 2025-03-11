@@ -1,4 +1,4 @@
-package response
+package e
 
 import (
 	"net/http"
@@ -24,7 +24,7 @@ type ResponseData struct {
 func ResponseError(c *gin.Context, code ResCode) {
 	c.JSON(http.StatusOK, &ResponseData{
 		Code: code,
-		Msg:  code.getMsg(),
+		Msg:  code.GetMsg(),
 		Data: nil,
 	})
 }
@@ -42,7 +42,7 @@ func ResponseErrorMsg(c *gin.Context, code ResCode, msg interface{}) {
 func ResponseSuccessData(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, &ResponseData{
 		Code: CodeSuccess,
-		Msg:  CodeSuccess.getMsg(),
+		Msg:  CodeSuccess.GetMsg(),
 		Data: data,
 	})
 }

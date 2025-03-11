@@ -1,4 +1,4 @@
-package response
+package e
 
 type ResCode int64
 
@@ -13,6 +13,7 @@ const (
 
 	CodeEmailNotExist
 	CodeEmailExist
+	CodeEmailFormat
 
 	CodeNeedLogin = 2000 + iota
 	CodeTokenInvalid
@@ -34,4 +35,5 @@ var codeMsgMap = map[ResCode]string{
 	CodeUploadFile:      "上传文件失败",
 	CodeEmailNotExist:   "邮箱不存在",
 	CodeEmailExist:      "邮箱已存在",
+	CodeEmailFormat:     "邮箱格式有误",
 }

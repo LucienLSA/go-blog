@@ -9,7 +9,7 @@ type User struct {
 	gorm.Model
 	UserID         int64  `gorm:"user_id"`
 	Age            uint8  `gorm:"age"`
-	Username       string `gorm:"user_name,unique" `
+	UserName       string `gorm:"unique"`
 	Password       string `gorm:"password"`
 	Email          string `gorm:"email"`
 	PasswordDigest string `gorm:"password_digest"`
@@ -25,9 +25,9 @@ func (u *User) TableName() string {
 
 // 用户登录请求
 type UserLogin struct {
-	UserID   int64  `json:"user_id" gorm:"user_id"`   // 用户id
-	Username string `json:"username" gorm:"username"` // 用户名
-	Token    string `json:"token" `                   // access token
+	UserID   int64  `json:"user_id" gorm:"user_id"`     // 用户id
+	Username string `json:"user_name" gorm:"user_name"` // 用户名
+	Token    string `json:"token" `                     // access token
 }
 
 // // 密码加密 旧版

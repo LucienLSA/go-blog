@@ -3,6 +3,7 @@ package mysql
 import (
 	"context"
 
+	"github.com/LucienLSA/go-blog/repository/db/models"
 	"gorm.io/gorm"
 )
 
@@ -21,19 +22,55 @@ func NewUserDaoByDB(db *gorm.DB) *UserDao {
 // 每一步数据库操作封装成函数
 // 待service层业务需求进行调用
 
-// // 检查指定用户名的用户是否存在
-// func CheckUserExist(username string) (err error) {
-// 	sqlStr := "select count(user_id) from user where username = ?"
-// 	var count int
-// 	if err = db.Get(&count, sqlStr, username); err != nil {
-// 		return err
-// 	}
-// 	// fmt.Println(count)
-// 	if count > 0 {
-// 		return ErrorUserExist
-// 	}
-// 	return nil
-// }
+// 检查指定用户名的用户是否存在
+func (dao *UserDao) CheckUserExist(username string) (user *models.User, exist bool, err error) {
+	// sqlStr := "select count(user_id) from user where username = ?"
+	var count int64
+	err = dao.DB.Model(&models.User{}).Where("user_name = ?", username).Count(&count).Error
+	if err != nil {
+		return user, false, err
+	}
+	if count <= 0 {
+		return user, false, err
+	}
+	// if err = db.Get(&count, sqlStr, username); err != nil {
+	// 	return err
+	// }
+	// fmt.Println(count)
+	err = dao.DB.Model(&models.User{}).Where("user_name = ?", username).First(&user).Error
+	if err != nil {
+		return user, false, err
+	}
+	return user, true, nil
+}
+
+// 检查指定用户名的邮箱是否存在
+func (dao *UserDao) ExistUserEmail(email string) (user *models.User, exist bool, err error) {
+	// sqlStr := "select count(user_id) from user where email = ?"
+	var count int64
+	// err = db.Get(&count, sqlStr, email)
+	err = dao.DB.Model(&models.User{}).Where("email = ?", email).Count(&count).Error
+	if err != nil {
+		return user, false, err
+	}
+	if count <= 0 {
+		return nil, false, err
+	}
+	err = dao.DB.Model(&models.User{}).Where("email = ?", email).First(&user).Error
+	if err != nil {
+		return user, false, err
+	}
+	return user, true, nil
+}
+
+// 向数据库中插入一条用户信息
+func (dao *UserDao) InsertUser(user *models.User) (err error) {
+	// 执行SQL语句
+	// sqlStr := `insert into user(user_id, username, password, email, age, gender, avatar) values(?,?,?,?,?,?,?)`
+	// _, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password, user.Email, user.Age, user.Gender, user.Avatar)
+	// return err
+	return dao.DB.Model(&models.User{}).Create(&user).Error
+}
 
 // // 检查指定用户名的用户是否不存在
 // func CheckUserNototExist(username string) (err error) {
@@ -47,20 +84,6 @@ func NewUserDaoByDB(db *gorm.DB) *UserDao {
 // 		return ErrorUserNotExist
 // 	}
 // 	return nil
-// }
-
-// // 向数据库中插入一条用户信息
-// func InsertUser(user *models.User) (err error) {
-// 	// 对密码进行加密
-// 	user.Password, err = SetPassword(user, user.Password)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	// fmt.Println(user.Password)
-// 	// 执行SQL语句
-// 	sqlStr := `insert into user(user_id, username, password, email, age, gender, avatar) values(?,?,?,?,?,?,?)`
-// 	_, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password, user.Email, user.Age, user.Gender, user.Avatar)
-// 	return err
 // }
 
 // // 向数据库更新用户信息
@@ -117,20 +140,6 @@ func NewUserDaoByDB(db *gorm.DB) *UserDao {
 // 	err = CheckPassword(user, userPassword)
 // 	if err != nil {
 // 		return ErrorInvalidPassword
-// 	}
-// 	return
-// }
-
-// // 检查指定用户名的邮箱是否存在
-// func ExistUserEmail(email string) (err error) {
-// 	sqlStr := "select count(user_id) from user where email = ?"
-// 	var count int
-// 	err = db.Get(&count, sqlStr, email)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	if count > 0 {
-// 		return ErrorEmailExist
 // 	}
 // 	return
 // }
