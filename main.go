@@ -14,6 +14,7 @@ import (
 	"github.com/LucienLSA/go-blog/pkg/translator"
 	"github.com/LucienLSA/go-blog/repository/db/dao/mysql"
 	redisCache "github.com/LucienLSA/go-blog/repository/db/dao/redis"
+	"github.com/LucienLSA/go-blog/routers"
 	"github.com/LucienLSA/go-blog/settings"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -58,7 +59,6 @@ func main() {
 		return
 	}
 	zap.L().Info("init mysql success")
-	defer mysql.Close()
 
 	// 4. 初始化Redis链接
 	if err := redisCache.InitRedis(sConf.RedisConfig); err != nil {
@@ -81,7 +81,7 @@ func main() {
 		fmt.Printf("init validator translator failed, err:%v\n", err)
 		return
 	}
-	r := route.SetupRouter(sConf.Mode)
+	r := routers.SetupRouter(sConf.Mode)
 
 	// 7. 启动服务（优雅关机）
 	srv := &http.Server{

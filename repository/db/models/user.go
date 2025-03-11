@@ -7,7 +7,7 @@ import (
 
 type User struct {
 	gorm.Model
-	UserID         uint   `gorm:"user_id"`
+	UserID         int64  `gorm:"user_id"`
 	Age            uint8  `gorm:"age"`
 	Username       string `gorm:"user_name,unique" `
 	Password       string `gorm:"password"`
@@ -16,6 +16,11 @@ type User struct {
 	Gender         string `gorm:"gender"`
 	Token          string `gorm:"token"`
 	Avatar         string `gorm:"avatar"`
+}
+
+// 实现TableName方法可以修改表名
+func (u *User) TableName() string {
+	return "user"
 }
 
 // 用户登录请求

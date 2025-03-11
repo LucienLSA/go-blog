@@ -1,16 +1,25 @@
 package mysql
 
-// import (
-// 	"database/sql"
+import (
+	"context"
 
-// 	"github.com/LucienLSA/go-blog/models"
-// 	"golang.org/x/crypto/bcrypt"
-// )
+	"gorm.io/gorm"
+)
 
-// // 每一步数据库操作封装成函数
-// // 待service层业务需求进行调用
+type UserDao struct {
+	*gorm.DB
+}
 
-// const PasswordCost = 12
+func NewUserDao(ctx context.Context) *UserDao {
+	return &UserDao{NewDBClient(ctx)}
+}
+
+func NewUserDaoByDB(db *gorm.DB) *UserDao {
+	return &UserDao{db}
+}
+
+// 每一步数据库操作封装成函数
+// 待service层业务需求进行调用
 
 // // 检查指定用户名的用户是否存在
 // func CheckUserExist(username string) (err error) {

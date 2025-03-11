@@ -2,10 +2,11 @@ package redisCache
 
 import (
 	"context"
-	"fmt"
+	"strings"
 
 	"github.com/LucienLSA/go-blog/settings"
 	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
 )
 
 // var 声明全局的rdb变量
@@ -22,7 +23,7 @@ func InitRedis(cfg *settings.RedisConfig) (err error) {
 		// Password: viper.GetString("redis.password"), // 密码
 		// DB:       viper.GetInt("redis.db"),          // 数据库
 		// PoolSize: viper.GetInt("redis.pool_size"),   // 连接池大小
-		Addr:     fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
+		Addr:     strings.Join([]string{cfg.Host, ":", cfg.Port}, ""),
 		Password: cfg.Password,
 		DB:       cfg.DB,
 		PoolSize: cfg.PoolSize,
@@ -30,9 +31,9 @@ func InitRedis(cfg *settings.RedisConfig) (err error) {
 
 	_, err = rdb.Ping(rctx).Result()
 	if err != nil {
-		return err
+		zap.L().Error("connect redis failed, err:%v\n", zap.Error(err))
+		return
 	}
-	// RedisClient = rdb
 	return nil
 }
 

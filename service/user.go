@@ -1,70 +1,88 @@
 package service
 
-// import (
-// 	"context"
-// 	"fmt"
-// 	"mime/multipart"
-// 	"strings"
-// 	"time"
+import (
+	"context"
+	"fmt"
+	"sync"
 
-// 	"github.com/LucienLSA/go-blog/pkg/email"
-// 	"github.com/LucienLSA/go-blog/pkg/jwt"
-// 	"github.com/LucienLSA/go-blog/pkg/snowflake"
-// 	"github.com/LucienLSA/go-blog/pkg/upload"
-// 	"github.com/LucienLSA/go-blog/repository/db/dao/mysql"
-// 	redisCache "github.com/LucienLSA/go-blog/repository/db/dao/redis"
-// 	"github.com/LucienLSA/go-blog/repository/db/models"
-// 	"github.com/LucienLSA/go-blog/settings"
-// 	"go.uber.org/zap"
-// )
+	"github.com/LucienLSA/go-blog/pkg/email"
+	"github.com/LucienLSA/go-blog/pkg/snowflake"
+	"github.com/LucienLSA/go-blog/repository/db/dao/mysql"
+	"github.com/LucienLSA/go-blog/repository/db/models"
+	"github.com/LucienLSA/go-blog/settings"
+	"github.com/LucienLSA/go-blog/types"
+	"go.uber.org/zap"
+)
 
-// // 存放业务逻辑
+// 单例模式
+var userSrvIns *UserSrv
+var userSrvOnce sync.Once
 
-// // 注册业务
-// func SignUp(p *models.ParamSignUp) (err error) {
-// 	// 1. 判断用户是否存在
-// 	if err = mysql.CheckUserExist(p.Username); err != nil {
-// 		// 数据库查询错误
-// 		zap.L().Error("mysql CheckUserExist failed", zap.Error(err))
-// 		return err
-// 	}
-// 	// 判断邮箱格式是否正确
-// 	if err = email.VerifyEmailFormat(p.Email); err != nil {
-// 		// 邮箱格式不正确
-// 		zap.L().Error("email VerifyEmailFormat failed", zap.Error(err))
-// 		return err
-// 	}
+type UserSrv struct {
+}
 
-// 	// 判断邮箱是否重复注册
-// 	if err = mysql.ExistUserEmail(p.Email); err != nil {
-// 		// 数据库查询错误
-// 		zap.L().Error("mysql ExistUserEmai failed", zap.Error(err))
-// 		return err
-// 	}
+// 单例实例 不对外暴露
+func GetUserSrv() *UserSrv {
+	userSrvOnce.Do(func() {
+		userSrvIns = &UserSrv{}
+	})
+	return userSrvIns
+}
 
-// 	// 2. 生成UID
-// 	userID := snowflake.GenID()
-// 	fmt.Println(userID)
-// 	// 3. 构造一个user示例
-// 	// 获取默认头像
-// 	defaultAvatar := settings.Conf.AppConfig.PhotoPathConfig
-// 	user := &models.User{
-// 		UserID:   userID,
-// 		Username: p.Username,
-// 		Age:      p.Age,
-// 		Email:    p.Email,
-// 		Password: p.Password,
-// 		Gender:   p.Gender,
-// 		Avatar:   defaultAvatar.DefaultAvatar,
-// 	}
-// 	fmt.Println(&user)
-// 	// 3. 保存到数据库
-// 	err = mysql.InsertUser(user)
-// 	if err != nil {
-// 		zap.L().Error("mysql InsertUser failed", zap.Error(err))
-// 	}
-// 	return err
-// }
+// 重置单例 便于测试
+func ResetUserSrv() {
+	userSrvOnce = sync.Once{}
+	userSrvIns = nil
+}
+
+// 存放业务逻辑
+
+// 注册业务
+func (s *UserSrv) UserSignUp(ctx context.Context, req *types.UserSignUpReq) (err error) {
+	userDao := dao.NewUserDao(ctx)
+	// 1. 判断用户是否存在
+	if err = mysql.CheckUserExist(p.Username); err != nil {
+		// 数据库查询错误
+		zap.L().Error("mysql CheckUserExist failed", zap.Error(err))
+		return err
+	}
+	// 判断邮箱格式是否正确
+	if err = email.VerifyEmailFormat(p.Email); err != nil {
+		// 邮箱格式不正确
+		zap.L().Error("email VerifyEmailFormat failed", zap.Error(err))
+		return err
+	}
+
+	// 判断邮箱是否重复注册
+	if err = mysql.ExistUserEmail(p.Email); err != nil {
+		// 数据库查询错误
+		zap.L().Error("mysql ExistUserEmai failed", zap.Error(err))
+		return err
+	}
+
+	// 2. 生成UID
+	userID := snowflake.GenID()
+	fmt.Println(userID)
+	// 3. 构造一个user示例
+	// 获取默认头像
+	defaultAvatar := settings.Conf.AppConfig.PhotoPathConfig
+	user := &models.User{
+		UserID:   userID,
+		Username: p.Username,
+		Age:      p.Age,
+		Email:    p.Email,
+		Password: p.Password,
+		Gender:   p.Gender,
+		Avatar:   defaultAvatar.DefaultAvatar,
+	}
+	fmt.Println(&user)
+	// 3. 保存到数据库
+	err = mysql.InsertUser(user)
+	if err != nil {
+		zap.L().Error("mysql InsertUser failed", zap.Error(err))
+	}
+	return err
+}
 
 // // 登录业务
 // func Login(p *models.ParamLogin) (user *models.User, err error) {

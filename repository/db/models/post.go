@@ -6,10 +6,10 @@ import (
 
 type Post struct {
 	gorm.Model
-	PostID      uint   `gorm:"post_id"`      // 帖子id
-	CommunityID uint   `gorm:"community_id"` // 社区id
-	AuthorID    uint   ` gorm:"author_id"`   // 帖子作者id
 	Status      int32  ` gorm:"status"`      // 帖子状态
+	PostID      int64  `gorm:"post_id"`      // 帖子id
+	CommunityID int64  `gorm:"community_id"` // 社区id
+	AuthorID    int64  ` gorm:"author_id"`   // 帖子作者id
 	Title       string ` gorm:"title"`       // 帖子标题
 	Content     string ` gorm:"content"`     // 帖子内容
 }
