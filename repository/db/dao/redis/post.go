@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/LucienLSA/go-blog/models"
+	"github.com/LucienLSA/go-blog/repository/db/models"
 	"github.com/redis/go-redis/v9"
 )
 

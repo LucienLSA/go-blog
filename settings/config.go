@@ -54,7 +54,7 @@ type MySQLConfig struct {
 	User         string `mapstructure:"user"`
 	Password     string `mapstructure:"password"`
 	DbName       string `mapstructure:"dbname"`
-	Port         int    `mapstructure:"port"`
+	Port         string `mapstructure:"port"`
 	MaxOpenConns int    `mapstructure:"max_open_conns"`
 	MaxIdleConns int    `mapstructure:"max_idle_conns"`
 }
@@ -62,7 +62,7 @@ type MySQLConfig struct {
 type RedisConfig struct {
 	Host     string `mapstructure:"host"`
 	Password string `mapstructure:"password"`
-	Port     int    `mapstructure:"port"`
+	Port     string `mapstructure:"port"`
 	DB       int    `mapstructure:"db"`
 	PoolSize int    `mapstructure:"pool_size"`
 }

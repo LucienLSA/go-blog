@@ -3,10 +3,10 @@ package controller
 import (
 	"strconv"
 
-	"github.com/LucienLSA/go-blog/models"
 	"github.com/LucienLSA/go-blog/pkg/request"
 	"github.com/LucienLSA/go-blog/pkg/response"
 	"github.com/LucienLSA/go-blog/pkg/translator"
+	"github.com/LucienLSA/go-blog/repository/db/models"
 	"github.com/LucienLSA/go-blog/service"
 	"github.com/LucienLSA/go-blog/settings"
 	"github.com/gin-gonic/gin"

@@ -9,12 +9,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/LucienLSA/go-blog/dao/mysql"
-	redisCache "github.com/LucienLSA/go-blog/dao/redis"
-	"github.com/LucienLSA/go-blog/logger"
+	logging "github.com/LucienLSA/go-blog/logger"
 	"github.com/LucienLSA/go-blog/pkg/snowflake"
 	"github.com/LucienLSA/go-blog/pkg/translator"
-	route "github.com/LucienLSA/go-blog/routers"
+	"github.com/LucienLSA/go-blog/repository/db/dao/mysql"
+	redisCache "github.com/LucienLSA/go-blog/repository/db/dao/redis"
 	"github.com/LucienLSA/go-blog/settings"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -41,10 +40,11 @@ func main() {
 		fmt.Printf("init settings failed, err:%v\n", err)
 		return
 	}
+	sConf := settings.Conf
 	zap.L().Info("init settings success")
 
 	// 2. 初始化日志
-	if err := logger.InitLogger(settings.Conf.LogConfig, settings.Conf.Mode); err != nil {
+	if err := logging.InitLogger(sConf.LogConfig, sConf.Mode); err != nil {
 		fmt.Printf("init logger failed, err:%v\n", err)
 		return
 	}
@@ -53,7 +53,7 @@ func main() {
 	defer zap.L().Sync()
 
 	// 3. 初始化MySQL
-	if err := mysql.InitMysql(settings.Conf.MySQLConfig); err != nil {
+	if err := mysql.InitMysql(sConf.MySQLConfig); err != nil {
 		fmt.Printf("init mysql failed, err:%v\n", err)
 		return
 	}
@@ -61,7 +61,7 @@ func main() {
 	defer mysql.Close()
 
 	// 4. 初始化Redis链接
-	if err := redisCache.InitRedis(settings.Conf.RedisConfig); err != nil {
+	if err := redisCache.InitRedis(sConf.RedisConfig); err != nil {
 		fmt.Printf("init redis failed, err:%v\n", err)
 		return
 	}
@@ -69,7 +69,7 @@ func main() {
 	defer redisCache.Close()
 
 	// 5. 初始化雪花算法
-	if err := snowflake.InitSnowflake(settings.Conf.AppConfig.StartTime, settings.Conf.AppConfig.MachineID); err != nil {
+	if err := snowflake.InitSnowflake(sConf.AppConfig.StartTime, sConf.AppConfig.MachineID); err != nil {
 		fmt.Printf("init snowflake failed, err:%v\n", err)
 		return
 	}
@@ -81,7 +81,7 @@ func main() {
 		fmt.Printf("init validator translator failed, err:%v\n", err)
 		return
 	}
-	r := route.SetupRouter(settings.Conf.Mode)
+	r := route.SetupRouter(sConf.Mode)
 
 	// 7. 启动服务（优雅关机）
 	srv := &http.Server{

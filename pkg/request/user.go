@@ -10,14 +10,13 @@ import (
 var ErrorUserNotLogin = errors.New("用户未登录")
 
 // 获取到经过中间件的jwt auth鉴权后登录的用户信息 ，进行下一步处理
-func GetLoginUserID(c *gin.Context) (userID int64, err error) {
+func GetLoginUserID(c *gin.Context) (userID uint, err error) {
 	uid, ok := c.Get(middlewares.CtxtUserIDKey)
 	if !ok {
 		err = ErrorUserNotLogin
 		return
 	}
-	userID, ok = uid.(int64)
-	if !ok {
+	if userID != uid {
 		err = ErrorUserNotLogin
 		return
 	}

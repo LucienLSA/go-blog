@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LucienLSA/go-blog/models"
+	"github.com/LucienLSA/go-blog/repository/db/models"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/locales/zh"

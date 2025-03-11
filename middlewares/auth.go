@@ -4,9 +4,9 @@ import (
 	"errors"
 	"strings"
 
-	redisCache "github.com/LucienLSA/go-blog/dao/redis"
 	"github.com/LucienLSA/go-blog/pkg/jwt"
 	"github.com/LucienLSA/go-blog/pkg/response"
+	redisCache "github.com/LucienLSA/go-blog/repository/db/dao/redis"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )

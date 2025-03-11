@@ -1,19 +1,19 @@
 package service
 
-import (
-	"strconv"
+// import (
+// 	"strconv"
 
-	redisCache "github.com/LucienLSA/go-blog/dao/redis"
-	"github.com/LucienLSA/go-blog/models"
-	"go.uber.org/zap"
-)
+// 	redisCache "github.com/LucienLSA/go-blog/dao/redis"
+// 	"github.com/LucienLSA/go-blog/models"
+// 	"go.uber.org/zap"
+// )
 
-// PostVote 为帖子投票
-func PostVote(userID int64, p *models.ParamVoteData) (err error) {
-	zap.L().Debug("PostVote", zap.Int64("userID", userID),
-		zap.Int64("PostID", p.PostID),
-		zap.Int8("Kind", p.Kind))
-	err = redisCache.PostVote(strconv.Itoa(int(userID)),
-		strconv.FormatInt(p.PostID, 10), float64(p.Kind))
-	return err
-}
+// // PostVote 为帖子投票
+// func PostVote(userID int64, p *models.ParamVoteData) (err error) {
+// 	zap.L().Debug("PostVote", zap.Int64("userID", userID),
+// 		zap.Int64("PostID", p.PostID),
+// 		zap.Int8("Kind", p.Kind))
+// 	err = redisCache.PostVote(strconv.Itoa(int(userID)),
+// 		strconv.FormatInt(p.PostID, 10), float64(p.Kind))
+// 	return err
+// }
