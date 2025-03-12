@@ -3,6 +3,9 @@ package ctl
 import (
 	"context"
 	"errors"
+
+	"github.com/LucienLSA/go-blog/middlewares"
+	"github.com/gin-gonic/gin"
 )
 
 type key int
@@ -11,6 +14,25 @@ var userKey key
 
 type UserInfo struct {
 	UserId int64 `json:"user_id"`
+}
+
+var (
+	ErrorUserNotLogin = errors.New("用户未登录")
+	ErrorGetUserInfo  = errors.New("获取用户信息错误")
+)
+
+// 获取到经过中间件的jwt auth鉴权后登录的用户信息 ，进行下一步处理
+func GetLoginUserID(ctx *gin.Context) (userID int64, err error) {
+	uid, ok := ctx.Get(middlewares.CtxtUserIDKey)
+	if !ok {
+		err = ErrorUserNotLogin
+		return
+	}
+	if userID != uid {
+		err = ErrorUserNotLogin
+		return
+	}
+	return
 }
 
 // 从context获取用户信息
@@ -23,7 +45,7 @@ func FromContext(ctx context.Context) (*UserInfo, bool) {
 func GetUserInfo(ctx context.Context) (*UserInfo, error) {
 	user, ok := FromContext(ctx)
 	if !ok {
-		return nil, errors.New("获取用户信息错误")
+		return nil, ErrorGetUserInfo
 	}
 	return user, nil
 }
