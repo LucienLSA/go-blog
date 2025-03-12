@@ -8,8 +8,6 @@ import (
 	logging "github.com/LucienLSA/go-blog/logger"
 	"github.com/LucienLSA/go-blog/middlewares"
 	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	gs "github.com/swaggo/gin-swagger"
 )
 
 func SetupRouter(mode string) *gin.Engine {
@@ -34,16 +32,16 @@ func SetupRouter(mode string) *gin.Engine {
 	r.Use(middlewares.Cors())
 
 	// 加载静态文件和html
-	r.LoadHTMLFiles("./templates/index.html")
-	r.Static("/static", "./static")
+	// r.LoadHTMLFiles("./templates/index.html")
+	// r.Static("/static", "./static")
 
 	// 代入根目录的html
-	r.GET("/", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "index.html", nil)
-	})
+	// r.GET("/", func(ctx *gin.Context) {
+	// 	ctx.HTML(http.StatusOK, "index.html", nil)
+	// })
 
 	// 导入swag接口文档
-	r.GET("/swagger/*any", gs.WrapHandler(swaggerFiles.Handler))
+	// r.GET("/swagger/*any", gs.WrapHandler(swaggerFiles.Handler))
 	v1 := r.Group("/api/v1")
 
 	// // 注册
