@@ -48,9 +48,9 @@ func SetupRouter(mode string) *gin.Engine {
 	v1.POST("/user/signup", controller.SignUpHandler())
 
 	// // 登录
-	// v1.POST("/user/login", controller.LoginHandler)
-	// v1.POST("/user/login/emailcode", controller.SendEmailCodeHandler)
-	// v1.POST("/user/login/email", controller.LoginEmailHandler)
+	v1.POST("/user/login", controller.LoginHandler())
+	v1.POST("/user/login/emailcode", controller.SendEmailCodeHandler())
+	v1.POST("/user/login/email", controller.LoginEmailHandler())
 
 	// // 获取社区信息
 	// v1.GET("/community/show", controller.CommunityHandler)
@@ -79,16 +79,16 @@ func SetupRouter(mode string) *gin.Engine {
 		// v1.POST("/posts/vote", controller.PostVoteHandler)
 
 		// // 用户头像上传
-		// v1.POST("/user/avatar", controller.UploadAvatarHandler)
+		v1.POST("/user/avatar", controller.UploadAvatarHandler())
 
 		// // 用户信息更新
-		// v1.POST("/user/update", controller.UpdateHandler)
+		v1.POST("/user/update", controller.UpdateHandler())
 
 		// // 用户发送邮箱
-		// v1.POST("/user/sendEmail", controller.SendEmailHandler)
+		v1.POST("/user/sendEmail", controller.SendEmailHandler())
 
 		// // 用户验证邮箱
-		// v1.GET("/user/validEmail", controller.ValidEmailHandler)
+		v1.GET("/user/validEmail", controller.ValidEmailHandler())
 	}
 	// 注册pprof路由 服务型性能分析
 	// pprof.Register(r)

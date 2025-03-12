@@ -8,54 +8,6 @@ const (
 	OrderScore = "score"
 )
 
-// 用户信息更新
-type ParamUpdate struct {
-	Age        uint8  `json:"age" binding:"gte=1,lte=130"`                     // 用户年龄
-	Gender     string `json:"gender" binding:"required,oneof=男 女 未知"`          // 用户性别
-	Username   string `json:"username" binding:"required"`                     // 用户名
-	Password   string `json:"password" binding:"required"`                     // 用户密码
-	RePassword string `json:"re_password" binding:"required,eqfield=Password"` // 用户重复密码
-	Email      string `json:"email" binding:"omitempty"`                       // 用户邮箱
-	Avatar     string `json:"avatar" binding:"omitempty"`                      // 用户头像
-}
-
-// 用户登录
-type ParamLogin struct {
-	Username string `json:"username" form:"username" binding:"required"`  // 登录人姓名
-	Password string ` json:"password" form:"password" binding:"required"` // 登录人密码
-}
-
-// 用户头像上传
-type ParamAvatar struct {
-	UserID   int64  `form:"user_id" json:"user_id"`   // 用户ID
-	UserName string `form:"username" json:"username"` // 用户名称
-	Avatar   string `form:"avatar" json:"avatar"`     // 用户密头像
-}
-
-// 用户邮箱发送验证码
-type ParamSendEmail struct {
-	OperationType int    `form:"operation_type" json:"operation_type" binding:"required"` // 邮箱操作类型
-	Email         string `form:"email" json:"email" binding:"required,email"`             // 用户邮箱
-}
-
-// 用户验证邮箱(绑定或解绑)
-type ParamVaildEmail struct {
-	UserName string `form:"username" json:"username"  binding:"required"` // 用户名称
-	Email    string `form:"email" json:"email" binding:"required,email"`  // 用户邮箱
-}
-
-// 用户邮箱登录
-type ParamLoginEmail struct {
-	UserEmail string `form:"email" json:"email" binding:"email,required"` // 用户邮箱
-	Code      int32  `form:"code" json:"code" binding:"required"`         // 邮箱收到的验证码
-}
-
-// 用户发送邮箱登录验证码
-type ParamSendEmailCode struct {
-	OperationType int    `form:"operation_type" json:"operation_type" binding:"required"` // 邮箱操作类型
-	UserEmail     string `form:"email" json:"email" binding:"email,required"`             // 用户邮箱
-}
-
 // 投票数据
 type ParamVoteData struct {
 	// UserID 从请求中获取当前用户

@@ -25,8 +25,8 @@ RUN go build -o bluebell_app .
 FROM scratch
 
 # 从builder镜像中把静态文件拷贝到当前目录
-COPY ./templates /templates
-COPY ./static /static
+# COPY ./templates /templates
+# COPY ./static /static
 
 # 从builder镜像中把配置文件拷贝到当前目录
 COPY ./config /config

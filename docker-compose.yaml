@@ -4,12 +4,12 @@ services:
   mysql8019:
     image: "mysql:8.0.19"
     ports:
-      - "33061:3306"
+      - "33061:3306" # 外部端口:内部端口
     command: "--default-authentication-plugin=mysql_native_password --init-file /data/application/init.sql"
     environment:
-      MYSQL_ROOT_PASSWORD: "root1234"
+      MYSQL_ROOT_PASSWORD: "123456"
       MYSQL_DATABASE: "bluebell_app"
-      MYSQL_PASSWORD: "root1234"
+      MYSQL_PASSWORD: "123456"
     volumes:
       - ./init.sql:/data/application/init.sql
   redis507:
@@ -18,7 +18,7 @@ services:
       - "26379:6379"
   bluebell_app:
     build: .
-    command: sh -c "./wait-for.sh mysql8019:3306 -- ./bluebell_app ./conf/config.ini"
+    command: sh -c "./wait-for.sh redis507:6379 mysql8019:3306 -- ./bluebell_app ./conf/config.yaml"
     depends_on:
       - mysql8019
     ports:

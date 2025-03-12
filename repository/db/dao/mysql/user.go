@@ -86,23 +86,24 @@ func (dao *UserDao) InsertUser(user *models.User) (err error) {
 // 	return nil
 // }
 
-// // 向数据库更新用户信息
-// func UpdateUser(uId int64, user *models.User) (err error) {
-// 	user.Password, err = SetPassword(user, user.Password)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	sqlStr := `
-// 	update user
-// 	set username=?,
-// 		password=?,
-// 		email=?,
-// 		age=?,
-// 		gender=?
-// 	where user_id = ?`
-// 	_, err = db.Exec(sqlStr, user.Username, user.Password, user.Email, user.Age, user.Gender, uId)
-// 	return err
-// }
+// 向数据库更新用户信息
+func (dao *UserDao) UpdateUser(uId int64, user *models.User) (err error) {
+	return dao.DB.Model(&models.User{}).Where("id=?", uId).
+		Updates(&user).Error
+	// user.Password, err = SetPassword(user, user.Password)
+	// if err != nil {
+	// 	return err
+	// }
+	// sqlStr := `
+	// update user
+	// set username=?,
+	// 	password=?,
+	// 	email=?,
+	// 	age=?,
+	// 	gender=?
+	// where user_id = ?`
+	// _, err = db.Exec(sqlStr, user.Username, user.Password, user.Email, user.Age, user.Gender, uId)
+}
 
 // // 向数据库更新用户头像
 // func UpdateAvatar(uId int64, user *models.User) (err error) {
@@ -112,37 +113,14 @@ func (dao *UserDao) InsertUser(user *models.User) (err error) {
 // 	return err
 // }
 
-// // 向数据库更新用户邮箱
-// func UpdateUserEmail(uId int64, user *models.User) (err error) {
-// 	userEmail := user.Email
-// 	sqlStr := `update user set email=? where user_id = ?`
-// 	_, err = db.Exec(sqlStr, userEmail, uId)
-// 	return err
-// }
-
-// // 用户登录 与数据库中用户信息比对
-// func Login(user *models.User) (err error) {
-// 	// 记录用户输入的密码
-// 	userPassword := user.Password
-// 	// 执行SQL语句
-// 	sqlStr := "select user_id, username, password from user where username=?"
-// 	err = db.Get(user, sqlStr, user.Username)
-// 	if err == sql.ErrNoRows { // sql自带查询错误
-// 		return ErrorUserNotExist
-// 	}
-// 	if err != nil {
-// 		// 查询数据库失败
-// 		return err
-// 	}
-// 	// fmt.Println("用户输入密码", userPassword)
-// 	// fmt.Println("数据库中密码", user.Password)
-// 	// 判断密码是否正确
-// 	err = CheckPassword(user, userPassword)
-// 	if err != nil {
-// 		return ErrorInvalidPassword
-// 	}
-// 	return
-// }
+// 向数据库更新用户邮箱
+func (dao *UserDao) UpdateUserEmail(uId int64, user *models.User) (err error) {
+	// userEmail := user.Email
+	// sqlStr := `update user set email=? where user_id = ?`
+	// _, err = db.Exec(sqlStr, userEmail, uId)
+	return dao.DB.Model(&models.User{}).Where("user_id=?", uId).
+		Updates(&user).Error
+}
 
 // // // 检查指定用户名的邮箱不存在，存在则获取用户
 // // func GetExistUserEmail(email string) (user *models.User, err error) {
@@ -178,25 +156,29 @@ func (dao *UserDao) InsertUser(user *models.User) (err error) {
 // // 	return
 // // }
 
-// // 根据作者/用户id获取用户id和用户名
-// func GetUserByID(uId uint) (user *models.User, err error) {
-// 	user = new(models.User)
-// 	sqlStr := `select user_id, username from user where user_id = ?`
-// 	err = db.Get(user, sqlStr, uId)
-// 	return
-// }
+// 根据作者/用户id获取用户id和用户名
+func (dao *UserDao) GetUserByID(uId int64) (user *models.User, err error) {
+	// user = new(models.User)
+	// sqlStr := `select user_id, username from user where user_id = ?`
+	// err = db.Get(user, sqlStr, uId)
+	err = dao.DB.Model(&models.User{}).Where("user_id=?", uId).
+		First(&user).Error
+	return
 
-// // 根据作者/用户邮箱获取用户id和用户名
-// func GetUserByEmail(email string) (user *models.User, err error) {
-// 	user = new(models.User)
-// 	sqlStr := `select user_id, username from user where email = ?`
-// 	err = db.Get(user, sqlStr, email)
-// 	if err == sql.ErrNoRows { // sql自带查询错误
-// 		return nil, ErrorEmailNotExit
-// 	}
-// 	if err != nil {
-// 		// 查询数据库失败
-// 		return nil, err
-// 	}
-// 	return
-// }
+}
+
+// 根据作者/用户邮箱获取用户id和用户名
+func (dao *UserDao) GetUserByEmail(email string) (user *models.User, err error) {
+	// sqlStr := `select user_id, username from user where email = ?`
+	// err = db.Get(user, sqlStr, email)
+	// if err == sql.ErrNoRows { // sql自带查询错误
+	// 	return nil, ErrorEmailNotExit
+	// }
+	// if err != nil {
+	// 	// 查询数据库失败
+	// 	return nil, err
+	// }
+	err = dao.DB.Model(&models.User{}).Where("email=?", email).
+		First(&user).Error
+	return
+}
