@@ -2,6 +2,7 @@ package routers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/LucienLSA/go-blog/controller"
 	_ "github.com/LucienLSA/go-blog/docs"
@@ -53,30 +54,30 @@ func SetupRouter(mode string) *gin.Engine {
 	v1.POST("/user/login/email", controller.LoginEmailHandler())
 
 	// // 获取社区信息
-	// v1.GET("/community/show", controller.CommunityHandler)
-	// v1.GET("/community/show/:community_id", controller.CommunityDetailHandler)
+	v1.GET("/community/show", controller.CommunityListHandler())
+	v1.GET("/community/show/:community_id", controller.CommunityDetailHandler())
 
 	// // 查看帖子
-	// v1.GET("/posts/showAll", controller.GetPostListHandler)
+	v1.GET("/posts/showAll", controller.GetPostListHandler())
 
 	// JWT中间件认证
 	v1.Use(middlewares.JWTAuthMiddleware())
 	{
 		// // 帖子查询新版
 		// // 参数动态获取帖子列表
-		// v1.GET("/posts/search", controller.SearchPostListHandler)
+		v1.GET("/posts/search", controller.SearchPostListHandler())
 
 		// // 根据社区查询帖子列表 整合到上一个hander中
 		// // v1.GET("/communitysearchposts", controller.CommunityPostListHandler)
 
 		// // 令牌桶填充速率2s， 容量1
-		// v1.GET("/posts/:post_id", middlewares.RateLimitMiddleware(2*time.Second, 1), controller.GetPostDetailHandler)
+		v1.GET("/posts/:post_id", middlewares.RateLimitMiddleware(2*time.Second, 1), controller.GetPostDetailHandler)
 
 		// // 发布帖子
-		// v1.POST("/posts/post", controller.CreatePostHandler)
+		v1.POST("/posts/post", controller.CreatePostHandler())
 
 		// // 帖子投票
-		// v1.POST("/posts/vote", controller.PostVoteHandler)
+		v1.POST("/posts/vote", controller.PostVoteHandler())
 
 		// // 用户头像上传
 		v1.POST("/user/avatar", controller.UploadAvatarHandler())

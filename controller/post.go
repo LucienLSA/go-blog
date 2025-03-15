@@ -1,64 +1,66 @@
 package controller
 
-// import (
-// 	"strconv"
+import (
+	"github.com/LucienLSA/go-blog/pkg/ctl"
+	"github.com/LucienLSA/go-blog/pkg/e"
+	"github.com/LucienLSA/go-blog/pkg/translator"
+	"github.com/LucienLSA/go-blog/service"
+	"github.com/LucienLSA/go-blog/types"
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"go.uber.org/zap"
+)
 
-// 	"github.com/LucienLSA/go-blog/pkg/request"
-// 	"github.com/LucienLSA/go-blog/pkg/response"
-// 	"github.com/LucienLSA/go-blog/pkg/translator"
-// 	"github.com/LucienLSA/go-blog/repository/db/models"
-// 	"github.com/LucienLSA/go-blog/service"
-// 	"github.com/LucienLSA/go-blog/settings"
-// 	"github.com/gin-gonic/gin"
-// 	"github.com/go-playground/validator/v10"
-// 	"go.uber.org/zap"
-// )
-
-// // CreatePostHandler 发布帖子
-// // @Summary 发布帖子
-// // @Description 发布帖子
-// // @Tags 帖子接口
-// // @Accept application/json
-// // @Produce application/json
-// // @Param Authorization header string false "Bearer 用户令牌"
-// // @Param object body models.ParamPostCreate false "请求参数"
-// // @Security ApiKeyAuth
-// // @Router /posts/post [post]
-// // 发布帖子
-// func CreatePostHandler(c *gin.Context) {
-// 	// 1. 获取参数 参数校验
-// 	p := new(models.Post)
-// 	// 如果请求中有json格式数据，才使用shouldbindjson
-// 	if err := c.ShouldBindJSON(&p); err != nil {
-// 		// 请求参数有误 直接返回响应
-// 		zap.L().Error("create post with invalid param", zap.Error(err))
-// 		// 判断err是不是validator.ValidationErrors类型
-// 		errs, ok := err.(validator.ValidationErrors)
-// 		if !ok {
-// 			response.ResponseError(c, response.CodeInvalidParam)
-// 			return
-// 		}
-// 		response.ResponseErrorMsg(c, response.CodeInvalidParam,
-// 			translator.RemoveTopStruct(errs.Translate(translator.Trans)))
-// 		return
-// 	}
-// 	// 从c 取到当前发请求的用户userid
-// 	userID, err := request.GetLoginUserID(c)
-// 	if err != nil {
-// 		zap.L().Error("request GetLoginUserID failed", zap.Error(err))
-// 		response.ResponseError(c, response.CodeNeedLogin)
-// 		return
-// 	}
-// 	p.AuthorID = userID
-// 	// 2. 创建帖子
-// 	if err := service.CreatePost(p); err != nil {
-// 		zap.L().Error("server CreatePost failed", zap.Error(err))
-// 		response.ResponseError(c, response.CodeServerBusy)
-// 		return
-// 	}
-// 	// 3. 返回响应
-// 	response.ResponseSuccessData(c, nil)
-// }
+// CreatePostHandler 发布帖子
+// @Summary 发布帖子
+// @Description 发布帖子
+// @Tags 帖子接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object body models.ParamPostCreate false "请求参数"
+// @Security ApiKeyAuth
+// @Router /posts/post [post]
+// 发布帖子
+func CreatePostHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// 1. 获取参数 参数校验
+		// p := new(models.Post)
+		var req types.PostCreateReq
+		// 如果请求中有json格式数据，才使用shouldbindjson
+		if err := c.ShouldBindJSON(&req); err != nil {
+			// 请求参数有误 直接返回响应
+			zap.L().Error("create post with invalid param", zap.Error(err))
+			// 判断err是不是validator.ValidationErrors类型
+			errs, ok := err.(validator.ValidationErrors)
+			if !ok {
+				e.ResponseError(c, e.CodeInvalidParam)
+				return
+			}
+			e.ResponseErrorMsg(c, e.CodeInvalidParam,
+				translator.RemoveTopStruct(errs.Translate(translator.Trans)))
+			return
+		}
+		// 从c 取到当前发请求的用户userid
+		// userID, err := request.GetLoginUserID(c)
+		user, err := ctl.GetLoginUserID(c)
+		if err != nil {
+			zap.L().Error("ctl GetLoginUserID failed", zap.Error(err))
+			e.ResponseError(c, e.CodeNeedLogin)
+			return
+		}
+		req.AuthorID = user.UserId
+		// 2. 创建帖子
+		l := service.GetPostSrv()
+		if err := l.CreatePost(c, &req); err != nil {
+			zap.L().Error("server CreatePost failed", zap.Error(err))
+			e.ResponseError(c, e.CodeServerBusy)
+			return
+		}
+		// 3. 返回响应
+		e.ResponseSuccessData(c, nil)
+	}
+}
 
 // // GetPostListHandler 获取帖子列表分页展示
 // // @Summary 获取帖子列表分页展示接口

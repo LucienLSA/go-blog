@@ -1,24 +1,35 @@
 package mysql
 
-// import (
-// 	"database/sql"
-// 	"strings"
+import (
+	"context"
 
-// 	"github.com/LucienLSA/go-blog/models"
-// 	"github.com/jmoiron/sqlx"
-// 	"go.uber.org/zap"
-// )
+	"github.com/LucienLSA/go-blog/repository/db/models"
+	"gorm.io/gorm"
+)
 
-// // 数据库创建帖子
-// func CreatePost(p *models.Post) (err error) {
-// 	sqlStr := `insert into post(post_id, title, content,
-// 	author_id, community_id)
-// 	values(?,?,?,?,?)`
+type PostDao struct {
+	*gorm.DB
+}
 
-// 	_, err = db.Exec(sqlStr, p.PostID, p.Title, p.Content,
-// 		p.AuthorID, p.CommunityID)
-// 	return err
-// }
+func NewPostDao(ctx context.Context) *PostDao {
+	return &PostDao{NewDBClient(ctx)}
+}
+
+func NewPostDaoByDB(db *gorm.DB) *PostDao {
+	return &PostDao{db}
+}
+
+// 数据库创建帖子
+func (dao *PostDao) CreatePost(p *models.Post) (err error) {
+	// sqlStr := `insert into post(post_id, title, content,
+	// author_id, community_id)
+	// values(?,?,?,?,?)`
+
+	// _, err = db.Exec(sqlStr, p.PostID, p.Title, p.Content,
+	// 	p.AuthorID, p.CommunityID)
+	// return err
+	return
+}
 
 // // 查询所有帖子列表
 // func GetPostList(pageNum, pageSize int64) (posts []*models.Post, err error) {

@@ -265,7 +265,8 @@ func (s *UserSrv) Update(ctx context.Context, req *types.UserUpdateReq) (err err
 
 // 上传用户头像
 func (s *UserSrv) UploadAvatar(ctx context.Context, file multipart.File, fileSize int64, req *types.UserAvatar) (resp interface{}, err error) {
-	u, _ := ctl.GetUserInfo(ctx)
+	// u, _ := ctl.GetUserInfo(ctx)
+	u, _ := ctl.GetLoginUserID(ctx)
 	userDao := mysql.NewUserDao(ctx)
 	user, err := userDao.GetUserByID(u.UserId)
 	if err != nil {
@@ -311,7 +312,8 @@ func (s *UserSrv) UploadAvatar(ctx context.Context, file multipart.File, fileSiz
 
 // 用户发送邮箱验证码绑定与解绑
 func (s *UserSrv) SendEmail(ctx context.Context, req *types.UserSendEmailReq) (err error) {
-	u, _ := ctl.GetUserInfo(ctx)
+	// u, _ := ctl.GetUserInfo(ctx)
+	u, _ := ctl.GetLoginUserID(ctx)
 	userDao := mysql.NewUserDao(ctx)
 	noticeDao := mysql.NewNoticeDao(ctx)
 	var user *models.User

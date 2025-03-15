@@ -1,29 +1,57 @@
 package service
 
-// import (
-// 	"github.com/LucienLSA/go-blog/pkg/snowflake"
-// 	"go.uber.org/zap"
-// )
+import (
+	"context"
+	"sync"
 
-// // 创建帖子业务
-// func CreatePost(p *models.Post) (err error) {
-// 	// 1. 生成post_id
-// 	p.PostID = int64(snowflake.GenID())
-// 	// 2. 保存到数据库
-// 	err = mysql.CreatePost(p)
-// 	if err != nil {
-// 		zap.L().Error("mysql CreatePost failed", zap.Error(err))
-// 		return
-// 	}
-// 	//3.  需要在redis记录帖子的创建时间
-// 	err = redisCache.CreatePost(p.PostID, p.CommunityID)
-// 	if err != nil {
-// 		zap.L().Error("redisCache CreatePost failed", zap.Error(err))
-// 		return
-// 	}
-// 	// 3. 返回
-// 	return err
-// }
+	"github.com/LucienLSA/go-blog/pkg/snowflake"
+	"github.com/LucienLSA/go-blog/repository/db/dao/mysql"
+	"github.com/LucienLSA/go-blog/types"
+	"go.uber.org/zap"
+)
+
+// 单例模式
+var postSrvIns *PostSrv
+var postSrvOnce sync.Once
+
+type PostSrv struct {
+}
+
+// 单例实例 不对外暴露 通过GetUserSrv来返回实例对象
+func GetPostSrv() *PostSrv {
+	postSrvOnce.Do(func() {
+		postSrvIns = &PostSrv{}
+	})
+	return postSrvIns
+}
+
+// 重置单例 便于测试
+func ResetPostSrv() {
+	postSrvOnce = sync.Once{}
+	postSrvIns = nil
+}
+
+// 创建帖子业务
+func (s *PostSrv) CreatePost(ctx context.Context, req *types.PostCreateReq) (err error) {
+	postDao := mysql.NewPostDao(ctx)
+
+	// 1. 生成post_id
+	req.PostID = int64(snowflake.GenID())
+	// 2. 保存到数据库
+	err = mysql.CreatePost(req)
+	if err != nil {
+		zap.L().Error("mysql CreatePost failed", zap.Error(err))
+		return
+	}
+	//3.  需要在redis记录帖子的创建时间
+	err = redisCache.CreatePost(p.PostID, p.CommunityID)
+	if err != nil {
+		zap.L().Error("redisCache CreatePost failed", zap.Error(err))
+		return
+	}
+	// 3. 返回
+	return err
+}
 
 // // 查询帖子列表业务
 // func GetPostList(pageNum, pageSize int64) (data []*models.ApiPostDetail, err error) {
