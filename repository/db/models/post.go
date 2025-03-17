@@ -6,7 +6,7 @@ import (
 
 type Post struct {
 	gorm.Model
-	Status      int32  ` gorm:"status"`      // 帖子状态
+	Status      int32  ` gorm:"status"`      // 帖子状态 0:帖子删除；1：帖子活跃
 	PostID      int64  `gorm:"post_id"`      // 帖子id
 	CommunityID int64  `gorm:"community_id"` // 社区id
 	AuthorID    int64  ` gorm:"author_id"`   // 帖子作者id
