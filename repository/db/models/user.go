@@ -23,12 +23,12 @@ func (u *User) TableName() string {
 	return "user"
 }
 
-// 用户登录请求
-type UserLogin struct {
-	UserID   int64  `json:"user_id" gorm:"user_id"`     // 用户id
-	Username string `json:"user_name" gorm:"user_name"` // 用户名
-	Token    string `json:"token" `                     // access token
-}
+// // 用户登录请求
+// type UserLogin struct {
+// 	UserID   int64  `json:"user_id" gorm:"user_id"`     // 用户id
+// 	Username string `json:"user_name" gorm:"user_name"` // 用户名
+// 	Token    string `json:"token" `                     // access token
+// }
 
 // // 密码加密 旧版
 // func encryptPassword(oPassword string) string {
@@ -54,7 +54,7 @@ func (user *User) SetPassword(password string) error {
 
 // CheckPassword 校验密码
 func (user *User) CheckPassword(password string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	err := bcrypt.CompareHashAndPassword([]byte(user.PasswordDigest), []byte(password))
 	if err != nil {
 		return err
 	}

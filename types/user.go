@@ -28,8 +28,15 @@ type UserUpdateReq struct {
 
 // 用户登录
 type UserLoginReq struct {
-	Username string `json:"user_name" form:"user_name" binding:"required"` // 登录人姓名
+	UserName string `json:"user_name" form:"user_name" binding:"required"` // 登录人姓名
 	Password string ` json:"password" form:"password" binding:"required"`  // 登录人密码
+}
+
+// 用户登录返回
+type UserLoginResp struct {
+	UserID   int64  `json:"user_id" form:"user_id"`     // 用户id
+	UserName string `json:"user_name" form:"user_name"` // 登录人姓名
+	Token    string `json:"token" form:"token"`         // 用户token
 }
 
 // 用户邮箱发送验证码绑定和解绑

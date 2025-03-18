@@ -159,9 +159,9 @@ func (s *PostSrv) GetPostDetailList(ctx context.Context, req *types.PostIdReq) (
 }
 
 // 新版查询帖子业务，根据前端返回参数，创建时间或者分数进行排序
-func (s *PostSrv) SearchPostList(p *models.ParamPostList) (data []*models.ApiPostDetail, err error) {
+func (s *PostSrv) SearchPostList(ctx context.Context, req *types.PostListReq) (data []*types.PostListResp, err error) {
 	// 2. redis查询帖子id列表
-	ids, err := redisCache.SearchPostIDsByOrder(p)
+	ids, err := redisCache.SearchPostIDsByOrder(req)
 	if err != nil {
 		zap.L().Error("redisCache SearchPostIDsByOrder failed",
 			zap.Error(err))
@@ -173,39 +173,41 @@ func (s *PostSrv) SearchPostList(p *models.ParamPostList) (data []*models.ApiPos
 	}
 	// 3. 根据id去数据库查询帖子详细信息
 	// **返回的数据是按照给定的顺序
-	posts, err := mysql.SearchPostListByIDs(ids)
-	data = make([]*models.ApiPostDetail, 0, len(posts)) // 初始化内存空间
-	if err != nil {
-		zap.L().Error("mysql SearchPostListByIDs failed",
-			zap.Error(err))
-		return
-	}
+	postDao := mysql.NewPostDao(ctx)
+	posts, err := postDao.SearchPostListByIDs(ids)
+	// data = make([]*models.ApiPostDetail, 0, len(posts)) // 初始化内存空间
+	// if err != nil {
+	// 	zap.L().Error("mysql SearchPostListByIDs failed",
+	// 		zap.Error(err))
+	// 	return
+	// }
 
 	// 提前查询好每条帖子的赞同数
 	voteAgreeData, err := redisCache.GetPostAgreeByIDs(ids)
 	if err != nil {
 		return
 	}
-
+	userDao := mysql.NewUserDao(ctx)
+	communityDao := mysql.NewCommunityDao(ctx)
 	// 将贴子的作者和社区信息查询处理填充到帖子中
 	for index, post := range posts {
 		// 根据作者id查询作者信息
-		user, err := mysql.GetUserByID(post.AuthorID)
+		user, err := userDao.GetUserByID(post.AuthorID)
 		if err != nil {
 			zap.L().Error("mysql GetUserByID failed",
 				zap.Int64("author_id", post.AuthorID),
 				zap.Error(err))
 			continue
 		}
-		community, err := mysql.GetCommunityDetailList(post.CommunityID)
+		community, err := communityDao.GetCommunityDetailList(post.CommunityID)
 		if err != nil {
 			zap.L().Error("mysql GetCommunityDetailList failed",
 				zap.Int64("community_id", post.CommunityID),
 				zap.Error(err))
 			continue
 		}
-		postDetail := &models.ApiPostDetail{
-			AuthorName:      user.Username,
+		postDetail := &types.PostListResp{
+			AuthorName:      user.UserName,
 			VoteAgreeNum:    voteAgreeData[index],
 			Post:            post,
 			CommunityDetail: community,
@@ -216,8 +218,8 @@ func (s *PostSrv) SearchPostList(p *models.ParamPostList) (data []*models.ApiPos
 }
 
 // 根据社区id查询帖子的列表信息
-func (s *PostSrv) CommunitySearchPostList(c context.Context, req *types.PostListReq) (data []*types.PostListResp, err error) {
-	userDao := mysql.NewUserDao(c)
+func (s *PostSrv) CommunitySearchPostList(ctx context.Context, req *types.PostListReq) (data []*types.PostListResp, err error) {
+	userDao := mysql.NewUserDao(ctx)
 	// 2. redis查询帖子id列表
 	ids, err := redisCache.CommunityPostIDsByOrder(req)
 	if err != nil {
@@ -231,21 +233,21 @@ func (s *PostSrv) CommunitySearchPostList(c context.Context, req *types.PostList
 	}
 	// 3. 根据id去数据库查询帖子详细信息
 	// **返回的数据是按照给定的顺序
-
-	posts, err := mysql.SearchPostListByIDs(ids)
-	data = make([]*models.ApiPostDetail, 0, len(posts)) // 初始化内存空间
-	if err != nil {
-		zap.L().Error("mysql SearchPostListByIDs failed",
-			zap.Error(err))
-		return
-	}
+	postDao := mysql.NewPostDao(ctx)
+	posts, err := postDao.SearchPostListByIDs(ids)
+	// data = make([]*models.ApiPostDetail, 0, len(posts)) // 初始化内存空间
+	// if err != nil {
+	// 	zap.L().Error("mysql SearchPostListByIDs failed",
+	// 		zap.Error(err))
+	// 	return
+	// }
 
 	// 提前查询好每条帖子的赞同数
 	voteAgreeData, err := redisCache.GetPostAgreeByIDs(ids)
 	if err != nil {
 		return
 	}
-
+	communityDao := mysql.NewCommunityDao(ctx)
 	// 将贴子的作者和社区信息查询处理填充到帖子中
 	for index, post := range posts {
 		// 根据作者id查询作者信息
@@ -256,15 +258,15 @@ func (s *PostSrv) CommunitySearchPostList(c context.Context, req *types.PostList
 				zap.Error(err))
 			continue
 		}
-		community, err := mysql.GetCommunityDetailList(post.CommunityID)
+		community, err := communityDao.GetCommunityDetailList(post.CommunityID)
 		if err != nil {
 			zap.L().Error("mysql GetCommunityDetailList failed",
 				zap.Int64("community_id", post.CommunityID),
 				zap.Error(err))
 			continue
 		}
-		postDetail := &models.ApiPostDetail{
-			AuthorName:      user.Username,
+		postDetail := &types.PostListResp{
+			AuthorName:      user.UserName,
 			VoteAgreeNum:    voteAgreeData[index],
 			Post:            post,
 			CommunityDetail: community,
@@ -278,11 +280,11 @@ func (s *PostSrv) CommunitySearchPostList(c context.Context, req *types.PostList
 func (s *PostSrv) GetPostListNew(c context.Context, req *types.PostListReq) (data []*types.PostListResp, err error) {
 	if req.CommunityID == 0 {
 		// 查询所有帖子
-		data, err = s.SearchPostList(req)
+		data, err = s.SearchPostList(c, req)
 
 	} else {
 		// 按照社区id查询帖子
-		data, err = s.CommunitySearchPostList(req)
+		data, err = s.CommunitySearchPostList(c, req)
 	}
 	if err != nil {
 		zap.L().Error("GetPostListNew failed", zap.Error(err))

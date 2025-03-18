@@ -1,19 +1,44 @@
 package service
 
-// import (
-// 	"strconv"
+import (
+	"context"
+	"strconv"
+	"sync"
 
-// 	redisCache "github.com/LucienLSA/go-blog/dao/redis"
-// 	"github.com/LucienLSA/go-blog/models"
-// 	"go.uber.org/zap"
-// )
+	"github.com/LucienLSA/go-blog/pkg/ctl"
+	redisCache "github.com/LucienLSA/go-blog/repository/db/dao/redis"
+	"github.com/LucienLSA/go-blog/types"
+	"go.uber.org/zap"
+)
 
-// // PostVote 为帖子投票
-// func PostVote(userID int64, p *models.ParamVoteData) (err error) {
-// 	zap.L().Debug("PostVote", zap.Int64("userID", userID),
-// 		zap.Int64("PostID", p.PostID),
-// 		zap.Int8("Kind", p.Kind))
-// 	err = redisCache.PostVote(strconv.Itoa(int(userID)),
-// 		strconv.FormatInt(p.PostID, 10), float64(p.Kind))
-// 	return err
-// }
+// 单例模式
+var voteSrvIns *VoteSrv
+var voteSrvOnce sync.Once
+
+type VoteSrv struct {
+}
+
+// 单例实例 不对外暴露 通过GetUserSrv来返回实例对象
+func GetVoteSrv() *VoteSrv {
+	voteSrvOnce.Do(func() {
+		voteSrvIns = &VoteSrv{}
+	})
+	return voteSrvIns
+}
+
+// 重置单例 便于测试
+func ResetVoteSrv() {
+	userSrvOnce = sync.Once{}
+	userSrvIns = nil
+}
+
+// PostVote 为帖子投票
+func (s *VoteSrv) PostVote(ctx context.Context, req *types.PostVoteDataReq) (err error) {
+	user, err := ctl.GetLoginUserID(ctx)
+	zap.L().Debug("PostVote", zap.Int64("userID", user.UserId),
+		zap.Int64("PostID", req.PostID),
+		zap.Int8("Kind", req.Kind))
+	err = redisCache.PostVote(strconv.Itoa(int(user.UserId)),
+		strconv.FormatInt(req.PostID, 10), float64(req.Kind))
+	return err
+}

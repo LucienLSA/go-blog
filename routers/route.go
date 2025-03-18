@@ -71,7 +71,7 @@ func SetupRouter(mode string) *gin.Engine {
 		// // v1.GET("/communitysearchposts", controller.CommunityPostListHandler)
 
 		// // 令牌桶填充速率2s， 容量1
-		v1.GET("/posts/:post_id", middlewares.RateLimitMiddleware(2*time.Second, 1), controller.GetPostDetailHandler)
+		v1.GET("/posts/:post_id", middlewares.RateLimitMiddleware(2*time.Second, 1), controller.GetPostDetailHandler())
 
 		// // 发布帖子
 		v1.POST("/posts/post", controller.CreatePostHandler())

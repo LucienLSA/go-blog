@@ -112,14 +112,14 @@ func (s *UserSrv) UserSignUp(ctx context.Context, req *types.UserSignUpReq) (err
 }
 
 // 登录业务
-func (s *UserSrv) UserLogin(ctx context.Context, req *types.UserLoginReq) (user *models.User, err error) {
+func (s *UserSrv) UserLogin(ctx context.Context, req *types.UserLoginReq) (resp interface{}, err error) {
 	userDao := mysql.NewUserDao(ctx)
-	user = &models.User{
-		UserName: req.Username,
-		Password: req.Password,
-	}
+	// user = &models.User{
+	// 	UserName: req.Username,
+	// 	Password: req.Password,
+	// }
 	// 1. 判断用户是否存在
-	_, exist, err := userDao.CheckUserExist(req.Username)
+	user, exist, err := userDao.CheckUserExist(req.UserName)
 	if err != nil {
 		// 数据库查询错误
 		zap.L().Error("userDao CheckUserExist failed", zap.Error(err))
@@ -130,7 +130,7 @@ func (s *UserSrv) UserLogin(ctx context.Context, req *types.UserLoginReq) (user 
 		return nil, e.ErrorUserNotExist
 	}
 	// 将用户登录输入的名称和密码信息传入model层的user中
-	if err = user.CheckPassword(user.Password); err != nil {
+	if err = user.CheckPassword(req.Password); err != nil {
 		// 传递的是指针，能拿到数据库中注册时原本生成的UserID和Username
 		zap.L().Error("mysql Login failed", zap.Error(err))
 		return nil, err
@@ -144,6 +144,11 @@ func (s *UserSrv) UserLogin(ctx context.Context, req *types.UserLoginReq) (user 
 	// 保存到redis中
 	if err = redisCache.StorgeUserIdToken(token, user.UserName); err != nil {
 		zap.L().Error("redisCache.StorgeUserIdToken failed", zap.Error(err))
+	}
+	resp = &types.UserLoginResp{
+		UserID:   user.UserID,
+		UserName: user.UserName,
+		Token:    user.Token,
 	}
 	return
 }

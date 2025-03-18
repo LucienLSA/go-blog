@@ -294,3 +294,45 @@
 {"level":"ERROR","time":"2025-03-11T22:00:42.196+0800","caller":"service/user.go:75","msg":"userDao CheckUserExist failed"}
 {"level":"ERROR","time":"2025-03-11T22:00:42.196+0800","caller":"controller/user.go:63","msg":"service signup failed","error":"邮箱已存在"}
 {"level":"INFO","time":"2025-03-11T22:00:42.196+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0020456}
+{"level":"INFO","time":"2025-03-18T17:09:41.433+0800","caller":"go-blog-bluebell/main.go:52","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-18T17:09:41.580+0800","caller":"go-blog-bluebell/main.go:61","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-18T17:09:41.588+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-18T17:09:41.588+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-18T17:25:11.196+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.2333707}
+{"level":"INFO","time":"2025-03-18T17:29:11.254+0800","caller":"go-blog-bluebell/main.go:52","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-18T17:29:11.302+0800","caller":"go-blog-bluebell/main.go:61","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-18T17:29:11.302+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-18T17:29:11.302+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-18T17:29:19.582+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.4138931}
+{"level":"INFO","time":"2025-03-18T17:42:51.940+0800","caller":"go-blog-bluebell/main.go:52","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-18T17:42:52.033+0800","caller":"go-blog-bluebell/main.go:61","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-18T17:42:52.034+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-18T17:42:52.034+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-18T17:42:54.950+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.211197}
+{"level":"INFO","time":"2025-03-18T17:43:17.710+0800","caller":"go-blog-bluebell/main.go:52","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-18T17:43:17.755+0800","caller":"go-blog-bluebell/main.go:61","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-18T17:43:17.755+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-18T17:43:17.756+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"ERROR","time":"2025-03-18T17:43:22.975+0800","caller":"service/user.go:61","msg":"userDao CheckUserExist failed"}
+{"level":"ERROR","time":"2025-03-18T17:43:22.976+0800","caller":"controller/user.go:63","msg":"service signup failed","error":"用户已存在"}
+{"level":"INFO","time":"2025-03-18T17:43:22.976+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0016918}
+{"level":"INFO","time":"2025-03-18T17:43:43.083+0800","caller":"go-blog-bluebell/main.go:52","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-18T17:43:43.130+0800","caller":"go-blog-bluebell/main.go:61","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-18T17:43:43.131+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-18T17:43:43.131+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"INFO","time":"2025-03-18T17:43:46.879+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.2402071}
+{"level":"ERROR","time":"2025-03-18T17:44:01.859+0800","caller":"controller/user.go:107","msg":"Login with invalid param","error":"Key: 'UserLoginReq.user_name' Error:Field validation for 'user_name' failed on the 'required' tag"}
+{"level":"INFO","time":"2025-03-18T17:44:01.859+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login","status":200,"method":"POST","path":"/api/v1/user/login","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0}
+{"level":"ERROR","time":"2025-03-18T17:44:09.838+0800","caller":"service/user.go:137","msg":"mysql Login failed","error":"crypto/bcrypt: hashedSecret too short to be a bcrypted password"}
+{"level":"ERROR","time":"2025-03-18T17:44:09.838+0800","caller":"controller/user.go:122","msg":"service login failed","username":"lucien","error":"crypto/bcrypt: hashedSecret too short to be a bcrypted password"}
+{"level":"INFO","time":"2025-03-18T17:44:09.838+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login","status":200,"method":"POST","path":"/api/v1/user/login","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0014909}
+{"level":"INFO","time":"2025-03-18T18:01:14.011+0800","caller":"go-blog-bluebell/main.go:52","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-18T18:01:14.051+0800","caller":"go-blog-bluebell/main.go:61","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-18T18:01:14.052+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-18T18:01:14.052+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
+{"level":"ERROR","time":"2025-03-18T18:01:17.786+0800","caller":"service/user.go:129","msg":"userDao CheckUserExist failed"}
+{"level":"ERROR","time":"2025-03-18T18:01:17.786+0800","caller":"controller/user.go:122","msg":"service login failed","username":"lucien","error":"用户不存在"}
+{"level":"INFO","time":"2025-03-18T18:01:17.786+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login","status":200,"method":"POST","path":"/api/v1/user/login","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0008948}
+{"level":"INFO","time":"2025-03-18T18:01:27.654+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/signup","status":200,"method":"POST","path":"/api/v1/user/signup","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.2557395}
+{"level":"INFO","time":"2025-03-18T18:01:30.153+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login","status":200,"method":"POST","path":"/api/v1/user/login","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.247303}
+{"level":"INFO","time":"2025-03-18T18:01:54.458+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/login","status":200,"method":"POST","path":"/api/v1/user/login","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.2129746}

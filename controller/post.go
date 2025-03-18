@@ -146,14 +146,14 @@ func GetPostDetailHandler() gin.HandlerFunc {
 // @Accept application/json
 // @Produce application/json
 // @Param Authorization header string false "Bearer 用户令牌"
-// @Param object query models.ParamPostList false "查询参数"
+// @Param object query types.PostListReq false "查询参数"
 // @Security ApiKeyAuth
 // @Success 200 {object} _ResponsePostList
 // @Router /posts/search [get]
 // 新版查询帖子，根据前端传来的参数动态获取帖子列表
 // 按照创建时间或者分数排序
 // 1. 获取参数
-// GET请求参数：/api/v1/searchposts?page_num=1&page_size=5&order=time
+// GET请求参数：/api/v1//posts/search?page_num=1&page_size=5&order=time
 // 以Query获取参数
 // 2. redis查询id列表
 // 3. 根据id去数据库查询帖子详细信息

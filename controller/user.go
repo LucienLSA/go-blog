@@ -119,7 +119,7 @@ func LoginHandler() gin.HandlerFunc {
 		l := service.GetUserSrv()
 		user, err := l.UserLogin(c.Request.Context(), &req)
 		if err != nil {
-			zap.L().Error("service login failed", zap.String("username", req.Username), zap.Error(err))
+			zap.L().Error("service login failed", zap.String("username", req.UserName), zap.Error(err))
 			if errors.Is(err, e.ErrorUserNotExist) {
 				e.ResponseError(c, e.CodeUserNotExist)
 				return
@@ -128,11 +128,12 @@ func LoginHandler() gin.HandlerFunc {
 			return
 		}
 		// 3. 返回响应
-		e.ResponseSuccessData(c, gin.H{
-			"user_id":   user.ID, // id值大于1<<53-1, int64类型最大值为1<<63-1，转化为字符串
-			"user_name": user.UserName,
-			"token":     user.Token,
-		})
+		// e.ResponseSuccessData(c, gin.H{
+		// 	"user_id":   user.ID, // id值大于1<<53-1, int64类型最大值为1<<63-1，转化为字符串
+		// 	"user_name": user.UserName,
+		// 	"token":     user.Token,
+		// })
+		e.ResponseSuccessData(c, user)
 	}
 }
 
