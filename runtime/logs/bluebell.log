@@ -105,3 +105,7 @@
 {"level":"INFO","time":"2025-03-23T21:31:15.510+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
 {"level":"INFO","time":"2025-03-23T21:31:15.510+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}
 {"level":"INFO","time":"2025-03-23T21:31:19.453+0800","caller":"logger/logger.go:87","msg":"/api/v1/user/update","status":200,"method":"POST","path":"/api/v1/user/update","query":"","ip":"127.0.0.1","user-agent":"Apifox/1.0.0 (https://apifox.com)","errors":"","cost":0.0088773}
+{"level":"INFO","time":"2025-03-23T21:39:01.721+0800","caller":"go-blog-bluebell/main.go:52","msg":"init logger success"}
+{"level":"INFO","time":"2025-03-23T21:39:01.796+0800","caller":"go-blog-bluebell/main.go:61","msg":"init mysql success"}
+{"level":"INFO","time":"2025-03-23T21:39:01.796+0800","caller":"go-blog-bluebell/main.go:68","msg":"init redis success"}
+{"level":"INFO","time":"2025-03-23T21:39:01.796+0800","caller":"go-blog-bluebell/main.go:76","msg":"init snowflake success"}

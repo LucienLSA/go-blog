@@ -38,10 +38,10 @@ type PostListReq struct {
 }
 
 type PostListResp struct {
-	AuthorName              string                              `json:"author_name" form:"author_name"`       // 帖子作者用户名
-	VoteAgreeNum            int64                               `json:"vote_agree_num" form:"vote_agree_num"` // 投票赞成数
-	*models.Post            `json:"post" form:"post"`           // 嵌入帖子信息
-	*models.CommunityDetail `json:"community" form:"community"` // 嵌入社区信息
+	AuthorName        string                              `json:"author_name" form:"author_name"`       // 帖子作者用户名
+	VoteAgreeNum      int64                               `json:"vote_agree_num" form:"vote_agree_num"` // 投票赞成数
+	*models.Post      `json:"post" form:"post"`           // 嵌入帖子信息
+	*models.Community `json:"community" form:"community"` // 嵌入社区信息
 }
 
 // type ApiPostDetail struct {

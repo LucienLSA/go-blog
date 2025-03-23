@@ -43,53 +43,56 @@ func SetupRouter(mode string) *gin.Engine {
 
 	// 导入swag接口文档
 	// r.GET("/swagger/*any", gs.WrapHandler(swaggerFiles.Handler))
-	v1 := r.Group("/api/v1")
+	v2 := r.Group("/api/v2")
 
 	// // 注册
-	v1.POST("/user/signup", controller.SignUpHandler())
+	v2.POST("/user/signup", controller.SignUpHandler())
 
 	// // 登录
-	v1.POST("/user/login", controller.LoginHandler())
-	v1.POST("/user/login/emailcode", controller.SendEmailCodeHandler())
-	v1.POST("/user/login/email", controller.LoginEmailHandler())
+	v2.POST("/user/login", controller.LoginHandler())
+	v2.POST("/user/login/emailcode", controller.SendEmailCodeHandler())
+	v2.POST("/user/login/email", controller.LoginEmailHandler())
 
 	// // 获取社区信息
-	v1.GET("/community/show", controller.CommunityListHandler())
-	v1.GET("/community/show/:community_id", controller.CommunityDetailHandler())
+	v2.GET("/community/show", controller.CommunityListHandler())
+	v2.GET("/community/show/:community_id", controller.CommunityDetailHandler())
 
 	// // 查看帖子
-	v1.GET("/posts/showAll", controller.GetPostListHandler())
+	v2.GET("/posts/showAll", controller.GetPostListHandler())
 
 	// JWT中间件认证
-	v1.Use(middlewares.JWTAuthMiddleware())
+	v2.Use(middlewares.JWTAuthMiddleware())
 	{
 		// // 帖子查询新版
 		// // 参数动态获取帖子列表
-		v1.GET("/posts/search", controller.SearchPostListHandler())
+		v2.GET("/posts/search", controller.SearchPostListHandler())
 
 		// // 根据社区查询帖子列表 整合到上一个hander中
 		// // v1.GET("/communitysearchposts", controller.CommunityPostListHandler)
 
 		// // 令牌桶填充速率2s， 容量1
-		v1.GET("/posts/:post_id", middlewares.RateLimitMiddleware(2*time.Second, 1), controller.GetPostDetailHandler())
+		v2.GET("/posts/:post_id", middlewares.RateLimitMiddleware(2*time.Second, 1), controller.GetPostDetailHandler())
 
 		// // 发布帖子
-		v1.POST("/posts/post", controller.CreatePostHandler())
+		v2.POST("/posts/post", controller.CreatePostHandler())
+
+		// 创建社区
+		v2.POST("/community/create", controller.CreateCommunity())
 
 		// // 帖子投票
-		v1.POST("/posts/vote", controller.PostVoteHandler())
+		v2.POST("/posts/vote", controller.PostVoteHandler())
 
 		// // 用户头像上传
-		v1.POST("/user/avatar", controller.UploadAvatarHandler())
+		v2.POST("/user/avatar", controller.UploadAvatarHandler())
 
 		// // 用户信息更新
-		v1.POST("/user/update", controller.UpdateHandler())
+		v2.POST("/user/update", controller.UpdateHandler())
 
 		// // 用户发送邮箱
-		v1.POST("/user/sendEmail", controller.SendEmailHandler())
+		v2.POST("/user/sendEmail", controller.SendEmailHandler())
 
 		// // 用户验证邮箱
-		v1.GET("/user/validEmail", controller.ValidEmailHandler())
+		v2.GET("/user/validEmail", controller.ValidEmailHandler())
 	}
 	// 注册pprof路由 服务型性能分析
 	// pprof.Register(r)

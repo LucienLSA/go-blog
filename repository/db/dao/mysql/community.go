@@ -31,7 +31,7 @@ func (dao *CommunityDao) GetCommunityList() (communityList []*models.Community, 
 	return
 }
 
-func (dao *CommunityDao) GetCommunityDetailList(cid int64) (community *models.CommunityDetail, err error) {
+func (dao *CommunityDao) GetCommunityDetailList(cid int64) (community *models.Community, err error) {
 	// community = new(models.CommunityDetail)
 	// sqlStr := `select community_id, community_name, introduction, create_time, update_time
 	//  from community where community_id = ?`
@@ -42,7 +42,7 @@ func (dao *CommunityDao) GetCommunityDetailList(cid int64) (community *models.Co
 	// 	}
 	// }
 	// return community, err
-	err = dao.DB.Model(&models.CommunityDetail{}).
+	err = dao.DB.Model(&models.Community{}).
 		Where("community_id=?", cid).First(&community).Error
 	return
 }

@@ -45,7 +45,7 @@ func (s *CommunitySrv) GetCommunityList(ctx context.Context, req *types.Communti
 }
 
 // 社区分类详情 根据community_id查询
-func (s *CommunitySrv) GetCommunityDetailList(ctx context.Context, req *types.CommunityIdReq) (*models.CommunityDetail, error) {
+func (s *CommunitySrv) GetCommunityDetailList(ctx context.Context, req *types.CommunityIdReq) (*models.Community, error) {
 	communityDao := mysql.NewCommunityDao(ctx)
 	communityList, err := communityDao.GetCommunityDetailList(req.CommunityID)
 	if err != nil {

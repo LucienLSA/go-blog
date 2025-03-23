@@ -109,8 +109,8 @@ func (s *PostSrv) GetPostList(ctx context.Context, pageNum, pageSize int64) (pos
 		postDetail := &types.PostListResp{
 			AuthorName: user.UserName,
 			// VoteAgreeNum: ,
-			Post:            post,
-			CommunityDetail: community,
+			Post:      post,
+			Community: community,
 		}
 		// fmt.Println(postDetail.Post)
 		// fmt.Println(postDetail.CommunityDetail)
@@ -153,9 +153,9 @@ func (s *PostSrv) GetPostDetailList(ctx context.Context, req *types.PostIdReq) (
 	}
 
 	data = &types.PostListResp{
-		AuthorName:      user.UserName,
-		Post:            post,
-		CommunityDetail: communityDetail,
+		AuthorName: user.UserName,
+		Post:       post,
+		Community:  communityDetail,
 	}
 	return data, err
 }
@@ -209,10 +209,10 @@ func (s *PostSrv) SearchPostList(ctx context.Context, req *types.PostListReq) (d
 			continue
 		}
 		postDetail := &types.PostListResp{
-			AuthorName:      user.UserName,
-			VoteAgreeNum:    voteAgreeData[index],
-			Post:            post,
-			CommunityDetail: community,
+			AuthorName:   user.UserName,
+			VoteAgreeNum: voteAgreeData[index],
+			Post:         post,
+			Community:    community,
 		}
 		data = append(data, postDetail)
 	}
@@ -268,10 +268,10 @@ func (s *PostSrv) CommunitySearchPostList(ctx context.Context, req *types.PostLi
 			continue
 		}
 		postDetail := &types.PostListResp{
-			AuthorName:      user.UserName,
-			VoteAgreeNum:    voteAgreeData[index],
-			Post:            post,
-			CommunityDetail: community,
+			AuthorName:   user.UserName,
+			VoteAgreeNum: voteAgreeData[index],
+			Post:         post,
+			Community:    community,
 		}
 		data = append(data, postDetail)
 	}
