@@ -88,7 +88,7 @@ func (dao *UserDao) InsertUser(user *models.User) (err error) {
 
 // 向数据库更新用户信息
 func (dao *UserDao) UpdateUser(uId int64, user *models.User) (err error) {
-	return dao.DB.Model(&models.User{}).Where("id=?", uId).
+	return dao.DB.Model(&models.User{}).Where("user_id=?", uId).
 		Updates(&user).Error
 	// user.Password, err = SetPassword(user, user.Password)
 	// if err != nil {

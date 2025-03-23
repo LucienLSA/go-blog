@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/LucienLSA/go-blog/pkg/ctl"
 	"github.com/LucienLSA/go-blog/pkg/e"
 	"github.com/LucienLSA/go-blog/pkg/jwt"
 	redisCache "github.com/LucienLSA/go-blog/repository/db/dao/redis"
@@ -11,7 +12,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const CtxtUserIDKey = "userID"
+const CtxtUserIDKey = "UserID"
 
 // JWTAuthMiddleware 基于JWT的认证中间件
 func JWTAuthMiddleware() func(c *gin.Context) {
@@ -69,7 +70,10 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			return
 		}
 		// 将当前请求的username信息保存到请求的上下文c上
-		c.Set(CtxtUserIDKey, mc.UserID)
+		// c.Set(CtxtUserIDKey, mc.UserID)
+		// 设置用户信息到上下文
+		c.Request = c.Request.WithContext(ctl.NewContext(c.Request.Context(), &ctl.UserInfo{UserId: mc.UserID}))
+		ctl.InitUserInfo(c.Request.Context())
 		c.Next() // 后续的处理请求的函数中 可以用c.Get(CtxtUserIDKey)来获取当前请求的用户信息
 	}
 }

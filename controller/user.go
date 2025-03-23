@@ -157,7 +157,7 @@ func SendEmailCodeHandler() gin.HandlerFunc {
 		}
 		// 2. 发送邮箱验证码业务
 		l := service.GetUserSrv()
-		err := l.SendEmailCode(ctx, &req)
+		err := l.SendEmailCode(ctx.Request.Context(), &req)
 		if err != nil {
 			zap.L().Error("service SendEmailCode failed", zap.String("UserEmail", req.UserEmail), zap.Error(err))
 			e.ResponseError(ctx, e.CodeServerBusy)
@@ -187,7 +187,7 @@ func LoginEmailHandler() gin.HandlerFunc {
 		}
 		// 2. 业务处理
 		l := service.GetUserSrv()
-		user, err := l.LoginEmail(ctx, &req)
+		user, err := l.LoginEmail(ctx.Request.Context(), &req)
 		if err != nil {
 			zap.L().Error("service login failed", zap.String("UserEmail", req.UserEmail), zap.Error(err))
 			if errors.Is(err, e.ErrorEmailNotExit) {
@@ -226,8 +226,7 @@ func UpdateHandler() gin.HandlerFunc {
 		}
 		// 2. 业务处理
 		l := service.GetUserSrv()
-		// claimsID, _ := request.GetLoginUserID(c)
-		if err := l.Update(c, &req); err != nil {
+		if err := l.Update(c.Request.Context(), &req); err != nil {
 			zap.L().Error("service update failed", zap.Error(err))
 			// 理论上这个错误不会发生，因为是在登录情况下执行的，一定是存在的
 			if errors.Is(err, e.ErrorUserNotExist) {

@@ -243,16 +243,22 @@ func (s *UserSrv) LoginEmail(ctx context.Context, req *types.UserLoginEmailReq) 
 
 // 用户信息修改
 func (s *UserSrv) Update(ctx context.Context, req *types.UserUpdateReq) (err error) {
+	// uid, _ := ctl.GetLoginUserID(ctx)
+	// claimsID, _ := ctl.GetLoginUserID()
+	// fmt.Println(claimsID)
+
 	u, _ := ctl.GetUserInfo(ctx)
+	fmt.Println(u.UserId)
+	uid := u.UserId
 	userDao := mysql.NewUserDao(ctx)
-	user, err := userDao.GetUserByID(u.UserId)
+	user, err := userDao.GetUserByID(uid)
 	// 1. 查询登录的用户ID，不用在数据库中查询是否存在，因为是已经登录过的
 	if err != nil {
 		zap.L().Error("mysql GetUserByID failed", zap.Error(err))
 		return err
 	}
 	user = &models.User{
-		UserID:   u.UserId,
+		UserID:   uid,
 		UserName: req.Username,
 		Age:      req.Age,
 		Email:    req.Email,
@@ -260,7 +266,7 @@ func (s *UserSrv) Update(ctx context.Context, req *types.UserUpdateReq) (err err
 		Gender:   req.Gender,
 		Avatar:   upload.AvatarURL() + req.Avatar,
 	}
-	err = userDao.UpdateUser(u.UserId, user)
+	err = userDao.UpdateUser(uid, user)
 	if err != nil {
 		zap.L().Error("mysql UpdateUser failed", zap.Error(err))
 		return err
@@ -270,10 +276,11 @@ func (s *UserSrv) Update(ctx context.Context, req *types.UserUpdateReq) (err err
 
 // 上传用户头像
 func (s *UserSrv) UploadAvatar(ctx context.Context, file multipart.File, fileSize int64, req *types.UserAvatar) (resp interface{}, err error) {
-	// u, _ := ctl.GetUserInfo(ctx)
-	u, _ := ctl.GetLoginUserID(ctx)
+	u, _ := ctl.GetUserInfo(ctx)
+	// uid, _ := ctl.GetLoginUserID(ctx)
+	uid := u.UserId
 	userDao := mysql.NewUserDao(ctx)
-	user, err := userDao.GetUserByID(u.UserId)
+	user, err := userDao.GetUserByID(uid)
 	if err != nil {
 		zap.L().Error("mysql GetUserByID failed", zap.Error(err))
 		return nil, err
@@ -281,7 +288,7 @@ func (s *UserSrv) UploadAvatar(ctx context.Context, file multipart.File, fileSiz
 	// 保存到本地
 	var path string
 	if settings.Conf.AppConfig.UploadModel == settings.UploadModelLocal { // 兼容两种存储方式
-		path, err = upload.UploadAvatarToLocalStatic(file, u.UserId, user.UserName)
+		path, err = upload.UploadAvatarToLocalStatic(file, uid, user.UserName)
 	} else { //保存到七牛云oss
 		path, err = upload.UploadToQiNiuAvatar(file, user.UserName, fileSize)
 	}
@@ -291,14 +298,14 @@ func (s *UserSrv) UploadAvatar(ctx context.Context, file multipart.File, fileSiz
 		return nil, err
 	}
 	user.Avatar = path
-	err = userDao.UpdateUser(u.UserId, user)
+	err = userDao.UpdateUser(uid, user)
 	if err != nil {
 		zap.L().Error("mysql UpdateUser failed", zap.Error(err))
 		return nil, err
 	}
 	// fmt.Println(user)
 	resp = &types.UserAvatar{
-		UserID:   u.UserId,
+		UserID:   uid,
 		UserName: user.UserName,
 		Avatar:   upload.AvatarURL() + user.Avatar,
 	}
@@ -317,18 +324,19 @@ func (s *UserSrv) UploadAvatar(ctx context.Context, file multipart.File, fileSiz
 
 // 用户发送邮箱验证码绑定与解绑
 func (s *UserSrv) SendEmail(ctx context.Context, req *types.UserSendEmailReq) (err error) {
-	// u, _ := ctl.GetUserInfo(ctx)
-	u, _ := ctl.GetLoginUserID(ctx)
+	u, _ := ctl.GetUserInfo(ctx)
+	// uid, _ := ctl.GetLoginUserID(ctx)
+	uid := u.UserId
 	userDao := mysql.NewUserDao(ctx)
 	noticeDao := mysql.NewNoticeDao(ctx)
 	var user *models.User
-	user, err = userDao.GetUserByID(u.UserId)
+	user, err = userDao.GetUserByID(uid)
 	if err != nil {
 		zap.L().Error("mysql GetUserByID failed", zap.Error(err))
 		return err
 	}
 
-	token, err := jwt.GenerateEmailToken(req.OperationType, u.UserId, req.Email, user.Password)
+	token, err := jwt.GenerateEmailToken(req.OperationType, uid, req.Email, user.Password)
 	if err != nil {
 		zap.L().Error("jwt GenerateEmailToken failed", zap.Error(err))
 		return err

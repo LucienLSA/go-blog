@@ -40,14 +40,16 @@ func (s *PostSrv) CreatePost(ctx context.Context, req *types.PostCreateReq) (err
 
 	// 从c 取到当前发请求的用户userid
 	// userID, err := request.GetLoginUserID(c)
-	user, err := ctl.GetLoginUserID(ctx)
+	// uid, err := ctl.GetLoginUserID(ctx)
+	u, err := ctl.GetUserInfo(ctx)
+	uid := u.UserId
 	if err != nil {
 		zap.L().Error("ctl GetLoginUserID failed", zap.Error(err))
 		// e.ResponseError(ctx, e.CodeNeedLogin)
 		return err
 	}
 	// 获取发布帖子的用户id
-	req.AuthorID = user.UserId
+	req.AuthorID = uid
 	postDao := mysql.NewPostDao(ctx)
 	// 1. 生成post_id
 	req.PostID = int64(snowflake.GenID())

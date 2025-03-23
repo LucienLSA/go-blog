@@ -34,11 +34,13 @@ func ResetVoteSrv() {
 
 // PostVote 为帖子投票
 func (s *VoteSrv) PostVote(ctx context.Context, req *types.PostVoteDataReq) (err error) {
-	user, err := ctl.GetLoginUserID(ctx)
-	zap.L().Debug("PostVote", zap.Int64("userID", user.UserId),
+	// uid, err := ctl.GetLoginUserID(ctx)
+	u, err := ctl.GetUserInfo(ctx)
+	uid := u.UserId
+	zap.L().Debug("PostVote", zap.Int64("userID", uid),
 		zap.Int64("PostID", req.PostID),
 		zap.Int8("Kind", req.Kind))
-	err = redisCache.PostVote(strconv.Itoa(int(user.UserId)),
+	err = redisCache.PostVote(strconv.Itoa(int(uid)),
 		strconv.FormatInt(req.PostID, 10), float64(req.Kind))
 	return err
 }
