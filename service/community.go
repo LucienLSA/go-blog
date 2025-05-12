@@ -56,3 +56,21 @@ func (s *CommunitySrv) GetCommunityDetailList(ctx context.Context, req *types.Co
 	// return mysql.GetCommunityDetailList(cid)
 	return communityList, nil
 }
+
+// 创建社区 社区、介绍
+func (s *CommunitySrv) CreateCommunity(ctx context.Context, req *types.CommunityCreateResp) error {
+	communityDao := mysql.NewCommunityDao(ctx)
+	community := &models.Community{
+		CommunityID:   req.CommunityID,
+		CommunityName: req.CommunityName,
+		Introduction:  req.Introduction,
+	}
+	err := communityDao.CreateCommunity(community)
+	if err != nil {
+		zap.L().Error("mysql CreateCommunity failed", zap.Error(err))
+		return err
+	}
+	// 查询数据库，找到community_id的信息 并返回
+	// return mysql.GetCommunityDetailList(cid)
+	return err
+}

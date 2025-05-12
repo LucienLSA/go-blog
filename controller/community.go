@@ -79,3 +79,34 @@ func CommunityDetailHandler() gin.HandlerFunc {
 		e.ResponseSuccessData(c, dataList)
 	}
 }
+
+// CommunityHandler 创建社区信息
+// @Summary 创建社区信息接口
+// @Description 创建社区信息
+// @Tags 社区接口
+// @Accept application/json
+// @Produce application/json
+// @Success 200 {object}
+// @Router /community/create [post]
+// 创建社区
+func CreateCommunityHandler() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var req types.CommunityCreateResp
+		// 查询到社区信息（community_id, community_name）以列表形式返回
+		if err := ctx.ShouldBind(&req); err != nil {
+			zap.L().Error("CommunityCreate with invalid params", zap.Error(err))
+			// 不轻易将服务端报错暴露给外面
+			e.ResponseError(ctx, e.CodeServerBusy)
+			return
+		}
+		l := service.GetCommunitySrv()
+		err := l.CreateCommunity(ctx.Request.Context(), &req)
+		if err != nil {
+			zap.L().Error("service CreateCommunity failed", zap.Error(err))
+			// 不轻易将服务端报错暴露给外面
+			e.ResponseError(ctx, e.CodeServerBusy)
+			return
+		}
+		e.ResponseSuccessData(ctx, nil)
+	}
+}

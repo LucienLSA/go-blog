@@ -46,3 +46,14 @@ func (dao *CommunityDao) GetCommunityDetailList(cid int64) (community *models.Co
 		Where("community_id=?", cid).First(&community).Error
 	return
 }
+
+func (dao *CommunityDao) CreateCommunity(community *models.Community) (err error) {
+	// sqlStr := "select community_id, community_name from community"
+	// if err := db.Select(&communityList, sqlStr); err != nil {
+	// 	if err == sql.ErrNoRows {
+	// 		zap.L().Warn("there is no community in database")
+	// 		err = nil
+	// 	}
+	// }
+	return dao.DB.Model(&models.Community{}).Create(&community).Error
+}

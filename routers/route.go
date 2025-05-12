@@ -77,7 +77,7 @@ func SetupRouter(mode string) *gin.Engine {
 		v2.POST("/posts/post", controller.CreatePostHandler())
 
 		// 创建社区
-		v2.POST("/community/create", controller.CreateCommunity())
+		v2.POST("/community/create", controller.CreateCommunityHandler())
 
 		// // 帖子投票
 		v2.POST("/posts/vote", controller.PostVoteHandler())
