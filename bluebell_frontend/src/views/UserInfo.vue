@@ -21,7 +21,8 @@
       <div>
         <label>邮箱：</label>
         <input v-model="user.email" />
-        <button type="button" @click="sendBindEmail">绑定/解绑邮箱</button>
+        <button type="button" @click="sendBindEmail(1)">绑定邮箱</button>
+        <button type="button" @click="sendBindEmail(2)">解绑邮箱</button>
       </div>
       <div>
         <label>头像：</label>
@@ -91,17 +92,17 @@ export default {
         }
       });
     },
-    sendBindEmail() {
+    sendBindEmail(type) {
       this.$axios({
         method: "post",
         url: "/user/sendEmail",
         data: JSON.stringify({
-          operation_type: 1, // 1为绑定，2为解绑
+          operation_type: type, // 1为绑定，2为解绑
           email: this.user.email
         })
       }).then(res => {
         if (res.code == 1000) {
-          alert("邮件已发送，请查收邮箱完成绑定/解绑操作");
+          alert("邮件已发送，请查收邮箱完成操作");
         } else {
           alert(res.msg || "操作失败");
         }
