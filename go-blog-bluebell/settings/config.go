@@ -68,7 +68,7 @@ type RedisConfig struct {
 }
 
 type EmailConfig struct {
-	VaildEmail          string        `mapstructure:"vaildEmail"`
+	ValidEmail          string        `mapstructure:"validEmail"`
 	SmtpHost            string        `mapstructure:"smtpHost"`
 	SmtpEmail           string        `mapstructure:"smtpEmail"`
 	SmtpPass            string        `mapstructure:"smtpPass"`

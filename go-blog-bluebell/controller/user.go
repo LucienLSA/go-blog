@@ -3,6 +3,7 @@ package controller
 import (
 	"errors"
 
+	"github.com/LucienLSA/go-blog/middlewares"
 	"github.com/LucienLSA/go-blog/pkg/e"
 	"github.com/LucienLSA/go-blog/pkg/email"
 	"github.com/LucienLSA/go-blog/pkg/translator"
@@ -213,7 +214,7 @@ func UpdateHandler() gin.HandlerFunc {
 		var req types.UserUpdateReq
 		if err := c.ShouldBindJSON(&req); err != nil {
 			// 请求参数有误 直接返回响应
-			zap.L().Error("Updatewith invalid param", zap.Error(err))
+			zap.L().Error("Update with invalid param", zap.Error(err))
 			// 判断err是不是validator.ValidationErrors类型
 			errs, ok := err.(validator.ValidationErrors)
 			if !ok {
@@ -224,18 +225,31 @@ func UpdateHandler() gin.HandlerFunc {
 				translator.RemoveTopStruct(errs.Translate(translator.Trans)))
 			return
 		}
+
 		// 2. 业务处理
 		l := service.GetUserSrv()
 		if err := l.Update(c.Request.Context(), &req); err != nil {
 			zap.L().Error("service update failed", zap.Error(err))
-			// 理论上这个错误不会发生，因为是在登录情况下执行的，一定是存在的
 			if errors.Is(err, e.ErrorUserNotExist) {
 				e.ResponseError(c, e.CodeUserNotExist)
+				return
+			}
+			if errors.Is(err, e.ErrorInvalidPassword) {
+				e.ResponseError(c, e.CodeInvalidPassword)
+				return
+			}
+			if errors.Is(err, e.ErrorEmailExist) {
+				e.ResponseError(c, e.CodeEmailExist)
+				return
+			}
+			if err.Error() == "用户未登录或信息获取失败" {
+				e.ResponseError(c, e.CodeNeedLogin)
 				return
 			}
 			e.ResponseError(c, e.CodeServerBusy)
 			return
 		}
+
 		// 3. 返回响应
 		e.ResponseSuccessData(c, nil)
 	}
@@ -299,7 +313,7 @@ func SendEmailHandler() gin.HandlerFunc {
 		}
 		// claimsID, _ := request.GetLoginUserID(ctx)
 		l := service.GetUserSrv()
-		if err := l.SendEmail(ctx, &req); err != nil {
+		if err := l.SendEmail(ctx.Request.Context(), &req); err != nil {
 			zap.L().Error("service SendEmail failed", zap.Error(err))
 			if errors.Is(err, e.ErrorUserNotExist) {
 				e.ResponseError(ctx, e.CodeUserNotExist)
@@ -317,10 +331,9 @@ func SendEmailHandler() gin.HandlerFunc {
 func ValidEmailHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var p types.UserVaildEmail
-		// p := new(models.ParamVaildEmail)
-		if err := ctx.ShouldBind(&p); err != nil {
-			// 2. 请求参数有误 直接返回响应
-			zap.L().Error("SendEmail with invalid param", zap.Error(err))
+		if err := ctx.ShouldBindJSON(&p); err != nil {
+			// 请求参数有误 直接返回响应
+			zap.L().Error("ValidEmail with invalid param", zap.Error(err))
 			// 判断err是不是validator.ValidationErrors类型
 			errs, ok := err.(validator.ValidationErrors)
 			if !ok {
@@ -330,24 +343,26 @@ func ValidEmailHandler() gin.HandlerFunc {
 			e.ResponseErrorMsg(ctx, e.CodeInvalidParam,
 				translator.RemoveTopStruct(errs.Translate(translator.Trans)))
 			return
-		} else {
-			// 验证邮箱业务
-			// TODO： 邮箱验证的token需要放在更隐蔽的位置
-			token := ctx.Query("token")
-			if token == " " {
-				zap.L().Error("get token failed", zap.Error(err))
-				e.ResponseError(ctx, e.CodeTokenInvalid)
-				return
-			}
-			l := service.GetUserSrv()
-			err := l.ValidEmail(ctx.Request.Context(), token)
-			if err != nil {
-				zap.L().Error("service VaildEmail failed", zap.Error(err))
-				e.ResponseError(ctx, e.CodeServerBusy)
-				return
-			}
-			// 3. 成功返回数据
-			e.ResponseSuccessData(ctx, nil)
 		}
+
+		// 从上下文中获取用户信息
+		u, ok := ctx.Get(middlewares.CtxUserKey)
+		if !ok {
+			e.ResponseError(ctx, e.CodeNeedLogin)
+			return
+		}
+		user := u.(*types.User)
+		p.UserName = user.UserName
+
+		// 验证邮箱验证码
+		l := service.GetUserSrv()
+		if err := l.ValidEmailCode(ctx.Request.Context(), &p); err != nil {
+			zap.L().Error("service ValidEmailCode failed", zap.Error(err))
+			e.ResponseErrorMsg(ctx, e.CodeInvalidEmailCode, err.Error())
+			return
+		}
+
+		// 成功返回
+		e.ResponseSuccessData(ctx, nil)
 	}
 }

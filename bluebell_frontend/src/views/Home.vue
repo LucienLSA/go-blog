@@ -135,7 +135,7 @@ export default {
     getPostList() {
       this.$axios({
         method: "get",
-        url: "/posts/showAll",
+        url: "/api/v2/posts/search",
         params: {
           page_num: this.page,
           order: this.order,
@@ -156,7 +156,7 @@ export default {
     vote(post_id, direction){
       this.$axios({
         method: "post",
-        url: "/posts/vote",
+        url: "/api/v2/posts/vote",
         data: JSON.stringify({
           post_id: post_id,
           direction: direction,

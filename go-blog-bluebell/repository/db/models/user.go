@@ -7,10 +7,10 @@ import (
 
 type User struct {
 	gorm.Model
-	UserID         int64  `gorm:"user_id"`
-	Age            uint8  `gorm:"age"`
-	UserName       string `gorm:"unique"`
-	Password       string `gorm:"password"`
+	UserID   int64  `gorm:"user_id"`
+	Age      uint8  `gorm:"age"`
+	UserName string `gorm:"unique"`
+	// Password    string `gorm:"password"`  // 删除明文密码字段
 	Email          string `gorm:"email"`
 	PasswordDigest string `gorm:"password_digest"`
 	Gender         string `gorm:"gender"`

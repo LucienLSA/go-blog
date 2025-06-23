@@ -88,12 +88,13 @@ func SetupRouter(mode string) *gin.Engine {
 		v2.POST("/user/avatar", controller.UploadAvatarHandler())
 
 		// // 用户信息更新
-		v2.POST("/user/update", controller.UpdateHandler())
+		v2.PUT("/user/update", controller.UpdateHandler())
 
 		// // 用户发送邮箱
 		v2.POST("/user/sendEmail", controller.SendEmailHandler())
 
 		// // 用户验证邮箱
+		v2.POST("/user/validEmail", controller.ValidEmailHandler())
 		v2.GET("/user/validEmail", controller.ValidEmailHandler())
 	}
 	// 注册pprof路由 服务型性能分析

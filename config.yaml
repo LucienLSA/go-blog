@@ -42,7 +42,7 @@ redis:
   pool_size: 100
 
 email:
-  vaildEmail: http://localhost:8081/#/user/vaildEmail/
+  validEmail: http://localhost:8001/#/user/validEmail/
   smtpHost: smtp.qq.com
   smtpEmail: 1020263522@qq.com
   smtpPass: asyommbmaepibeha

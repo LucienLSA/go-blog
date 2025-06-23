@@ -10,18 +10,16 @@ type EmailClaims struct {
 	OperationType int    `json:"operation_type" form:"operation_type"`
 	UserID        int64  `json:"user_id" form:"user_id"`
 	Email         string `json:"email" form:"email"`
-	Password      string `json:"password" form:"password"`
 	jwt.StandardClaims
 }
 
 // 生成邮箱验证token
-func GenerateEmailToken(operation_type int, userID int64, email, password string) (string, error) {
+func GenerateEmailToken(operation_type int, userID int64, email string) (string, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(2 * time.Hour)
 	claims := EmailClaims{
 		UserID:        userID,
 		Email:         email,
-		Password:      password,
 		OperationType: operation_type,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),

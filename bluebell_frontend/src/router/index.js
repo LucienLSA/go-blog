@@ -6,6 +6,7 @@ import Publish from '../views/Publish.vue'
 import Login from '../views/Login.vue'
 import SignUp from '../views/SignUp.vue'
 import UserInfo from '../views/UserInfo.vue'
+import ValidEmail from '../views/ValidEmail.vue'
 const originalPush = VueRouter.prototype.push;
 VueRouter.prototype.push = function push(location) {
   return originalPush.call(this, location).catch(err => err);
@@ -44,11 +45,16 @@ Vue.use(VueRouter)
     name: 'UserInfo',
     component: UserInfo,
     meta: { requireAuth: true }
+  },
+  {
+    path: '/user/validEmail/:token',
+    name: 'ValidEmail',
+    component: ValidEmail
   }
 ]
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: 'hash',
   base: process.env.BASE_URL,
   routes
 })

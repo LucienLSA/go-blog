@@ -3,7 +3,7 @@ CREATE TABLE `user` (
     `user_id` bigint(20) NOT NULL,
     `age` int(11) NOT NULL DEFAULT '0',
     `username` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `password` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `password_digest` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
     `email` varchar(64) COLLATE utf8mb4_unicode_ci,
     `gender` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
     `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,

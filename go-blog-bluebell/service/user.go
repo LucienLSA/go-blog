@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"mime/multipart"
 	"strings"
@@ -94,7 +95,6 @@ func (s *UserSrv) UserSignUp(ctx context.Context, req *types.UserSignUpReq) (err
 		UserName: req.UserName,
 		Age:      req.Age,
 		Email:    req.Email,
-		Password: req.Password,
 		Gender:   req.Gender,
 		Avatar:   defaultAvatar.DefaultAvatar,
 	}
@@ -114,25 +114,18 @@ func (s *UserSrv) UserSignUp(ctx context.Context, req *types.UserSignUpReq) (err
 // 登录业务
 func (s *UserSrv) UserLogin(ctx context.Context, req *types.UserLoginReq) (resp interface{}, err error) {
 	userDao := mysql.NewUserDao(ctx)
-	// user = &models.User{
-	// 	UserName: req.Username,
-	// 	Password: req.Password,
-	// }
-	// 1. 判断用户是否存在
 	user, exist, err := userDao.CheckUserExist(req.UserName)
 	if err != nil {
-		// 数据库查询错误
 		zap.L().Error("userDao CheckUserExist failed", zap.Error(err))
 		return nil, err
 	}
-	if !exist { // 如果查询不到，返回相应的错误
+	if !exist {
 		zap.L().Error("userDao CheckUserExist failed", zap.Error(err))
 		return nil, e.ErrorUserNotExist
 	}
-	// 将用户登录输入的名称和密码信息传入model层的user中
+	zap.L().Info("登录校验", zap.String("输入密码", req.Password), zap.String("数据库摘要", user.PasswordDigest))
 	if err = user.CheckPassword(req.Password); err != nil {
-		// 传递的是指针，能拿到数据库中注册时原本生成的UserID和Username
-		zap.L().Error("mysql Login failed", zap.Error(err))
+		zap.L().Error("mysql Login failed", zap.String("输入密码", req.Password), zap.String("数据库摘要", user.PasswordDigest), zap.Error(err))
 		return nil, err
 	}
 	// 生成JWT
@@ -157,7 +150,7 @@ func (s *UserSrv) UserLogin(ctx context.Context, req *types.UserLoginReq) (resp 
 func (s *UserSrv) SendEmailCode(ctx context.Context, req *types.UserSendEmailCodeReq) (err error) {
 	noticeDao := mysql.NewNoticeDao(ctx)
 	// 检查是否在1分钟内发送过邮件， 如果有发送过，需等待后才能发送
-	err = redisCache.EmailCodeExists(req.UserEmail)
+	err = redisCache.EmailCodeExists(req.UserEmail, req.OperationType)
 	if err != nil {
 		zap.L().Error("send email code from redis in 1 minutes")
 		fmt.Printf("send email code from redis in 1 minutes")
@@ -168,15 +161,14 @@ func (s *UserSrv) SendEmailCode(ctx context.Context, req *types.UserSendEmailCod
 	code := email.GetConfirmCode()
 
 	// 将其存储至Redis中，由于Redis为KV键值对存储所以需要定义前缀方便使用
-	err = redisCache.StorgeEmailCode(req.UserEmail, code)
+	err = redisCache.StorgeEmailCode(req.UserEmail, code, req.OperationType)
 	if err != nil {
-		zap.L().Error("redisCache.StorgeEmailCode failed, err:%\v", zap.Error(err))
-		fmt.Printf("redisCache.StorgeEmailCode failed, err:%\v", err)
+		zap.L().Error("redisCache.StorgeEmailCode failed", zap.Error(err))
+		fmt.Printf("redisCache.StorgeEmailCode failed, err:%v", err)
 		return err
 	}
 
 	// 发送邮件，此处为方便起见没有处理返回值
-	// address = settings.Conf.EmailConfig.VaildEmail + token
 	var notice *models.Notice
 	notice, err = noticeDao.GetNoticeById(req.OperationType)
 	if err != nil {
@@ -187,18 +179,18 @@ func (s *UserSrv) SendEmailCode(ctx context.Context, req *types.UserSendEmailCod
 	var builder strings.Builder
 	builder.WriteString(mailStr)
 	builder.Write([]byte(code))
-	// mailTex := strings.Replace(mailStr, "Email", code, -1)
-	// 第一个参数内容 第二个参数接收方 第三个标题 第四个发送方
+
+	// 发送邮件
 	err = email.Send(builder.String(), req.UserEmail, settings.Conf.AppConfig.Name, settings.Conf.EmailConfig.SmtpEmail)
 	if err != nil {
 		zap.L().Error("email Send failed", zap.Error(err))
 		return err
 	}
 	// 设置每个邮箱发送邮件的时间 此处设置为1分钟，由于Redis为KV键值对存储所以需要定义前缀方便使用
-	err = redisCache.SendEmailCode(req.UserEmail, code)
+	err = redisCache.SendEmailCode(req.UserEmail, code, req.OperationType)
 	if err != nil {
-		zap.L().Error("redisCache.SendEmailCode failed, err:%\v", zap.Error(err))
-		fmt.Printf("redisCache.SendEmailCode failed, err:%\v", err)
+		zap.L().Error("redisCache.SendEmailCode failed", zap.Error(err))
+		fmt.Printf("redisCache.SendEmailCode failed, err:%v", err)
 		return err
 	}
 	return nil
@@ -207,13 +199,12 @@ func (s *UserSrv) SendEmailCode(ctx context.Context, req *types.UserSendEmailCod
 // 用户邮箱验证码登录业务
 func (s *UserSrv) LoginEmail(ctx context.Context, req *types.UserLoginEmailReq) (user *models.User, err error) {
 	userDao := mysql.NewUserDao(ctx)
-	// 将用户邮箱登录输入的邮箱传入dao层mysql中进行判断是否存在，并取出
 	// 从数据库中获取用户信息（用户名和id）
 	user, err = userDao.GetUserByEmail(req.UserEmail)
 	// 如果不存在则错误
 	if err != nil {
-		zap.L().Error(" mysql.NotExistUserEmail failed, err:%\v", zap.Error(err))
-		fmt.Printf(" mysql.NotExistUserEmail failed, err:%\v", err)
+		zap.L().Error("mysql.NotExistUserEmail failed", zap.Error(err))
+		fmt.Printf("mysql.NotExistUserEmail failed, err:%v", err)
 		return nil, err
 	}
 	userInfo := &models.User{
@@ -221,11 +212,12 @@ func (s *UserSrv) LoginEmail(ctx context.Context, req *types.UserLoginEmailReq) 
 		Email:    req.UserEmail,
 		UserName: user.UserName,
 	}
+
 	// 校验验证码正确性
-	err = redisCache.CheckEmailCode(req.UserEmail, userInfo.Email, req.Code)
+	err = redisCache.CheckEmailCode(req.UserEmail, req.Code, 3) // 3表示登录操作
 	if err != nil {
-		zap.L().Error("redisCache.CheckEmailCode failed, err:%\v", zap.Error(err))
-		fmt.Printf("redisCache.CheckEmailCode failed, err:%\v", err)
+		zap.L().Error("redisCache.CheckEmailCode failed", zap.Error(err))
+		fmt.Printf("redisCache.CheckEmailCode failed, err:%v", err)
 		return nil, err
 	}
 	// 生成JWT
@@ -243,13 +235,15 @@ func (s *UserSrv) LoginEmail(ctx context.Context, req *types.UserLoginEmailReq) 
 
 // 用户信息修改
 func (s *UserSrv) Update(ctx context.Context, req *types.UserUpdateReq) (err error) {
-	// uid, _ := ctl.GetLoginUserID(ctx)
-	// claimsID, _ := ctl.GetLoginUserID()
-	// fmt.Println(claimsID)
-
-	u, _ := ctl.GetUserInfo(ctx)
-	fmt.Println(u.UserId)
+	// 获取当前登录用户信息
+	u, err := ctl.GetUserInfo(ctx)
+	if err != nil || u == nil {
+		zap.L().Error("GetUserInfo failed", zap.Error(err))
+		return errors.New("用户未登录或信息获取失败")
+	}
 	uid := u.UserId
+
+	// 获取用户当前信息
 	userDao := mysql.NewUserDao(ctx)
 	user, err := userDao.GetUserByID(uid)
 	// 1. 查询登录的用户ID，不用在数据库中查询是否存在，因为是已经登录过的
@@ -257,27 +251,60 @@ func (s *UserSrv) Update(ctx context.Context, req *types.UserUpdateReq) (err err
 		zap.L().Error("mysql GetUserByID failed", zap.Error(err))
 		return err
 	}
-	user = &models.User{
-		UserID:   uid,
-		UserName: req.Username,
-		Age:      req.Age,
-		Email:    req.Email,
-		Password: req.Password,
-		Gender:   req.Gender,
-		Avatar:   upload.AvatarURL() + req.Avatar,
+
+	// 如果提供了新密码，需要验证并更新
+	if req.Password != "" && req.NewPassword != "" {
+		if err = user.CheckPassword(req.Password); err != nil {
+			return errors.New("当前密码错误")
+		}
+		if err = user.SetPassword(req.NewPassword); err != nil {
+			return errors.New("新密码设置失败")
+		}
+		zap.L().Info("新密码加密摘要", zap.String("digest", user.PasswordDigest))
 	}
-	err = userDao.UpdateUser(uid, user)
+
+	// 构建只包含需要更新字段的map
+	updates := map[string]interface{}{}
+	if req.Age > 0 {
+		updates["age"] = req.Age
+		user.Age = req.Age
+	}
+	if req.Gender != "" {
+		updates["gender"] = req.Gender
+		user.Gender = req.Gender
+	}
+	// 邮箱字段特殊处理：如果请求中包含email字段，则更新（包括空字符串，表示解绑）
+	updates["email"] = req.Email
+	user.Email = req.Email
+	if req.Avatar != "" {
+		updates["avatar"] = upload.AvatarURL() + req.Avatar
+		user.Avatar = upload.AvatarURL() + req.Avatar
+	}
+	if req.Password != "" && req.NewPassword != "" {
+		updates["password_digest"] = user.PasswordDigest
+	}
+	if req.UserName != "" {
+		updates["user_name"] = req.UserName
+		user.UserName = req.UserName
+	}
+
+	zap.L().Info("用户信息更新字段", zap.Any("updates", updates))
+	// 保存到数据库
+	err = userDao.UpdateUser(uid, updates)
 	if err != nil {
 		zap.L().Error("mysql UpdateUser failed", zap.Error(err))
 		return err
 	}
-	return err
+	return nil
 }
 
 // 上传用户头像
 func (s *UserSrv) UploadAvatar(ctx context.Context, file multipart.File, fileSize int64, req *types.UserAvatar) (resp interface{}, err error) {
-	u, _ := ctl.GetUserInfo(ctx)
-	// uid, _ := ctl.GetLoginUserID(ctx)
+	u, err := ctl.GetUserInfo(ctx)
+	if err != nil || u == nil {
+		zap.L().Error("GetUserInfo failed", zap.Error(err))
+		return nil, errors.New("用户未登录或信息获取失败")
+	}
 	uid := u.UserId
 	userDao := mysql.NewUserDao(ctx)
 	user, err := userDao.GetUserByID(uid)
@@ -298,76 +325,56 @@ func (s *UserSrv) UploadAvatar(ctx context.Context, file multipart.File, fileSiz
 		return nil, err
 	}
 	user.Avatar = path
-	err = userDao.UpdateUser(uid, user)
+	updates := map[string]interface{}{
+		"avatar": path,
+	}
+	err = userDao.UpdateUser(uid, updates)
 	if err != nil {
 		zap.L().Error("mysql UpdateUser failed", zap.Error(err))
 		return nil, err
 	}
-	// fmt.Println(user)
 	resp = &types.UserAvatar{
 		UserID:   uid,
 		UserName: user.UserName,
 		Avatar:   upload.AvatarURL() + user.Avatar,
 	}
-	// if settings.Conf.AppConfig.UploadModel == settings.UploadModelLocal {
-	// 	paramAvatar.Avatar = upload.AvatarURL() + user.Avatar
-	// } else {
-	// 	paramAvatar = &models.ParamAvatar{
-	// 		Avatar:   upload.AvatarURL() + user.Avatar,
-	// 		UserID:   uId,
-	// 		UserName: user.Username,
-	// 	}
-	// }
-
 	return resp, nil
 }
 
 // 用户发送邮箱验证码绑定与解绑
 func (s *UserSrv) SendEmail(ctx context.Context, req *types.UserSendEmailReq) (err error) {
-	u, _ := ctl.GetUserInfo(ctx)
-	// uid, _ := ctl.GetLoginUserID(ctx)
-	uid := u.UserId
-	userDao := mysql.NewUserDao(ctx)
-	noticeDao := mysql.NewNoticeDao(ctx)
-	var user *models.User
-	user, err = userDao.GetUserByID(uid)
+	u, err := ctl.GetUserInfo(ctx)
+	if err != nil || u == nil {
+		zap.L().Error("GetUserInfo failed", zap.Error(err))
+		return errors.New("用户未登录或信息获取失败")
+	}
+
+	// 生成验证码并保存到 Redis
+	code := email.GetConfirmCode()
+	err = redisCache.StorgeEmailCode(req.Email, code, req.OperationType)
 	if err != nil {
-		zap.L().Error("mysql GetUserByID failed", zap.Error(err))
+		zap.L().Error("redis StorgeEmailCode failed", zap.Error(err))
 		return err
 	}
 
-	token, err := jwt.GenerateEmailToken(req.OperationType, uid, req.Email, user.Password)
-	if err != nil {
-		zap.L().Error("jwt GenerateEmailToken failed", zap.Error(err))
-		return err
+	// 邮件正文为验证码
+	var operationText string
+	if req.OperationType == 1 {
+		operationText = "绑定"
+	} else {
+		operationText = "解绑"
 	}
-	// notice := new(models.Notice)
-	var notice *models.Notice
-	notice, err = noticeDao.GetNoticeById(req.OperationType)
-	if err != nil {
-		zap.L().Error("mysql GetNoticeById failed", zap.Error(err))
-		return err
-	}
-	var address string
-	address = settings.Conf.EmailConfig.VaildEmail + token
-	mailStr := notice.Text
-	mailTex := strings.Replace(mailStr, "Email", address, -1)
+
+	mailTex := fmt.Sprintf(`
+	  <p>您正在%s邮箱，验证码为：</p>
+	  <h2 style=\"color:blue;\">%s</h2>
+	  <p>请在页面输入该验证码完成操作。</p>
+	`, operationText, code)
 	err = email.Send(mailTex, req.Email, settings.Conf.AppConfig.Name, settings.Conf.EmailConfig.SmtpEmail)
 	if err != nil {
 		zap.L().Error("email Send failed", zap.Error(err))
 		return err
 	}
-	// m := mail.NewMessage()
-	// m.SetHeader("From", settings.Conf.EmailConfig.SmtpEmail)
-	// m.SetHeader("To", p.Email)
-	// m.SetHeader("Subject", "bluebell")
-	// m.SetBody("text/html", mailTex)
-	// d := mail.NewDialer(settings.Conf.EmailConfig.SmtpHost, 465, settings.Conf.EmailConfig.SmtpEmail, settings.Conf.EmailConfig.SmtpPass)
-	// d.StartTLSPolicy = mail.MandatoryStartTLS
-	// if err = d.DialAndSend(m); err != nil {
-	// 	zap.L().Error("DialAndSend failed", zap.Error(err))
-	// 	return err
-	// }
 	return
 }
 
@@ -376,7 +383,7 @@ func (s *UserSrv) SendEmail(ctx context.Context, req *types.UserSendEmailReq) (e
 func (s *UserSrv) ValidEmail(ctx context.Context, token string) (err error) {
 	var operationType int
 	var uId int64
-	var user *models.User
+	// var user *models.User // 已无用，删除
 	var email string
 	userDao := mysql.NewUserDao(ctx)
 	// 1.校验参数
@@ -392,20 +399,58 @@ func (s *UserSrv) ValidEmail(ctx context.Context, token string) (err error) {
 	uId = claims.UserID
 	email = claims.Email
 	operationType = claims.OperationType
-	user, err = userDao.GetUserByID(uId)
-	if err != nil {
-		zap.L().Error("mysql GetUserByID failed", zap.Error(err))
-		return err
-	}
+	// user, err = userDao.GetUserByID(uId) // 已无用，删除
+	// if err != nil {
+	// 	zap.L().Error("mysql GetUserByID failed", zap.Error(err))
+	// 	return err
+	// }
+	updates := map[string]interface{}{}
 	if operationType == 1 {
-		user.Email = email
+		updates["email"] = email
 	} else if operationType == 2 {
-		user.Email = " "
+		updates["email"] = " "
 	}
-	err = userDao.UpdateUserEmail(uId, user)
+	err = userDao.UpdateUser(uId, updates)
 	if err != nil {
 		zap.L().Error("mysql UpdateUserEmail failed", zap.Error(err))
 		return err
 	}
 	return
+}
+
+// ValidEmailCode 验证邮箱验证码
+func (u *UserSrv) ValidEmailCode(ctx context.Context, p *types.UserVaildEmail) error {
+	// 验证码校验
+	if err := redisCache.CheckEmailCode(p.Email, p.Code, p.OperationType); err != nil {
+		return err
+	}
+
+	// 获取用户信息
+	userDao := mysql.NewUserDao(ctx)
+	user, exist, err := userDao.CheckUserExist(p.UserName)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return errors.New("用户不存在")
+	}
+
+	// 如果是绑定操作，检查邮箱是否已被其他用户使用
+	updates := map[string]interface{}{}
+	if p.OperationType == 1 {
+		_, exist, err := userDao.ExistUserEmail(p.Email)
+		if err != nil {
+			return err
+		}
+		if exist {
+			return errors.New("该邮箱已被其他用户绑定")
+		}
+		updates["email"] = p.Email
+	} else {
+		// 解绑操作
+		updates["email"] = ""
+	}
+
+	// 更新用户信息
+	return userDao.UpdateUser(user.UserID, updates)
 }

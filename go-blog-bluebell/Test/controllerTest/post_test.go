@@ -56,3 +56,26 @@ package controllerTest
 // 	// assert.Equal(t, int(res.Code), response.CodeNeedLogin)
 
 // }
+
+import (
+	"fmt"
+	"testing"
+
+	"golang.org/x/crypto/bcrypt"
+)
+
+func CheckBcryptHash(hash, password string) {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	if err != nil {
+		fmt.Println("密码不匹配:", err)
+	} else {
+		fmt.Println("密码匹配成功！")
+	}
+}
+
+// 用法示例：
+func TestCheckBcryptHash(t *testing.T) {
+	hash := "$2a$12$vXUgWrVTMpoJthcYRs0FNeQyiikmOpa61taFs7XST5Hy4SlINb3G6"
+	password := "1234"
+	CheckBcryptHash(hash, password)
+}

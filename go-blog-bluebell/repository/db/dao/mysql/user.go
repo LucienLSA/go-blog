@@ -65,10 +65,7 @@ func (dao *UserDao) ExistUserEmail(email string) (user *models.User, exist bool,
 
 // 向数据库中插入一条用户信息
 func (dao *UserDao) InsertUser(user *models.User) (err error) {
-	// 执行SQL语句
-	// sqlStr := `insert into user(user_id, username, password, email, age, gender, avatar) values(?,?,?,?,?,?,?)`
-	// _, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password, user.Email, user.Age, user.Gender, user.Avatar)
-	// return err
+	// 只插入User结构体中存在的字段，Password字段已移除
 	return dao.DB.Model(&models.User{}).Create(&user).Error
 }
 
@@ -87,22 +84,8 @@ func (dao *UserDao) InsertUser(user *models.User) (err error) {
 // }
 
 // 向数据库更新用户信息
-func (dao *UserDao) UpdateUser(uId int64, user *models.User) (err error) {
-	return dao.DB.Model(&models.User{}).Where("user_id=?", uId).
-		Updates(&user).Error
-	// user.Password, err = SetPassword(user, user.Password)
-	// if err != nil {
-	// 	return err
-	// }
-	// sqlStr := `
-	// update user
-	// set username=?,
-	// 	password=?,
-	// 	email=?,
-	// 	age=?,
-	// 	gender=?
-	// where user_id = ?`
-	// _, err = db.Exec(sqlStr, user.Username, user.Password, user.Email, user.Age, user.Gender, uId)
+func (dao *UserDao) UpdateUser(uId int64, updates map[string]interface{}) (err error) {
+	return dao.DB.Model(&models.User{}).Where("user_id=?", uId).Updates(updates).Error
 }
 
 // // 向数据库更新用户头像

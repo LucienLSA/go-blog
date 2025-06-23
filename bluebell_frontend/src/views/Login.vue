@@ -70,7 +70,7 @@ export default {
 			this.codeBtnText = '发送中...';
 			this.$axios({
 				method: 'post',
-				url: '/user/login/emailcode',
+				url: '/api/v2/user/login/emailcode',
 				data: JSON.stringify({
 					email: this.email,
 					operation_type: 1
@@ -106,7 +106,7 @@ export default {
 			if (this.loginType === 'password') {
 				this.$axios({
 					method: 'post',
-					url:'/user/login',
+					url:'/api/v2/user/login',
 					data: JSON.stringify({
 						user_name: this.username,
 						password: this.password
@@ -123,7 +123,7 @@ export default {
 			} else {
 				this.$axios({
 					method: 'post',
-					url:'/user/login/email',
+					url:'/api/v2/user/login/email',
 					data: JSON.stringify({
 						email: this.email,
 						code: this.emailCode

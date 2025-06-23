@@ -3,67 +3,66 @@ package redisCache
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/LucienLSA/go-blog/settings"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
 
 var (
-	ErrExistCode = errors.New("邮箱验证码已发送过")
-	ErrEmailCode = errors.New("邮箱验证码不正确")
+	ErrExistCode   = errors.New("邮箱验证码已发送过")
+	ErrEmailCode   = errors.New("邮箱验证码不正确")
+	ErrCodeExpired = errors.New("验证码已过期")
 )
 
 // 邮箱和验证码存入redis
-func StorgeEmailCode(email, code string) (err error) {
+func StorgeEmailCode(email string, code string, opType int) error {
 	duration := time.Duration(settings.Conf.EmailConfig.EmailCodeSaveTime * time.Minute)
-	key := GetRedisKey(KeyEmailSetPrefix)
-	err = rdb.Set(rctx, key+email, code, duration).Err()
+	key := fmt.Sprintf("email_code:%s:%d", email, opType)
+	err := rdb.Set(rctx, key, code, duration).Err()
 	if err != nil {
-		zap.L().Error("Insert email code into redis failed, err:%v\n", zap.Error(err))
-		fmt.Printf("Insert email code into redis failed, err:%v\n", err)
+		zap.L().Error("Insert email code into redis failed", zap.Error(err))
 		return err
 	}
-	return
+	return nil
 }
 
 // 从redis查看邮箱和验证码是否存在
-func EmailCodeExists(email string) (err error) {
-	key := GetRedisKey(KeySendEmailSetPrefix)
-	if rdb.Exists(rctx, key+email).Val() > 0 {
-		zap.L().Error("Get email code from redis")
-		fmt.Printf("Get email code from redis")
+func EmailCodeExists(email string, opType int) error {
+	key := fmt.Sprintf("email_code:%s:%d", email, opType)
+	if rdb.Exists(rctx, key).Val() > 0 {
 		return ErrExistCode
 	}
-	return
+	return nil
 }
 
 // 发送邮箱和验证码存入redis，区别于StorgeEmailCode是为了验证发送验证码的时效
-func SendEmailCode(email, code string) (err error) {
+func SendEmailCode(email string, code string, opType int) error {
 	duration := time.Duration(settings.Conf.EmailConfig.EmailCodeExpireTime * time.Second)
-	key := GetRedisKey(KeySendEmailSetPrefix)
-	err = rdb.Set(rctx, key+email, code, duration).Err()
+	key := fmt.Sprintf("email_code:%s:%d", email, opType)
+	err := rdb.Set(rctx, key, code, duration).Err()
 	if err != nil {
-		zap.L().Error("Insert send-email code into redis failed, err:%v\n", zap.Error(err))
-		fmt.Printf("Insert send-email code into redis failed, err:%v\n", err)
+		zap.L().Error("Insert send-email code into redis failed", zap.Error(err))
 		return err
 	}
-	return
+	return nil
 }
 
 // 检验redis中邮箱验证码的正确性
-func CheckEmailCode(pEmail, uEmail string, code int32) (err error) {
-	key1 := GetRedisKey(KeyEmailSetPrefix)
-	// key2 := GetRedisKey(KeySendEmailSetPrefix)
-	// fmt.Println(key1+uEmail, key2+pEmail)
-	codeStroage, _ := rdb.Get(rctx, key1+uEmail).Result()
-	// fmt.Println(codeStroage)
-	// fmt.Println(code)
-	if codeStroage != strconv.Itoa(int(code)) {
-		zap.L().Error("check email code failed")
-		fmt.Printf("check email code failed")
+func CheckEmailCode(email string, code string, opType int) error {
+	key := fmt.Sprintf("email_code:%s:%d", email, opType)
+	codeStored, err := rdb.Get(rctx, key).Result()
+	if err != nil {
+		if err == redis.Nil {
+			return ErrCodeExpired
+		}
+		return err
+	}
+	if codeStored != code {
 		return ErrEmailCode
 	}
-	return
+	// 验证通过后删除验证码
+	rdb.Del(rctx, key)
+	return nil
 }

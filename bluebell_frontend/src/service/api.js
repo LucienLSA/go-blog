@@ -1,6 +1,5 @@
-
 import axios from 'axios';
-axios.defaults.baseURL = "/api/v2/";
+
 axios.interceptors.request.use((config) => {
   let loginResult = JSON.parse(localStorage.getItem("loginResult"));
   if (loginResult) { 
