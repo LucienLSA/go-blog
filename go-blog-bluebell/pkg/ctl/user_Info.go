@@ -10,7 +10,8 @@ type key int
 var userKey key
 
 type UserInfo struct {
-	UserId int64 `json:"user_id"`
+	UserId   int64  `json:"user_id"`
+	UserName string `json:"user_name"`
 }
 
 var (

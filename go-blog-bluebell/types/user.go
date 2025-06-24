@@ -57,10 +57,11 @@ type UserSendEmailReq struct {
 
 // 用户验证邮箱(绑定或解绑)
 type UserVaildEmail struct {
-	UserName      string `form:"user_name" json:"user_name"`                                        // 用户名称（从 JWT 获取）
-	Email         string `form:"email" json:"email" binding:"required,email"`                       // 用户邮箱
-	Code          string `form:"code" json:"code" binding:"required"`                               // 验证码
-	OperationType int    `form:"operation_type" json:"operation_type" binding:"required,oneof=1 2"` // 1-绑定 2-解绑
+	UserName      string `json:"user_name" binding:"-"` // 禁止自动绑定
+	UserID        int64  `json:"user_id" binding:"-"`   // 禁止自动绑定
+	Email         string `form:"email" json:"email" binding:"required,email"`
+	Code          string `form:"code" json:"code" binding:"required"`
+	OperationType int    `form:"operation_type" json:"operation_type" binding:"required,oneof=1 2"`
 }
 
 // 用户发送邮箱登录验证码

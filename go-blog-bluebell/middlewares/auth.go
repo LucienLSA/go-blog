@@ -8,13 +8,12 @@ import (
 	"github.com/LucienLSA/go-blog/pkg/e"
 	"github.com/LucienLSA/go-blog/pkg/jwt"
 	redisCache "github.com/LucienLSA/go-blog/repository/db/dao/redis"
-	"github.com/LucienLSA/go-blog/types"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 const (
-	CtxUserKey = "user" // 用户信息的上下文key
+	// CtxUserKey = "user" // 用户信息的上下文key
 	// 不需要验证token的路由
 	SendEmailPath     = "/api/v2/email/send"
 	ValidEmailPath    = "/api/v2/email/valid"
@@ -71,16 +70,19 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			return
 		}
 
-		// 将用户信息保存到上下文中
-		user := &types.User{
-			UserID:   mc.UserID,
-			UserName: mc.Username,
-		}
-		c.Set(CtxUserKey, user)
+		// // 将用户信息保存到上下文中
+		// user := &types.User{
+		// 	UserID:   mc.UserID,
+		// 	UserName: mc.Username,
+		// }
+		// c.Set(CtxUserKey, user)
 
-		// 设置用户信息到请求上下文
-		c.Request = c.Request.WithContext(ctl.NewContext(c.Request.Context(), &ctl.UserInfo{UserId: mc.UserID}))
-		ctl.InitUserInfo(c.Request.Context())
+		// // 设置用户信息到请求上下文
+		c.Request = c.Request.WithContext(ctl.NewContext(c.Request.Context(), &ctl.UserInfo{
+			UserId:   mc.UserID,
+			UserName: mc.Username,
+		}))
+		// ctl.InitUserInfo(c.Request.Context())
 		c.Next()
 	}
 }

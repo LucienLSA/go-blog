@@ -3,7 +3,7 @@ package controller
 import (
 	"errors"
 
-	"github.com/LucienLSA/go-blog/middlewares"
+	"github.com/LucienLSA/go-blog/pkg/ctl"
 	"github.com/LucienLSA/go-blog/pkg/e"
 	"github.com/LucienLSA/go-blog/pkg/email"
 	"github.com/LucienLSA/go-blog/pkg/translator"
@@ -272,7 +272,7 @@ func UploadAvatarHandler() gin.HandlerFunc {
 			// 获取登录用户的id
 			// claimID, _ := request.GetLoginUserID(c)
 			l := service.GetUserSrv()
-			resp, err := l.UploadAvatar(c, file, fileSize, &req)
+			resp, err := l.UploadAvatar(c.Request.Context(), file, fileSize, &req)
 			if err != nil {
 				zap.L().Error("service UploadAvatar failed, err:", zap.Error(err))
 				e.ResponseError(c, e.CodeServerBusy)
@@ -331,7 +331,7 @@ func SendEmailHandler() gin.HandlerFunc {
 func ValidEmailHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var p types.UserVaildEmail
-		if err := ctx.ShouldBindJSON(&p); err != nil {
+		if err := ctx.ShouldBind(&p); err != nil {
 			// 请求参数有误 直接返回响应
 			zap.L().Error("ValidEmail with invalid param", zap.Error(err))
 			// 判断err是不是validator.ValidationErrors类型
@@ -345,14 +345,14 @@ func ValidEmailHandler() gin.HandlerFunc {
 			return
 		}
 
-		// 从上下文中获取用户信息
-		u, ok := ctx.Get(middlewares.CtxUserKey)
-		if !ok {
+		// 从上下文中获取用户信息（由JWT中间件注入）
+		u, err := ctl.GetUserInfo(ctx.Request.Context())
+		if err != nil || u == nil {
 			e.ResponseError(ctx, e.CodeNeedLogin)
 			return
 		}
-		user := u.(*types.User)
-		p.UserName = user.UserName
+		p.UserID = u.UserId
+		p.UserName = u.UserName
 
 		// 验证邮箱验证码
 		l := service.GetUserSrv()
