@@ -17,6 +17,9 @@ static/
 .DS_Store
 .idea
 tmp
+runtime/
+docs/swagger.json
+docs/swagger.yaml
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
