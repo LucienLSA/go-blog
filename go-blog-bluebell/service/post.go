@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"sync"
 
 	"github.com/LucienLSA/go-blog/pkg/ctl"
@@ -120,36 +121,30 @@ func (s *PostSrv) GetPostList(ctx context.Context, pageNum, pageSize int64) (pos
 }
 
 // 查询帖子详情业务
-func (s *PostSrv) GetPostDetailList(ctx context.Context, req *types.PostIdReq) (data *types.PostListResp, err error) {
+func (s *PostSrv) GetPostDetailList(ctx context.Context, pid int64) (data *types.PostListResp, err error) {
 	// 查询数据库，找到post_id的信息 并返回
 	// 查询并组合接口需要的数据
 	postDao := mysql.NewPostDao(ctx)
-	post, err := postDao.GetPostDetailList(req.PostID)
-	if err != nil {
-		zap.L().Error("mysql GetPostDetailList failed",
-			zap.Int64("pid", req.PostID),
-			zap.Error(err))
-		return
+	post, err := postDao.GetPostDetailList(pid)
+	if err != nil || post == nil {
+		zap.L().Error("mysql GetPostDetailList failed", zap.Int64("pid", pid), zap.Error(err))
+		return nil, errors.New("帖子不存在")
 	}
 	// fmt.Println(post)
 	// fmt.Println(post.AuthorID)
 	// 根据作者id 查询作者信息
 	userDao := mysql.NewUserDao(ctx)
 	user, err := userDao.GetUserByID(post.AuthorID)
-	if err != nil {
-		zap.L().Error("mysql GetUserByID failed",
-			zap.Int64("author_id", post.AuthorID),
-			zap.Error(err))
-		return
+	if err != nil || user == nil {
+		zap.L().Error("mysql GetUserByID failed", zap.Int64("author_id", post.AuthorID), zap.Error(err))
+		return nil, errors.New("作者不存在")
 	}
 	// 根据社区id 查询社区详情信息
 	communityDao := mysql.NewCommunityDao(ctx)
 	communityDetail, err := communityDao.GetCommunityDetailList(post.CommunityID)
-	if err != nil {
-		zap.L().Error("mysql GetCommunityDetailList failed",
-			zap.Int64("community_id", post.CommunityID),
-			zap.Error(err))
-		return
+	if err != nil || communityDetail == nil {
+		zap.L().Error("mysql GetCommunityDetailList failed", zap.Int64("community_id", post.CommunityID), zap.Error(err))
+		return nil, errors.New("社区不存在")
 	}
 
 	data = &types.PostListResp{

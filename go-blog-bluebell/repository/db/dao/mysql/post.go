@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"strings"
 
-	"github.com/LucienLSA/go-blog/pkg/e"
 	"github.com/LucienLSA/go-blog/repository/db/models"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -53,7 +52,7 @@ func (dao *PostDao) GetPostList(pageNum, pageSize int64) (posts []*models.Post, 
 	// }
 	offset := (pageNum - 1) * pageSize
 	err = dao.DB.Model(&models.Post{}).
-		Order("update_time DESC").Offset(int(offset)).Limit(int(pageSize)).Find(&posts).Error
+		Order("updated_at DESC").Offset(int(offset)).Limit(int(pageSize)).Find(&posts).Error
 	if err == sql.ErrNoRows {
 		zap.L().Warn("there is no post in database")
 		return nil, err
@@ -63,21 +62,13 @@ func (dao *PostDao) GetPostList(pageNum, pageSize int64) (posts []*models.Post, 
 
 // 根据帖子id查询单个分类帖子详情
 func (dao *PostDao) GetPostDetailList(pid int64) (post *models.Post, err error) {
-	// post = new(models.Post)
-	// // fmt.Println(pid)
-	// sqlStr := `select post_id, author_id, community_id, title
-	// , content, status, create_time, update_time
-	// from post where post_id = ?`
-	// if err = db.Get(post, sqlStr, pid); err != nil {
-	// 	if err == sql.ErrNoRows {
-	// 		zap.L().Warn("This post_id is not existing in database")
-	// 		err = e.ErrorInvalidID
-	// 	}
-	// }
-	err = dao.DB.Model(&models.Post{}).Where("post_id", post.PostID).First(&post).Error
-	if err == sql.ErrNoRows {
-		zap.L().Warn("This post_id is not existing in database")
-		err = e.ErrorInvalidID
+	post = new(models.Post)
+	err = dao.DB.Model(&models.Post{}).Where("post_id=?", pid).First(post).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
 	}
 	return post, nil
 }

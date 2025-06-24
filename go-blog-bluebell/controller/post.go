@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"strconv"
+
 	"github.com/LucienLSA/go-blog/pkg/e"
 	"github.com/LucienLSA/go-blog/pkg/translator"
 	"github.com/LucienLSA/go-blog/service"
@@ -13,13 +15,14 @@ import (
 
 // CreatePostHandler 发布帖子
 // @Summary 发布帖子
-// @Description 发布帖子
+// @Description 用户发布新帖子
 // @Tags 帖子接口
-// @Accept application/json
-// @Produce application/json
-// @Param Authorization header string false "Bearer 用户令牌"
-// @Param object body models.ParamPostCreate false "请求参数"
-// @Security ApiKeyAuth
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer 用户令牌"
+// @Param data body types.PostCreateReq true "帖子内容"
+// @Success 200 {object} _ResponseSuccess
+// @Failure 400 {object} _ResponseError
 // @Router /posts/post [post]
 // 发布帖子
 func CreatePostHandler() gin.HandlerFunc {
@@ -43,7 +46,7 @@ func CreatePostHandler() gin.HandlerFunc {
 		}
 		// 2. 创建帖子
 		l := service.GetPostSrv()
-		if err := l.CreatePost(c, &req); err != nil {
+		if err := l.CreatePost(c.Request.Context(), &req); err != nil {
 			zap.L().Error("server CreatePost failed", zap.Error(err))
 			e.ResponseError(c, e.CodeServerBusy)
 			return
@@ -53,14 +56,14 @@ func CreatePostHandler() gin.HandlerFunc {
 	}
 }
 
-// GetPostListHandler 获取帖子列表分页展示
-// @Summary 获取帖子列表分页展示接口
-// @Description 根据分页参数获取帖子列表分页展示
+// GetPostListHandler 获取帖子列表分页
+// @Summary 获取帖子列表分页
+// @Description 分页获取帖子列表
 // @Tags 帖子接口
-// @Accept application/json
-// @Produce application/json
-// @Param Authorization header string false "Bearer 用户令牌"
-// @Param object query models.ParamPostSearch false "请求参数"
+// @Accept json
+// @Produce json
+// @Param page_num query int false "页码"
+// @Param page_size query int false "每页数量"
 // @Success 200 {object} _ResponsePostList
 // @Router /posts/show [get]
 // 获取帖子列表分页展示
@@ -95,39 +98,37 @@ func GetPostListHandler() gin.HandlerFunc {
 	}
 }
 
-// GetPostDetailHandler 获取帖子分类详情
-// @Summary 获取帖子分类详情接口
-// @Description 根据帖子id获取帖子分类详情接口
+// GetPostDetailHandler 获取帖子详情
+// @Summary 获取帖子详情
+// @Description 根据帖子ID获取详情
 // @Tags 帖子接口
-// @Accept application/json
-// @Produce application/json
-// @Param Authorization header string false "Bearer 用户令牌"
-// @Param post_id path models.ParamPostId true "帖子ID"
-// @Security ApiKeyAuth
-// @Success 200 {object} _ResponsePostList
+// @Accept json
+// @Produce json
+// @Param post_id path int true "帖子ID"
+// @Success 200 {object} _ResponsePostDetail
 // @Router /posts/{post_id} [get]
 // 获取帖子分类详情
 func GetPostDetailHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var req types.PostIdReq
+		// var req types.PostIdReq
 		// 1. 获取帖子ID
-		// pIdStr := c.Param("post_id")
+		pIdStr := c.Param("post_id")
 		// 获取URL参数 并将其字符串参数转化为int64类型
-		// postID, err := strconv.ParseInt(pIdStr, 10, 64)
-		// if err != nil {
-		// 	zap.L().Error("get post detail with invalid param", zap.Error(err))
-		// 	e.ResponseError(c, e.CodeInvalidParam)
-		// 	return
-		// }
-		if err := c.ShouldBind(&req); err != nil {
-			zap.L().Error("GetPostList with invalid params", zap.Error(err))
-			// 不轻易将服务端报错暴露给外面
+		postID, err := strconv.ParseInt(pIdStr, 10, 64)
+		if err != nil {
+			zap.L().Error("get post detail with invalid param", zap.Error(err))
 			e.ResponseError(c, e.CodeInvalidParam)
 			return
 		}
+		// if err := c.ShouldBind(&req); err != nil {
+		// 	zap.L().Error("GetPostList with invalid params", zap.Error(err))
+		// 	// 不轻易将服务端报错暴露给外面
+		// 	e.ResponseError(c, e.CodeInvalidParam)
+		// 	return
+		// }
 		// 2. 调用服务层获取帖子详情
 		l := service.GetPostSrv()
-		dataList, err := l.GetPostDetailList(c, &req)
+		dataList, err := l.GetPostDetailList(c, postID)
 		// fmt.Println(dataList.Post.CreateTime, dataList.Post.UpdateTime)
 		// 3. 返回错误和数据
 		if err != nil {
@@ -139,15 +140,16 @@ func GetPostDetailHandler() gin.HandlerFunc {
 	}
 }
 
-// SearchPostListHandler 升级版帖子列表接口
-// @Summary 升级版帖子列表接口
-// @Description 可按社区按时间或分数排序查询帖子列表接口
+// SearchPostListHandler 搜索/排序帖子列表
+// @Summary 搜索/排序帖子列表
+// @Description 可按社区、时间、分数排序查询帖子
 // @Tags 帖子接口
-// @Accept application/json
-// @Produce application/json
-// @Param Authorization header string false "Bearer 用户令牌"
-// @Param object query types.PostListReq false "查询参数"
-// @Security ApiKeyAuth
+// @Accept json
+// @Produce json
+// @Param page_num query int false "页码"
+// @Param page_size query int false "每页数量"
+// @Param order query string false "排序方式(time/score)"
+// @Param community_id query int false "社区ID"
 // @Success 200 {object} _ResponsePostList
 // @Router /posts/search [get]
 // 新版查询帖子，根据前端传来的参数动态获取帖子列表
@@ -162,14 +164,13 @@ func SearchPostListHandler() gin.HandlerFunc {
 		// 获取分页参数
 		// c.ShouldBind() //根据请求数据类型选择相应的方法获取数据
 		// 初始化结构体传入初始参数
-		var req types.PostListReq
-		req = types.PostListReq{
+		req := types.PostListReq{
 			PageNum:  settings.Conf.AppConfig.PageNum,
 			PageSize: settings.Conf.AppConfig.PageSize,
 			Order:    types.OrderTime,
 			// CommunityID不初始化，根据有无查询的业务不一样
 		}
-		if err := c.ShouldBindQuery(&req); err != nil {
+		if err := c.ShouldBind(&req); err != nil {
 			zap.L().Error("SearchPostListHandler failed with invalid params", zap.Error(err))
 			e.ResponseError(c, e.CodeInvalidParam)
 			return

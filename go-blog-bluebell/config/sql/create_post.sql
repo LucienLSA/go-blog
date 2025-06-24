@@ -21,18 +21,15 @@ create index idx_author_id
 create index idx_community_id
     on post (community_id);
 
--- INSERT INTO bluebell.post (id, post_id, title, content, author_id, community_id, status, create_time, update_time) VALUES (1, 14283784123846656, '学习使我快乐', '只有学习才能变得更强', 28018727488323585, 1, 1, '2020-08-09 09:58:39', '2020-08-09 09:58:39');
--- INSERT INTO bluebell.post (id, post_id, title, content, author_id, community_id, status, create_time, update_time) VALUES (2, 14373128436191232, 'CSGO开箱子好上瘾', '花了钱不出金，我好气啊', 28018727488323585, 2, 1, '2020-08-09 15:53:40', '2020-08-09 15:53:40');
--- INSERT INTO bluebell.post (id, post_id, title, content, author_id, community_id, status, create_time, update_time) VALUES (3, 14373246019309568, 'IG牛逼', '打得好啊。。。', 28018727488323585, 3, 1, '2020-08-09 15:54:08', '2020-08-09 15:54:08');
--- INSERT INTO bluebell.post (id, post_id, title, content, author_id, community_id, status, create_time, update_time) VALUES (4, 19432670719119360, '投票功能真好玩', '12345', 28018727488323585, 2, 1, '2020-08-23 14:58:29', '2020-08-23 14:58:29');
--- INSERT INTO bluebell.post (id, post_id, title, content, author_id, community_id, status, create_time, update_time) VALUES (5, 19433711036534784, '投票功能真好玩2', '12345', 28018727488323585, 2, 1, '2020-08-23 15:02:37', '2020-08-23 15:02:37');
--- INSERT INTO bluebell.post (id, post_id, title, content, author_id, community_id, status, create_time, update_time) VALUES (6, 19434165682311168, '投票功能真好玩2', '12345', 28018727488323585, 2, 1, '2020-08-23 15:04:26', '2020-08-23 15:04:26');
--- INSERT INTO bluebell.post (id, post_id, title, content, author_id, community_id, status, create_time, update_time) VALUES (7, 21810561880690688, '看图说话', '4321', 28018727488323585, 2, 1, '2020-08-30 04:27:23', '2020-08-30 04:27:23');
--- INSERT INTO bluebell.post (id, post_id, title, content, author_id, community_id, status, create_time, update_time) VALUES (8, 21810685746876416, '永远不要高估自己', '做个普通人也挺难', 28018727488323585, 3, 1, '2020-08-30 04:27:52', '2020-08-30 04:27:52');
--- INSERT INTO bluebell.post (id, post_id, title, content, author_id, community_id, status, create_time, update_time) VALUES (9, 21810865955147776, '你知道泛型是什么吗？', '不知道泛型是什么却一直在问泛型什么时候出', 28018727488323585, 1, 1, '2020-08-30 04:28:35', '2020-08-30 04:28:35');
--- INSERT INTO bluebell.post (id, post_id, title, content, author_id, community_id, status, create_time, update_time) VALUES (10, 21810938202034176, '国庆假期哪里玩？', '走遍四海，还是威海。', 28018727488323585, 1, 1, '2020-08-30 04:28:52', '2020-08-30 04:28:52');
--- INSERT INTO bluebell.post (id, post_id, title, content, author_id, community_id, status, create_time, update_time) VALUES (11, 1, 'test', 'just for test', 1, 1, 1, '2020-09-12 14:03:18', '2020-09-12 14:03:18');
--- INSERT INTO bluebell.post (id, post_id, title, content, author_id, community_id, status, create_time, update_time) VALUES (12, 92636388033302528, 'test', 'just a test', 1, 1, 1, '2020-09-12 15:03:56', '2020-09-12 15:03:56');
--- INSERT INTO bluebell.post (id, post_id, title, content, author_id, community_id, status, create_time, update_time) VALUES (13, 92636388142354432, 'test', 'just a test', 1, 1, 1, '2020-09-12 15:03:56', '2020-09-12 15:03:56');
--- INSERT INTO bluebell.post (id, post_id, title, content, author_id, community_id, status, create_time, update_time) VALUES (15, 123, 'test', 'just a test', 1, 1, 1, '2020-09-13 03:31:50', '2020-09-13 03:31:50');
--- INSERT INTO bluebell.post (id, post_id, title, content, author_id, community_id, status, create_time, update_time) VALUES (16, 10, 'test', 'just a test', 123, 1, 1, '2020-09-13 04:12:44', '2020-09-13 04:12:44');
+INSERT INTO bluebell_v2.post
+(created_at, updated_at, deleted_at, status, post_id, community_id, author_id, title, content) VALUES
+('2020-08-09 09:58:39', '2020-08-09 09:58:39', NULL, 1, 14283784123846656, 1, 28018727488323585, '学习使我快乐', '只有学习才能变得更强'),
+('2020-08-09 15:53:40', '2020-08-09 15:53:40', NULL, 1, 14373128436191232, 2, 28018727488323585, 'CSGO开箱子好上瘾', '花了钱不出金，我好气啊'),
+('2020-08-09 15:54:08', '2020-08-09 15:54:08', NULL, 1, 14373246019309568, 3, 28018727488323585, 'IG牛逼', '打得好啊。。。'),
+('2020-08-23 14:58:29', '2020-08-23 14:58:29', NULL, 1, 19432670719119360, 2, 28018727488323585, '投票功能真好玩', '12345'),
+('2020-08-23 15:02:37', '2020-08-23 15:02:37', NULL, 1, 19433711036534784, 2, 28018727488323585, '投票功能真好玩2', '12345'),
+('2020-08-23 15:04:26', '2020-08-23 15:04:26', NULL, 1, 19434165682311168, 2, 28018727488323585, '投票功能真好玩2', '12345'),
+('2020-08-30 04:27:23', '2020-08-30 04:27:23', NULL, 1, 21810561880690688, 2, 28018727488323585, '看图说话', '4321'),
+('2020-08-30 04:27:52', '2020-08-30 04:27:52', NULL, 1, 21810685746876416, 3, 28018727488323585, '永远不要高估自己', '做个普通人也挺难'),
+('2020-08-30 04:28:35', '2020-08-30 04:28:35', NULL, 1, 21810865955147776, 1, 28018727488323585, '你知道泛型是什么吗？', '不知道泛型是什么却一直在问泛型什么时候出'),
+('2020-08-30 04:28:52', '2020-08-30 04:28:52', NULL, 1, 21810938202034176, 1, 28018727488323585, '国庆假期哪里玩？', '走遍四海，还是威海。');

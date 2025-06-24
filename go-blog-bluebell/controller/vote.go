@@ -11,16 +11,17 @@ import (
 	"go.uber.org/zap"
 )
 
-// LoginHandler 用户投票
-// @Summary 用户投票接口
-// @Description 根据帖子id进行投票
-// @Tags 用户接口
-// @Accept application/json
-// @Produce application/json
-// @Param Authorization header string false "Bearer 用户令牌"
-// @Param object body models.ParamVoteData true "用户投票"
+// PostVoteHandler 用户投票
+// @Summary 用户投票
+// @Description 用户对帖子进行投票（点赞/点踩）
+// @Tags 帖子接口
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer 用户令牌"
+// @Param data body types.PostVoteDataReq true "投票参数"
+// @Success 200 {object} _ResponseSuccess
+// @Failure 400 {object} _ResponseError
 // @Router /posts/vote [post]
-// 用户投票
 func PostVoteHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 参数校验
@@ -49,7 +50,7 @@ func PostVoteHandler() gin.HandlerFunc {
 		// 将其转化格式，userID和PostID int64转化为string, Kind int8转化为float64
 
 		l := service.GetVoteSrv()
-		if err := l.PostVote(c, &req); err != nil {
+		if err := l.PostVote(c.Request.Context(), &req); err != nil {
 			zap.L().Error("service.PostVote failed", zap.Error(err))
 			e.ResponseError(c, e.CodeServerBusy)
 			return

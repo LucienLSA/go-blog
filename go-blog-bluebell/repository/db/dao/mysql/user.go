@@ -141,13 +141,15 @@ func (dao *UserDao) UpdateUserEmail(uId int64, user *models.User) (err error) {
 
 // 根据作者/用户id获取用户id和用户名
 func (dao *UserDao) GetUserByID(uId int64) (user *models.User, err error) {
-	// user = new(models.User)
-	// sqlStr := `select user_id, username from user where user_id = ?`
-	// err = db.Get(user, sqlStr, uId)
-	err = dao.DB.Model(&models.User{}).Where("user_id=?", uId).
-		First(&user).Error
-	return
-
+	user = new(models.User)
+	err = dao.DB.Model(&models.User{}).Where("user_id=?", uId).First(user).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 // 根据作者/用户邮箱获取用户id和用户名

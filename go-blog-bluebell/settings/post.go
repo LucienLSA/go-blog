@@ -1,3 +1,3 @@
 package settings
 
-const POST_STATUS_ON = 0
+const POST_STATUS_ON = 1

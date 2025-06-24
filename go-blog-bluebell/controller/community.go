@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"strconv"
+
 	"github.com/LucienLSA/go-blog/pkg/e"
 	"github.com/LucienLSA/go-blog/service"
 	"github.com/LucienLSA/go-blog/types"
@@ -8,7 +10,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// CommunityHandler 查询社区信息
+// CommunityListHandler 查询社区信息
 // @Summary 查询社区信息接口
 // @Description 查询社区信息返回列表
 // @Tags 社区接口
@@ -39,37 +41,37 @@ func CommunityListHandler() gin.HandlerFunc {
 	}
 }
 
-// CommunityHandler 查询社区分类详情信息
+// CommunityDetailHandler 查询社区分类详情信息
 // @Summary 查询社区分类详情信息接口
 // @Description 查询社区分类详情信息返回列表
 // @Tags 社区接口
 // @Accept application/json
 // @Produce application/json
-// @Param community_id path models.ParamCommunityId true "社区ID"
-// @Success 200 {object} _ResponseCommunityDetailList
+// @Param community_id path int true "社区ID"
+// @Success 200 {object} _ResponseCommunityDetail
 // @Router /community/show/{community_id} [get]
 // 社区分类详细请求
 func CommunityDetailHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var req types.CommunityIdReq
+		// var req types.CommunityIdReq
 		// 1. 获取社区ID
-		// cidStr := c.Param("community_id")
-		if err := c.ShouldBind(&req); err != nil {
-			zap.L().Error("CommunityId with invalid params", zap.Error(err))
-			// 不轻易将服务端报错暴露给外面
-			e.ResponseError(c, e.CodeServerBusy)
-			return
-		}
-		// 获取URL参数 并将其字符串参数转化为int64类型
-		// communityID, err := strconv.ParseInt(cid, 10, 64)
-		// if err != nil {
-		// 	zap.L().Error("get community detail with invalid param", zap.Error(err))
-		// 	response.ResponseError(c, response.CodeInvalidParam)
+		cidStr := c.Param("community_id")
+		// if err := c.ShouldBind(&req); err != nil {
+		// 	zap.L().Error("CommunityId with invalid params", zap.Error(err))
+		// 	// 不轻易将服务端报错暴露给外面
+		// 	e.ResponseError(c, e.CodeServerBusy)
 		// 	return
 		// }
+		// 获取URL参数 并将其字符串参数转化为int64类型
+		communityID, err := strconv.ParseInt(cidStr, 10, 64)
+		if err != nil {
+			zap.L().Error("get community detail with invalid param", zap.Error(err))
+			e.ResponseError(c, e.CodeInvalidParam)
+			return
+		}
 		// 2. 调用服务层获取详情
 		l := service.GetCommunitySrv()
-		dataList, err := l.GetCommunityDetailList(c.Request.Context(), &req)
+		dataList, err := l.GetCommunityDetailList(c.Request.Context(), communityID)
 		// 3. 返回错误和数据
 		if err != nil {
 			zap.L().Error("service GetCommunityDetailList failed", zap.Error(err))
@@ -86,7 +88,7 @@ func CommunityDetailHandler() gin.HandlerFunc {
 // @Tags 社区接口
 // @Accept application/json
 // @Produce application/json
-// @Success 200 {object}
+// @Success 200 {object} _ResponseSuccess
 // @Router /community/create [post]
 // 创建社区
 func CreateCommunityHandler() gin.HandlerFunc {

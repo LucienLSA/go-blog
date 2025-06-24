@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"strconv"
 	"sync"
 
@@ -34,8 +35,10 @@ func ResetVoteSrv() {
 
 // PostVote 为帖子投票
 func (s *VoteSrv) PostVote(ctx context.Context, req *types.PostVoteDataReq) (err error) {
-	// uid, err := ctl.GetLoginUserID(ctx)
 	u, err := ctl.GetUserInfo(ctx)
+	if err != nil || u == nil {
+		return errors.New("用户未登录")
+	}
 	uid := u.UserId
 	zap.L().Debug("PostVote", zap.Int64("userID", uid),
 		zap.Int64("PostID", req.PostID),

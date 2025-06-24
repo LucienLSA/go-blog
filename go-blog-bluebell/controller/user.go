@@ -15,12 +15,13 @@ import (
 )
 
 // SignUpHandler 用户注册
-// @Summary 用户注册接口
-// @Description 根据用户所填信息进行注册
+// @Summary 用户注册
+// @Description 用户注册
 // @Tags 用户接口
-// @Accept application/json
-// @Produce application/json
-// @Param object body models.ParamSignUp true "用户注册"
+// @Accept json
+// @Produce json
+// @Param data body types.UserSignUpReq true "注册信息"
+// @Success 200 {object} _ResponseUserLogin
 // @Router /user/signup [post]
 // 注册请求
 func SignUpHandler() gin.HandlerFunc {
@@ -90,12 +91,12 @@ func SignUpHandler() gin.HandlerFunc {
 }
 
 // LoginHandler 用户登录
-// @Summary 用户登录接口
-// @Description 根据所填用户名和密码进行登录
+// @Summary 用户登录
+// @Description 用户名密码登录
 // @Tags 用户接口
-// @Accept application/json
-// @Produce application/json
-// @Param object body models.ParamLogin true "用户登录"
+// @Accept json
+// @Produce json
+// @Param data body types.UserLoginReq true "登录信息"
 // @Success 200 {object} _ResponseUserLogin
 // @Router /user/login [post]
 // 登录请求
@@ -139,6 +140,14 @@ func LoginHandler() gin.HandlerFunc {
 }
 
 // SendEmailCodeHandler 用户登录时给邮箱发送验证码
+// @Summary 发送登录验证码
+// @Description 发送用于登录的邮箱验证码
+// @Tags 用户接口
+// @Accept json
+// @Produce json
+// @Param data body types.UserSendEmailCodeReq true "邮箱信息"
+// @Success 200 {object} _ResponseSuccess
+// @Router /user/email/login [post]
 func SendEmailCodeHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// 1. 获取参数和参数校验
@@ -169,6 +178,14 @@ func SendEmailCodeHandler() gin.HandlerFunc {
 }
 
 // LoginEmailHandler 用户邮箱验证码登录
+// @Summary 邮箱登录
+// @Description 使用邮箱和验证码登录
+// @Tags 用户接口
+// @Accept json
+// @Produce json
+// @Param data body types.UserLoginEmailReq true "邮箱登录信息"
+// @Success 200 {object} _ResponseUserLogin
+// @Router /user/email/login [post]
 func LoginEmailHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// 1. 获取参数和参数校验
@@ -208,6 +225,15 @@ func LoginEmailHandler() gin.HandlerFunc {
 }
 
 // UpdateHandler 用户信息更新
+// @Summary 更新用户信息
+// @Description 更新当前登录用户的信息
+// @Tags 用户接口
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer 用户令牌"
+// @Param data body types.UserUpdateReq true "更新信息"
+// @Success 200 {object} _ResponseSuccess
+// @Router /user/update [put]
 func UpdateHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 1. 获取参数和参数校验
@@ -255,7 +281,16 @@ func UpdateHandler() gin.HandlerFunc {
 	}
 }
 
-// 用户头像上传
+// UploadAvatarHandler 用户头像上传
+// @Summary 上传头像
+// @Description 为当前登录用户上传头像
+// @Tags 用户接口
+// @Accept multipart/form-data
+// @Produce json
+// @Param Authorization header string true "Bearer 用户令牌"
+// @Param file formData file true "头像文件"
+// @Success 200 {object} _ResponseSuccess
+// @Router /user/avatar [post]
 func UploadAvatarHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 1. 获取上传的文件参数
@@ -295,6 +330,15 @@ func UploadAvatarHandler() gin.HandlerFunc {
 }
 
 // SendEmailHandler 发送邮箱验证码及信息
+// @Summary 发送绑定/解绑邮箱验证码
+// @Description 发送用于绑定或解绑邮箱的验证码
+// @Tags 用户接口
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer 用户令牌"
+// @Param data body types.UserSendEmailReq true "操作信息"
+// @Success 200 {object} _ResponseSuccess
+// @Router /user/email/send [post]
 func SendEmailHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req types.UserSendEmailReq
@@ -327,7 +371,16 @@ func SendEmailHandler() gin.HandlerFunc {
 	}
 }
 
-// ValidEmailHandler用户验证邮箱
+// ValidEmailHandler 用户验证邮箱
+// @Summary 验证邮箱
+// @Description 验证邮箱验证码以完成绑定或解绑
+// @Tags 用户接口
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer 用户令牌"
+// @Param data body types.UserVaildEmail true "验证信息"
+// @Success 200 {object} _ResponseSuccess
+// @Router /user/email/valid [post]
 func ValidEmailHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var p types.UserVaildEmail
