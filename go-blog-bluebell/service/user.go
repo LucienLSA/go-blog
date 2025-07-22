@@ -112,7 +112,7 @@ func (s *UserSrv) UserSignUp(ctx context.Context, req *types.UserSignUpReq) (err
 }
 
 // 登录业务
-func (s *UserSrv) UserLogin(ctx context.Context, req *types.UserLoginReq) (resp interface{}, err error) {
+func (s *UserSrv) UserLogin(ctx context.Context, ip string, req *types.UserLoginReq) (resp interface{}, err error) {
 	userDao := mysql.NewUserDao(ctx)
 	user, exist, err := userDao.CheckUserExist(req.UserName)
 	if err != nil {
@@ -135,7 +135,7 @@ func (s *UserSrv) UserLogin(ctx context.Context, req *types.UserLoginReq) (resp 
 	}
 	user.Token = token
 	// 保存到redis中
-	if err = redisCache.StorgeUserIdToken(token, user.UserName); err != nil {
+	if err = redisCache.StorgeUserIdToken(token, user.UserName, ip); err != nil {
 		zap.L().Error("redisCache.StorgeUserIdToken failed", zap.Error(err))
 	}
 	resp = &types.UserLoginResp{
@@ -197,7 +197,7 @@ func (s *UserSrv) SendEmailCode(ctx context.Context, req *types.UserSendEmailCod
 }
 
 // 用户邮箱验证码登录业务
-func (s *UserSrv) LoginEmail(ctx context.Context, req *types.UserLoginEmailReq) (user *models.User, err error) {
+func (s *UserSrv) LoginEmail(ctx context.Context, ip string, req *types.UserLoginEmailReq) (user *models.User, err error) {
 	userDao := mysql.NewUserDao(ctx)
 	// 从数据库中获取用户信息（用户名和id）
 	user, err = userDao.GetUserByEmail(req.UserEmail)
@@ -227,7 +227,7 @@ func (s *UserSrv) LoginEmail(ctx context.Context, req *types.UserLoginEmailReq) 
 	}
 	user.Token = token
 	// 保存到redis中
-	if err = redisCache.StorgeUserIdToken(token, userInfo.Email); err != nil {
+	if err = redisCache.StorgeUserIdToken(token, userInfo.Email, ip); err != nil {
 		zap.L().Error("redisCache.StorgeUserIdToken failed", zap.Error(err))
 	}
 	return

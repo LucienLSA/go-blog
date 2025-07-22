@@ -55,7 +55,7 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			c.Abort()
 			return
 		}
-		// 从redis中获取token 并比较判断当前登录解析得到的token
+		// 从redis中获取token 并判断当前登录解析得到的token
 		token, err := redisCache.GetJwtToken(mc.Username)
 		// token不存在 需要重新登录
 		if err == redisCache.ErrNotExistToken {

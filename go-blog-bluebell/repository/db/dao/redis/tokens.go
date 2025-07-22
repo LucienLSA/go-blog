@@ -15,10 +15,10 @@ var (
 )
 
 // Tokens存入redis
-func StorgeUserIdToken(token, username string) (err error) {
+func StorgeUserIdToken(token, username, ip string) (err error) {
 	// 获取token的存活实践
 	duration := time.Duration(settings.Conf.AppConfig.JwtExpireTime * time.Hour)
-	key := GetRedisKey(KeyUserIDTokenSetPrefix)
+	key := GetRedisKey(KeyUserIDTokenSetPrefix) + ip
 	// 存入redis
 	if err = rdb.Set(rctx, key+username, token, duration).Err(); err != nil {
 		zap.L().Error("Insert username, token into redis failed, err:%v", zap.Error(err))

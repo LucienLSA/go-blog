@@ -118,8 +118,9 @@ func LoginHandler() gin.HandlerFunc {
 			return
 		}
 		// 2. 业务处理
+		ip := c.RemoteIP()
 		l := service.GetUserSrv()
-		user, err := l.UserLogin(c.Request.Context(), &req)
+		user, err := l.UserLogin(c.Request.Context(), ip, &req)
 		if err != nil {
 			zap.L().Error("service login failed", zap.String("username", req.UserName), zap.Error(err))
 			if errors.Is(err, e.ErrorUserNotExist) {
@@ -205,7 +206,8 @@ func LoginEmailHandler() gin.HandlerFunc {
 		}
 		// 2. 业务处理
 		l := service.GetUserSrv()
-		user, err := l.LoginEmail(ctx.Request.Context(), &req)
+		ip := ctx.RemoteIP()
+		user, err := l.LoginEmail(ctx.Request.Context(), ip, &req)
 		if err != nil {
 			zap.L().Error("service login failed", zap.String("UserEmail", req.UserEmail), zap.Error(err))
 			if errors.Is(err, e.ErrorEmailNotExit) {
