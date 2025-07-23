@@ -30,8 +30,8 @@ func StorgeUserIdToken(token, username, ip string) (err error) {
 }
 
 // 从redis取token
-func GetJwtToken(username string) (token string, err error) {
-	key := GetRedisKey(KeyUserIDTokenSetPrefix)
+func GetJwtToken(username string, ip string) (token string, err error) {
+	key := GetRedisKey(KeyUserIDTokenSetPrefix) + ip
 	token, err = rdb.Get(rctx, key+username).Result()
 	if err == redis.Nil {
 		return "", ErrNotExistToken

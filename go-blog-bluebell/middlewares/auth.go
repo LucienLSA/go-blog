@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/LucienLSA/go-blog/pkg/ctl"
@@ -56,19 +57,31 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			return
 		}
 		// 从redis中获取token 并判断当前登录解析得到的token
-		token, err := redisCache.GetJwtToken(mc.Username)
-		// token不存在 需要重新登录
-		if err == redisCache.ErrNotExistToken {
-			e.ResponseError(c, e.CodeNeedLogin)
-			c.Abort()
-			return
+		token, err := redisCache.GetJwtToken(mc.Username, c.RemoteIP())
+		// key不存在说明未登录 或者header中的token和redis中的token不一样 说明存在同一ip下同一用户有多次登录
+		if err != nil || parts[1] != token {
+			if err != nil {
+				zap.L().Error("GetJwtToken failed", zap.Error(errors.New("无效的Token")))
+				e.ResponseError(c, e.CodeNeedLogin)
+				c.Abort()
+				return
+			} else {
+				zap.L().Info(fmt.Sprintf("用户:[%d] IP:[%s] 同一时间登录多次", mc.UserID, c.RemoteIP()))
+				e.ResponseError(c, e.CodeLimitLogin)
+				c.Abort()
+				return
+			}
 		}
+		// // token不存在 需要重新登录
+		// if err == redisCache.ErrNotExistToken {
+
+		// }
 		// 	如果不一致，则说明在另一端登录
-		if parts[1] != token {
-			e.ResponseError(c, e.CodeLimitLogin)
-			c.Abort()
-			return
-		}
+		// if parts[1] != token {
+		// 	e.ResponseError(c, e.CodeLimitLogin)
+		// 	c.Abort()
+		// 	return
+		// }
 
 		// // 将用户信息保存到上下文中
 		// user := &types.User{
