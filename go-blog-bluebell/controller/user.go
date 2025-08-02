@@ -3,7 +3,6 @@ package controller
 import (
 	"errors"
 
-	"github.com/LucienLSA/go-blog/pkg/ctl"
 	"github.com/LucienLSA/go-blog/pkg/e"
 	"github.com/LucienLSA/go-blog/pkg/email"
 	"github.com/LucienLSA/go-blog/pkg/translator"
@@ -153,7 +152,7 @@ func SendEmailCodeHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// 1. 获取参数和参数校验
 		var req types.UserSendEmailCodeReq
-		if err := ctx.ShouldBindJSON(&req); err != nil {
+		if err := ctx.ShouldBind(&req); err != nil {
 			// 请求参数有误 直接返回响应
 			zap.L().Error("send email code with invalid param", zap.Error(err))
 			// 判断err是不是validator.ValidationErrors类型
@@ -296,20 +295,48 @@ func UpdateHandler() gin.HandlerFunc {
 func UploadAvatarHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 1. 获取上传的文件参数
-		file, fileHeader, _ := c.Request.FormFile("file")
-		if fileHeader == nil {
+		file, fileHeader, err := c.Request.FormFile("file")
+		if err != nil || fileHeader == nil {
 			e.ResponseError(c, e.CodeUploadFile)
-			zap.L().Error("UpLoad file failed")
+			zap.L().Error("UpLoad file failed", zap.Error(err))
 			return
 		}
+
+		// 2. 文件验证
 		fileSize := fileHeader.Size
-		// 2. 用户校验
+		fileName := fileHeader.Filename
+
+		// 验证文件大小 (限制为5MB)
+		const maxFileSize = 5 * 1024 * 1024 // 5MB
+		if fileSize > maxFileSize {
+			e.ResponseError(c, e.CodeFileTooLarge)
+			zap.L().Error("File size too large", zap.Int64("size", fileSize), zap.String("filename", fileName))
+			return
+		}
+
+		// 验证文件类型
+		contentType := fileHeader.Header.Get("Content-Type")
+		allowedTypes := []string{"image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"}
+		isValidType := false
+		for _, allowedType := range allowedTypes {
+			if contentType == allowedType {
+				isValidType = true
+				break
+			}
+		}
+		if !isValidType {
+			e.ResponseError(c, e.CodeInvalidFileType)
+			zap.L().Error("Invalid file type", zap.String("contentType", contentType), zap.String("filename", fileName))
+			return
+		}
+
+		// 3. 用户校验
 		var req types.UserAvatar
 		if err := c.ShouldBind(&req); err == nil {
 			// 获取登录用户的id
 			// claimID, _ := request.GetLoginUserID(c)
 			l := service.GetUserSrv()
-			resp, err := l.UploadAvatar(c.Request.Context(), file, fileSize, &req)
+			resp, err := l.UploadAvatar(c.Request.Context(), file, fileSize, fileName, &req)
 			if err != nil {
 				zap.L().Error("service UploadAvatar failed, err:", zap.Error(err))
 				e.ResponseError(c, e.CodeServerBusy)
@@ -344,7 +371,7 @@ func UploadAvatarHandler() gin.HandlerFunc {
 func SendEmailHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req types.UserSendEmailReq
-		if err := ctx.ShouldBindJSON(&req); err != nil {
+		if err := ctx.ShouldBind(&req); err != nil {
 			// 请求参数有误 直接返回响应
 			zap.L().Error("SendEmail with invalid param", zap.Error(err))
 			// 判断err是不是validator.ValidationErrors类型
@@ -373,51 +400,83 @@ func SendEmailHandler() gin.HandlerFunc {
 	}
 }
 
-// ValidEmailHandler 用户验证邮箱
-// @Summary 验证邮箱
-// @Description 验证邮箱验证码以完成绑定或解绑
+// ValidEmailHandler 用户验证邮箱(绑定或解绑)
+// @Summary 用户验证邮箱
+// @Description 用户验证邮箱(绑定或解绑)
 // @Tags 用户接口
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "Bearer 用户令牌"
-// @Param data body types.UserVaildEmail true "验证信息"
-// @Success 200 {object} _ResponseSuccess
-// @Router /user/email/valid [post]
+// @Param data body types.UserVaildEmail true "验证邮箱信息"
+// @Success 200 {object} _ResponseUserLogin
+// @Router /user/valid_email [post]
 func ValidEmailHandler() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		var p types.UserVaildEmail
-		if err := ctx.ShouldBind(&p); err != nil {
-			// 请求参数有误 直接返回响应
+	return func(c *gin.Context) {
+		// 1. 获取请求参数和参数校验
+		var req types.UserVaildEmail
+		if err := c.ShouldBind(&req); err != nil {
 			zap.L().Error("ValidEmail with invalid param", zap.Error(err))
-			// 判断err是不是validator.ValidationErrors类型
 			errs, ok := err.(validator.ValidationErrors)
 			if !ok {
-				e.ResponseError(ctx, e.CodeInvalidParam)
+				e.ResponseError(c, e.CodeInvalidParam)
 				return
 			}
-			e.ResponseErrorMsg(ctx, e.CodeInvalidParam,
+			e.ResponseErrorMsg(c, e.CodeInvalidParam,
+				translator.RemoveTopStruct(errs.Translate(translator.Trans)))
+			return
+		}
+		// 2. 业务处理
+		l := service.GetUserSrv()
+		if err := l.ValidEmailCode(c.Request.Context(), &req); err != nil {
+			zap.L().Error("service valid email failed", zap.Error(err))
+			if errors.Is(err, e.ErrorEmailExist) {
+				e.ResponseError(c, e.CodeEmailExist)
+				return
+			}
+			e.ResponseError(c, e.CodeServerBusy)
+			return
+		}
+		// 3. 返回响应
+		e.ResponseSuccessData(c, nil)
+	}
+}
+
+// LogoutHandler 用户登出
+// @Summary 用户登出
+// @Description 用户登出，清除token
+// @Tags 用户接口
+// @Accept json
+// @Produce json
+// @Param data body types.UserLogoutReq true "登出信息"
+// @Success 200 {object} _ResponseUserLogin
+// @Router /user/logout [post]
+func LogoutHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// 1. 获取请求参数和参数校验
+		var req types.UserLogoutReq
+		if err := c.ShouldBind(&req); err != nil {
+			zap.L().Error("Logout with invalid param", zap.Error(err))
+			errs, ok := err.(validator.ValidationErrors)
+			if !ok {
+				e.ResponseError(c, e.CodeInvalidParam)
+				return
+			}
+			e.ResponseErrorMsg(c, e.CodeInvalidParam,
 				translator.RemoveTopStruct(errs.Translate(translator.Trans)))
 			return
 		}
 
-		// 从上下文中获取用户信息（由JWT中间件注入）
-		u, err := ctl.GetUserInfo(ctx.Request.Context())
-		if err != nil || u == nil {
-			e.ResponseError(ctx, e.CodeNeedLogin)
-			return
-		}
-		p.UserID = u.UserId
-		p.UserName = u.UserName
+		// 2. 获取客户端IP
+		ip := c.ClientIP()
 
-		// 验证邮箱验证码
+		// 3. 业务处理
 		l := service.GetUserSrv()
-		if err := l.ValidEmailCode(ctx.Request.Context(), &p); err != nil {
-			zap.L().Error("service ValidEmailCode failed", zap.Error(err))
-			e.ResponseErrorMsg(ctx, e.CodeInvalidEmailCode, err.Error())
+		if _, err := l.UserLogout(c.Request.Context(), ip, &req); err != nil {
+			zap.L().Error("service logout failed", zap.Error(err))
+			e.ResponseError(c, e.CodeServerBusy)
 			return
 		}
 
-		// 成功返回
-		e.ResponseSuccessData(ctx, nil)
+		// 4. 返回响应
+		e.ResponseSuccessData(c, nil)
 	}
 }

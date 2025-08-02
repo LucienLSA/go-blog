@@ -57,11 +57,9 @@ type UserSendEmailReq struct {
 
 // 用户验证邮箱(绑定或解绑)
 type UserVaildEmail struct {
-	UserName      string `json:"user_name" binding:"-"` // 禁止自动绑定
-	UserID        int64  `json:"user_id" binding:"-"`   // 禁止自动绑定
-	Email         string `form:"email" json:"email" binding:"required,email"`
-	Code          string `form:"code" json:"code" binding:"required"`
-	OperationType int    `form:"operation_type" json:"operation_type" binding:"required,oneof=1 2"`
+	Email         string `form:"email" json:"email" binding:"required,email"`                       // 用户邮箱
+	Code          string `form:"code" json:"code" binding:"required"`                               // 验证码
+	OperationType int    `form:"operation_type" json:"operation_type" binding:"required,oneof=1 2"` // 操作类型 1-绑定 2-解绑
 }
 
 // 用户发送邮箱登录验证码
@@ -81,4 +79,9 @@ type UserAvatar struct {
 	UserID   int64  `form:"user_id" json:"user_id"`     // 用户ID
 	UserName string `form:"user_name" json:"user_name"` // 用户名称
 	Avatar   string `form:"avatar" json:"avatar"`       // 用户密头像
+}
+
+// 用户登出
+type UserLogoutReq struct {
+	UserName string `json:"user_name" form:"user_name" binding:"required"` // 登出用户名
 }

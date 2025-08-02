@@ -146,6 +146,18 @@ func (s *UserSrv) UserLogin(ctx context.Context, ip string, req *types.UserLogin
 	return
 }
 
+// UserLogout 用户登出
+func (s *UserSrv) UserLogout(ctx context.Context, ip string, req *types.UserLogoutReq) (resp interface{}, err error) {
+	// 从redis中删除用户token
+	if err = redisCache.DeleteUserToken(req.UserName, ip); err != nil {
+		zap.L().Error("redisCache.DeleteUserToken failed", zap.Error(err))
+		return nil, err
+	}
+
+	zap.L().Info("用户登出成功", zap.String("用户名", req.UserName), zap.String("IP", ip))
+	return nil, nil
+}
+
 // 登录发送邮箱验证码业务
 func (s *UserSrv) SendEmailCode(ctx context.Context, req *types.UserSendEmailCodeReq) (err error) {
 	noticeDao := mysql.NewNoticeDao(ctx)
@@ -287,7 +299,8 @@ func (s *UserSrv) Update(ctx context.Context, req *types.UserUpdateReq) (err err
 		updates["user_name"] = req.UserName
 		user.UserName = req.UserName
 	}
-
+	fmt.Println(user)
+	fmt.Println(updates)
 	zap.L().Info("用户信息更新字段", zap.Any("updates", updates))
 	// 保存到数据库
 	err = userDao.UpdateUser(uid, updates)
@@ -299,7 +312,7 @@ func (s *UserSrv) Update(ctx context.Context, req *types.UserUpdateReq) (err err
 }
 
 // 上传用户头像
-func (s *UserSrv) UploadAvatar(ctx context.Context, file multipart.File, fileSize int64, req *types.UserAvatar) (resp interface{}, err error) {
+func (s *UserSrv) UploadAvatar(ctx context.Context, file multipart.File, fileSize int64, fileName string, req *types.UserAvatar) (resp interface{}, err error) {
 	u, err := ctl.GetUserInfo(ctx)
 	if err != nil || u == nil {
 		zap.L().Error("GetUserInfo failed", zap.Error(err))
@@ -310,29 +323,45 @@ func (s *UserSrv) UploadAvatar(ctx context.Context, file multipart.File, fileSiz
 	user, err := userDao.GetUserByID(uid)
 	if err != nil {
 		zap.L().Error("mysql GetUserByID failed", zap.Error(err))
-		return nil, err
+		return nil, errors.New("获取用户信息失败")
 	}
+
+	// 保存旧头像路径，用于失败时恢复
+	oldAvatar := user.Avatar
+
 	// 保存到本地
 	var path string
 	if settings.Conf.AppConfig.UploadModel == settings.UploadModelLocal { // 兼容两种存储方式
-		path, err = upload.UploadAvatarToLocalStatic(file, uid, user.UserName)
+		path, err = upload.UploadAvatarToLocalStatic(file, uid, user.UserName, fileName)
 	} else { //保存到七牛云oss
-		path, err = upload.UploadToQiNiuAvatar(file, user.UserName, fileSize)
+		path, err = upload.UploadToQiNiuAvatar(file, user.UserName, fileSize, fileName)
 	}
 
 	if err != nil {
 		zap.L().Error("upload avatar failed", zap.Error(err))
-		return nil, err
+		return nil, errors.New("头像上传失败")
 	}
+
+	// 更新数据库
 	user.Avatar = path
 	updates := map[string]interface{}{
-		"avatar": path,
+		"avatar": upload.AvatarURL() + path,
 	}
 	err = userDao.UpdateUser(uid, updates)
 	if err != nil {
 		zap.L().Error("mysql UpdateUser failed", zap.Error(err))
-		return nil, err
+		// 数据库更新失败，删除已上传的文件
+		if settings.Conf.AppConfig.UploadModel == settings.UploadModelLocal {
+			upload.DeleteOldAvatar(path)
+		}
+		return nil, errors.New("更新用户头像信息失败")
 	}
+
+	// 数据库更新成功，删除旧头像文件（如果是本地存储）
+	if settings.Conf.AppConfig.UploadModel == settings.UploadModelLocal && oldAvatar != "" && oldAvatar != path {
+		upload.DeleteOldAvatar(oldAvatar)
+	}
+
 	resp = &types.UserAvatar{
 		UserID:   uid,
 		UserName: user.UserName,
@@ -366,14 +395,18 @@ func (s *UserSrv) SendEmail(ctx context.Context, req *types.UserSendEmailReq) (e
 	}
 
 	mailTex := fmt.Sprintf(`
-	  <p>您正在%s邮箱，验证码为：</p>
+	  <p>您正在%s邮箱, 验证码为: </p>
 	  <h2 style=\"color:blue;\">%s</h2>
 	  <p>请在页面输入该验证码完成操作。</p>
 	`, operationText, code)
-	err = email.Send(mailTex, req.Email, settings.Conf.AppConfig.Name, settings.Conf.EmailConfig.SmtpEmail)
-	if err != nil {
-		zap.L().Error("email Send failed", zap.Error(err))
-		return err
+	if settings.Conf.AppConfig.Mode == "pro" {
+		err = email.Send(mailTex, req.Email, settings.Conf.AppConfig.Name, settings.Conf.EmailConfig.SmtpEmail)
+		if err != nil {
+			zap.L().Error("email Send failed", zap.Error(err))
+			return err
+		}
+	} else {
+		return
 	}
 	return
 }
@@ -419,36 +452,48 @@ func (s *UserSrv) ValidEmail(ctx context.Context, token string) (err error) {
 }
 
 // ValidEmailCode 验证邮箱验证码
-func (u *UserSrv) ValidEmailCode(ctx context.Context, p *types.UserVaildEmail) error {
+func (s *UserSrv) ValidEmailCode(ctx context.Context, p *types.UserVaildEmail) error {
+	u, err := ctl.GetUserInfo(ctx)
+	if err != nil || u == nil {
+		zap.L().Error("GetUserInfo failed", zap.Error(err))
+		return errors.New("用户未登录或信息获取失败")
+	}
+	uid := u.UserId
+	// 获取用户信息
+	userDao := mysql.NewUserDao(ctx)
+	user, err := userDao.GetUserByID(uid)
+	if err != nil {
+		zap.L().Error("mysql GetUserByID failed", zap.Error(err))
+		return errors.New("获取用户信息失败")
+	}
+
 	// 验证码校验
 	if err := redisCache.CheckEmailCode(p.Email, p.Code, p.OperationType); err != nil {
 		return err
 	}
 
-	// 获取用户信息
-	userDao := mysql.NewUserDao(ctx)
-	user, exist, err := userDao.CheckUserExist(p.UserName)
-	if err != nil {
-		return err
-	}
-	if !exist {
-		return errors.New("用户不存在")
-	}
-
 	// 如果是绑定操作，检查邮箱是否已被其他用户使用
 	updates := map[string]interface{}{}
 	if p.OperationType == 1 {
-		_, exist, err := userDao.ExistUserEmail(p.Email)
+		// 绑定操作：检查邮箱是否已被其他用户使用
+		existingUser, exist, err := userDao.ExistUserEmail(p.Email)
 		if err != nil {
-			return err
+			zap.L().Error("mysql ExistUserEmail failed", zap.Error(err))
+			return errors.New("检查邮箱状态失败")
 		}
-		if exist {
+		if exist && existingUser.UserID != user.UserID {
 			return errors.New("该邮箱已被其他用户绑定")
 		}
+		// 如果邮箱不存在或被当前用户绑定，允许绑定
 		updates["email"] = p.Email
-	} else {
-		// 解绑操作
+	} else if p.OperationType == 2 {
+		// 解绑操作：验证用户是否拥有该邮箱
+		if user.Email != p.Email {
+			return errors.New("只能解绑自己的邮箱")
+		}
 		updates["email"] = ""
+	} else {
+		return errors.New("无效的操作类型")
 	}
 
 	// 更新用户信息

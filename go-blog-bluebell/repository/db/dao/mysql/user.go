@@ -46,19 +46,20 @@ func (dao *UserDao) CheckUserExist(username string) (user *models.User, exist bo
 
 // 检查指定用户名的邮箱是否存在
 func (dao *UserDao) ExistUserEmail(email string) (user *models.User, exist bool, err error) {
-	// sqlStr := "select count(user_id) from user where email = ?"
 	var count int64
-	// err = db.Get(&count, sqlStr, email)
 	err = dao.DB.Model(&models.User{}).Where("email = ?", email).Count(&count).Error
 	if err != nil {
-		return user, false, err
-	}
-	if count <= 0 {
 		return nil, false, err
 	}
-	err = dao.DB.Model(&models.User{}).Where("email = ?", email).First(&user).Error
+	if count <= 0 {
+		return nil, false, nil
+	}
+
+	// 如果邮箱存在，获取用户信息
+	user = &models.User{}
+	err = dao.DB.Model(&models.User{}).Where("email = ?", email).First(user).Error
 	if err != nil {
-		return user, false, err
+		return nil, false, err
 	}
 	return user, true, nil
 }

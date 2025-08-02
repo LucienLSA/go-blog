@@ -57,7 +57,8 @@ func CheckEmailCode(email string, code string, opType int) error {
 		if err == redis.Nil {
 			return ErrCodeExpired
 		}
-		return err
+		zap.L().Error("CheckEmailCode failed", zap.Error(err), zap.String("email", email), zap.Int("opType", opType))
+		return errors.New("验证码验证失败，请重试")
 	}
 	if codeStored != code {
 		return ErrEmailCode

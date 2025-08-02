@@ -16,7 +16,7 @@ var (
 
 // Tokens存入redis
 func StorgeUserIdToken(token, username, ip string) (err error) {
-	// 获取token的存活实践
+	// 获取token的存活时间
 	duration := time.Duration(settings.Conf.AppConfig.JwtExpireTime * time.Hour)
 	key := GetRedisKey(KeyUserIDTokenSetPrefix) + ip
 	// 存入redis
@@ -42,4 +42,15 @@ func GetJwtToken(username string, ip string) (token string, err error) {
 		return
 	}
 	return
+}
+
+// 删除用户token（登出功能）
+func DeleteUserToken(username string, ip string) (err error) {
+	key := GetRedisKey(KeyUserIDTokenSetPrefix) + ip
+	if err = rdb.Del(rctx, key+username).Err(); err != nil {
+		zap.L().Error("Delete user token from redis failed, err:%v", zap.Error(err))
+		fmt.Printf("Delete user token from redis failed, err:%v", zap.Error(err))
+		return
+	}
+	return nil
 }

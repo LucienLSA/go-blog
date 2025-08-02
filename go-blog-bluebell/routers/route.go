@@ -96,6 +96,9 @@ func SetupRouter(mode string) *gin.Engine {
 		// // 用户验证邮箱
 		v2.POST("/user/validEmail", controller.ValidEmailHandler())
 		v2.GET("/user/validEmail", controller.ValidEmailHandler())
+
+		// // 用户登出
+		v2.DELETE("/user/logout", controller.LogoutHandler())
 	}
 	// 注册pprof路由 服务型性能分析
 	// pprof.Register(r)

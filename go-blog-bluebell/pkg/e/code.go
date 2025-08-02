@@ -20,6 +20,8 @@ const (
 	CodeLimitLogin
 
 	CodeUploadFile = 3000 + iota
+	CodeFileTooLarge
+	CodeInvalidFileType
 
 	CodeInvalidToken
 	CodeInvalidEmailCode
@@ -36,6 +38,8 @@ var codeMsgMap = map[ResCode]string{
 	CodeTokenInvalid:     "无效的Token",
 	CodeLimitLogin:       "已在另一台设备登录",
 	CodeUploadFile:       "上传文件失败",
+	CodeFileTooLarge:     "文件大小超过限制",
+	CodeInvalidFileType:  "文件类型不支持",
 	CodeEmailNotExist:    "邮箱不存在",
 	CodeEmailExist:       "邮箱已存在",
 	CodeEmailFormat:      "邮箱格式有误",
