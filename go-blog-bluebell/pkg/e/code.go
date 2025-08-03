@@ -25,6 +25,7 @@ const (
 
 	CodeInvalidToken
 	CodeInvalidEmailCode
+	CodeUserAlreadyLogin
 )
 
 var codeMsgMap = map[ResCode]string{
@@ -45,4 +46,5 @@ var codeMsgMap = map[ResCode]string{
 	CodeEmailFormat:      "邮箱格式有误",
 	CodeInvalidToken:     "无效的Token",
 	CodeInvalidEmailCode: "邮箱验证码无效",
+	CodeUserAlreadyLogin: "用户已登录",
 }

@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/LucienLSA/go-blog/settings"
-	"github.com/qiniu/go-sdk/v7/auth/qbox"
 	"github.com/qiniu/go-sdk/v7/storage"
+	"github.com/qiniu/go-sdk/v7/storagev2/credentials"
 	"go.uber.org/zap"
 )
 
@@ -33,7 +33,7 @@ func UploadToQiNiuAvatar(file multipart.File, userName string, fileSize int64, f
 		Scope: Bucket,
 	}
 
-	mac := qbox.NewMac(AccessKey, SerectKey)
+	mac := credentials.NewCredentials(AccessKey, SerectKey)
 	upToken := putPlicy.UploadToken(mac)
 	cfg := storage.Config{
 		Zone:          &storage.ZoneHuadong,

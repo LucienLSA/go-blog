@@ -123,6 +123,15 @@ func (s *UserSrv) UserLogin(ctx context.Context, ip string, req *types.UserLogin
 		zap.L().Error("userDao CheckUserExist failed", zap.Error(err))
 		return nil, e.ErrorUserNotExist
 	}
+	
+	// 检查用户是否已经通过邮箱登录
+	existingToken, err := redisCache.CheckUserLoginByUsername(user.UserName, ip)
+	if err == nil && existingToken != "" {
+		// 用户已登录，返回已登录错误
+		zap.L().Info("用户已登录", zap.String("用户名", user.UserName), zap.String("IP", ip))
+		return nil, e.ErrorUserAlreadyLogin
+	}
+	
 	zap.L().Info("登录校验", zap.String("输入密码", req.Password), zap.String("数据库摘要", user.PasswordDigest))
 	if err = user.CheckPassword(req.Password); err != nil {
 		zap.L().Error("mysql Login failed", zap.String("输入密码", req.Password), zap.String("数据库摘要", user.PasswordDigest), zap.Error(err))
@@ -219,6 +228,15 @@ func (s *UserSrv) LoginEmail(ctx context.Context, ip string, req *types.UserLogi
 		fmt.Printf("mysql.NotExistUserEmail failed, err:%v", err)
 		return nil, err
 	}
+	
+	// 检查用户是否已经通过用户名登录
+	existingToken, err := redisCache.CheckUserLoginByUsername(user.UserName, ip)
+	if err == nil && existingToken != "" {
+		// 用户已登录，返回已登录错误
+		zap.L().Info("用户已登录", zap.String("用户名", user.UserName), zap.String("IP", ip))
+		return nil, e.ErrorUserAlreadyLogin
+	}
+	
 	userInfo := &models.User{
 		UserID:   user.UserID,
 		Email:    req.UserEmail,
@@ -239,7 +257,7 @@ func (s *UserSrv) LoginEmail(ctx context.Context, ip string, req *types.UserLogi
 	}
 	user.Token = token
 	// 保存到redis中
-	if err = redisCache.StorgeUserIdToken(token, userInfo.Email, ip); err != nil {
+	if err = redisCache.StorgeUserIdToken(token, userInfo.UserName, ip); err != nil {
 		zap.L().Error("redisCache.StorgeUserIdToken failed", zap.Error(err))
 	}
 	return

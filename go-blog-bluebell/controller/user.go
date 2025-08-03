@@ -126,6 +126,10 @@ func LoginHandler() gin.HandlerFunc {
 				e.ResponseError(c, e.CodeUserNotExist)
 				return
 			}
+			if errors.Is(err, e.ErrorUserAlreadyLogin) {
+				e.ResponseError(c, e.CodeUserAlreadyLogin)
+				return
+			}
 			e.ResponseError(c, e.CodeInvalidPassword)
 			return
 		}
@@ -211,6 +215,10 @@ func LoginEmailHandler() gin.HandlerFunc {
 			zap.L().Error("service login failed", zap.String("UserEmail", req.UserEmail), zap.Error(err))
 			if errors.Is(err, e.ErrorEmailNotExit) {
 				e.ResponseError(ctx, e.CodeEmailNotExist)
+				return
+			}
+			if errors.Is(err, e.ErrorUserAlreadyLogin) {
+				e.ResponseError(ctx, e.CodeUserAlreadyLogin)
 				return
 			}
 			e.ResponseError(ctx, e.CodeInvalidParam)

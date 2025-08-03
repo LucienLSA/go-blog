@@ -3,6 +3,7 @@ package redisCache
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/LucienLSA/go-blog/settings"
@@ -53,4 +54,9 @@ func DeleteUserToken(username string, ip string) (err error) {
 		return
 	}
 	return nil
+}
+
+// 检查用户是否已登录（通过用户名）
+func CheckUserLoginByUsername(username string, ip string) (token string, err error) {
+	return GetJwtToken(username, ip)
 }
