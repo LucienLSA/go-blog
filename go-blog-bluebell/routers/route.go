@@ -47,59 +47,63 @@ func SetupRouter(mode string) *gin.Engine {
 	r.GET("/swagger/*any", gs.WrapHandler(swaggerFiles.Handler))
 	v2 := r.Group("/api/v2")
 
-	// // 注册
-	v2.POST("/user/signup", controller.SignUpHandler())
-
-	// // 登录
-	v2.POST("/user/login", controller.LoginHandler())
-	v2.POST("/user/login/emailcode", controller.SendEmailCodeHandler())
-	v2.POST("/user/login/email", controller.LoginEmailHandler())
-
-	// // 获取社区信息
-	v2.GET("/community/show", controller.CommunityListHandler())
-	v2.GET("/community/show/:community_id", controller.CommunityDetailHandler())
-
-	// // 查看帖子
-	v2.GET("/posts/showAll", controller.GetPostListHandler())
-
-	// JWT中间件认证
-	v2.Use(middlewares.JWTAuthMiddleware())
+	userRoute := v2.Group("/user")
 	{
+		// // 注册
+		userRoute.POST("/signup", controller.SignUpHandler())
+
+		// // 登录
+		userRoute.POST("/login", controller.LoginHandler())
+		userRoute.POST("/login/emailcode", controller.SendEmailCodeHandler())
+		userRoute.POST("/login/email", controller.LoginEmailHandler())
+
+		userAuthRoute := userRoute.Use(middlewares.JWTAuthMiddleware())
+		// // 用户头像上传
+		userAuthRoute.POST("/avatar", controller.UploadAvatarHandler())
+
+		// // 用户信息更新
+		userAuthRoute.PUT("/update", controller.UpdateHandler())
+
+		// // 用户发送邮箱
+		userAuthRoute.POST("/sendEmail", controller.SendEmailHandler())
+
+		// // 用户验证邮箱
+		userAuthRoute.POST("/validEmail", controller.ValidEmailHandler())
+		userAuthRoute.GET("/validEmail", controller.ValidEmailHandler())
+
+		// // 用户登出
+		userAuthRoute.DELETE("/logout", controller.LogoutHandler())
+	}
+	communityRoute := v2.Group("/community")
+	{
+		// // 获取社区信息
+		communityRoute.GET("/show", controller.CommunityListHandler())
+		communityRoute.GET("/show/:community_id", controller.CommunityDetailHandler())
+		// 创建社区
+		communityRoute.Use(middlewares.JWTAuthMiddleware()).POST("/create", controller.CreateCommunityHandler())
+	}
+	postsRoute := v2.Group("/posts")
+	{
+		// // 查看帖子
+		postsRoute.GET("/showAll", controller.GetPostListHandler())
+		postsAuthRoute := postsRoute.Use(middlewares.JWTAuthMiddleware())
 		// // 帖子查询新版
 		// // 参数动态获取帖子列表
-		v2.GET("/posts/search", controller.SearchPostListHandler())
+		postsAuthRoute.GET("/search", controller.SearchPostListHandler())
 
 		// // 根据社区查询帖子列表 整合到上一个hander中
 		// // v1.GET("/communitysearchposts", controller.CommunityPostListHandler)
 
 		// // 令牌桶填充速率2s， 容量1
-		v2.GET("/posts/:post_id", middlewares.RateLimitMiddleware(2*time.Second, 1), controller.GetPostDetailHandler())
+		postsAuthRoute.GET("/:post_id", middlewares.RateLimitMiddleware(2*time.Second, 1), controller.GetPostDetailHandler())
 
 		// // 发布帖子
-		v2.POST("/posts/post", controller.CreatePostHandler())
-
-		// 创建社区
-		v2.POST("/community/create", controller.CreateCommunityHandler())
+		postsAuthRoute.POST("/post", controller.CreatePostHandler())
 
 		// // 帖子投票
-		v2.POST("/posts/vote", controller.PostVoteHandler())
-
-		// // 用户头像上传
-		v2.POST("/user/avatar", controller.UploadAvatarHandler())
-
-		// // 用户信息更新
-		v2.PUT("/user/update", controller.UpdateHandler())
-
-		// // 用户发送邮箱
-		v2.POST("/user/sendEmail", controller.SendEmailHandler())
-
-		// // 用户验证邮箱
-		v2.POST("/user/validEmail", controller.ValidEmailHandler())
-		v2.GET("/user/validEmail", controller.ValidEmailHandler())
-
-		// // 用户登出
-		v2.DELETE("/user/logout", controller.LogoutHandler())
+		postsAuthRoute.POST("/vote", controller.PostVoteHandler())
 	}
+
 	// 注册pprof路由 服务型性能分析
 	// pprof.Register(r)
 
