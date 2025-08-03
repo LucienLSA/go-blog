@@ -66,7 +66,7 @@
 
 <script>
 export default {
-  name: "Publish",
+  name: "PublishPost",
   data() {
     return {
       title: "",

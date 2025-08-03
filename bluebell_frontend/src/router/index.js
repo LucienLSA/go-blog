@@ -1,5 +1,4 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Content from '../views/Content.vue'
 import Publish from '../views/Publish.vue'
@@ -7,13 +6,8 @@ import Login from '../views/Login.vue'
 import SignUp from '../views/SignUp.vue'
 import UserInfo from '../views/UserInfo.vue'
 import ValidEmail from '../views/ValidEmail.vue'
-const originalPush = VueRouter.prototype.push;
-VueRouter.prototype.push = function push(location) {
-  return originalPush.call(this, location).catch(err => err);
-}
-Vue.use(VueRouter)
 
-  const routes = [
+const routes = [
   {
     path: '/',
     name: 'Home',
@@ -32,12 +26,12 @@ Vue.use(VueRouter)
   },
   {
     path: '/login',
-    name:"Login",
+    name: "Login",
     component: Login
   },
   {
     path: '/signup',
-    name:"SignUp",
+    name: "SignUp",
     component: SignUp
   },
   {
@@ -53,9 +47,8 @@ Vue.use(VueRouter)
   }
 ]
 
-const router = new VueRouter({
-  mode: 'hash',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHashHistory(process.env.BASE_URL),
   routes
 })
 

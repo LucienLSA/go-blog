@@ -69,7 +69,7 @@
 
 <script>
 export default {
-  name: "Content",
+  name: "PostContent",
   data(){
     return {
       post:{},

@@ -3,7 +3,6 @@ package redisCache
 import (
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/LucienLSA/go-blog/settings"

@@ -1,13 +1,15 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
 import axios from './service/api'
 
-Vue.prototype.$axios = axios;
-Vue.config.productionTip = false
+const app = createApp(App)
 
+// 全局属性
+app.config.globalProperties.$axios = axios
 
+// 路由守卫
 router.beforeEach((to, from, next) => {
   console.log(to);
   console.log(from);
@@ -39,8 +41,6 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-new Vue({
-  router,
-  store,
-  render: h => h(App)
-}).$mount('#app')
+app.use(router)
+app.use(store)
+app.mount('#app')
