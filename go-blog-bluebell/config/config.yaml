@@ -1,0 +1,57 @@
+app:
+  name: "bluebellApp"
+  mode: "dev"
+  port: 8081
+  version: "1.0.0"
+  start_time: "2025-01-01"
+  machine_id: 1
+  jwt_expire_time: 3600
+
+  page_size: 5
+  page_num: 1
+
+  uploadModel: "oss"
+
+  photoPath:
+    photoHost: http://127.0.0.1
+    avatarPath: /static/img/avatar/
+    defaultAvatar: http://ssjjen2mm.hd-bkt.clouddn.com/avatar/user.png
+
+log:
+  level: "debug"
+  filepath: "./runtime/logs/"
+  filename: "bluebell.log"
+  max_size: 200
+  max_age: 30
+  max_backups: 7
+
+mysql:
+  host: "127.0.0.1"
+  port: 3306
+  user: "root"
+  password: "123456"
+  dbname: "bluebell_v2"
+  max_open_conns: 200
+  max_idle_conns: 50
+
+redis:
+  host: "127.0.0.1"
+  port: 6379
+  password: ""
+  db: 5
+  pool_size: 100
+
+email:
+  vaildEmail: http://localhost:8081/#/user/vaildEmail/
+  smtpHost: smtp.qq.com
+  smtpEmail: 1020263522@qq.com
+  smtpPass: asyommbmaepibeha
+  emailCodeExpireTime: 600
+  emailCodeSaveTime: 3600
+
+
+oss:
+  accessKeyId: PuNOZxN43ZaokjeXV3Q11A2H3oo4zNwoSLU7XHms
+  accessKeySecret: 8jNWfIsLL58lhf1tgqDE4y0tGD3mM1mmQm1lNkl7
+  bucketName: bluebelldemo2
+  qiNiuServer: t0elomjvk.hd-bkt.clouddn.com # 测试域名

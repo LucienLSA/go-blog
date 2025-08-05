@@ -1,0 +1,39 @@
+services:
+- name: bluebell-user-service
+  url: http://go-blog-upstream/api/v2/user
+  routes:
+  - name: signup-route
+    paths: ["/api/v2/user/signup"]
+    methods: ["POST"]
+  - name: login-route
+    paths: ["/api/v2/user/login","/api/v2/user/login/emailcode","/api/v2/user/login/email"]
+    methods: ["POST"]
+  - name: avatar-route
+    paths: ["/api/v2/user/avatar"]
+    methods: ["POST"]
+  - name: email-route
+    paths: ["/api/v2/user/sendEmail", "/api/v2/user/validEmail"]
+    methods: ["POST","GET"]  
+  - name: update-route
+    paths: ["/api/v2/user/update"]
+    methods: ["PUT"] 
+  - name: logout-route
+    paths: ["/api/v2/user/logout"]
+    methods: ["DELETE"] 
+  # 添加更多用户相关路由...
+
+- name: bluebell-post-service
+  url: http://go-blog-upstream/api/v2/posts
+  routes:
+  - name: post-list-route
+    paths: ["/api/v2/posts/showAll"]
+    methods: ["GET"]
+  # 添加更多帖子相关路由...
+
+
+- name: bluebell-community-service
+  url: http://go-blog-upstream/api/v2/community
+  routes:
+  - name: post-list-route
+    paths: ["/api/v2/community/show"]
+    methods: ["GET"]

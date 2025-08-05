@@ -10,6 +10,7 @@ import (
 	"time"
 
 	logging "github.com/LucienLSA/go-blog/logger"
+	"github.com/LucienLSA/go-blog/pkg/scheduler"
 	"github.com/LucienLSA/go-blog/pkg/snowflake"
 	"github.com/LucienLSA/go-blog/pkg/translator"
 	"github.com/LucienLSA/go-blog/repository/db/dao/mysql"
@@ -83,7 +84,11 @@ func main() {
 	}
 	r := routers.SetupRouter(sConf.Mode)
 
-	// 7. 启动服务（优雅关机）
+	// 7. 启动GitHub热点数据定时任务
+	scheduler.StartGitHubTrendingScheduler()
+	zap.L().Info("github trending data scheduler started")
+
+	// 8. 启动服务（优雅关机）
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", viper.GetInt("app.port")),
 		Handler: r,
@@ -105,6 +110,11 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM) // 此处不会阻塞
 	<-quit                                               // 阻塞在此，当接收到上述两种信号时才会往下执行
 	zap.L().Info("Shutdown Server ...")
+
+	// 停止GitHub热点数据定时任务
+	scheduler.StopGitHubTrendingScheduler()
+	zap.L().Info("github trending data scheduler stopped")
+
 	// 创建一个5秒超时的context
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

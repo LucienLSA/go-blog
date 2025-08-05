@@ -95,13 +95,24 @@ func SetupRouter(mode string) *gin.Engine {
 		// // v1.GET("/communitysearchposts", controller.CommunityPostListHandler)
 
 		// // 令牌桶填充速率2s， 容量1
-		postsAuthRoute.GET("/:post_id", middlewares.RateLimitMiddleware(2*time.Second, 1), controller.GetPostDetailHandler())
+		postsAuthRoute.GET("/:post_id(\\d{1,18})", middlewares.RateLimitMiddleware(2*time.Second, 1), controller.GetPostDetailHandler())
 
 		// // 发布帖子
 		postsAuthRoute.POST("/post", controller.CreatePostHandler())
 
 		// // 帖子投票
 		postsAuthRoute.POST("/vote", controller.PostVoteHandler())
+	}
+
+	// GitHub热点数据路由
+	githubRoute := v2.Group("/github")
+	{
+		// 获取GitHub热点数据
+		githubRoute.GET("/trending", controller.GetGitHubTrendingHandler())
+		// 获取所有GitHub热点数据
+		githubRoute.GET("/trending/all", controller.GetAllGitHubTrendingHandler())
+		// 手动刷新GitHub热点数据
+		githubRoute.POST("/trending/refresh", controller.RefreshGitHubTrendingHandler())
 	}
 
 	// 注册pprof路由 服务型性能分析
