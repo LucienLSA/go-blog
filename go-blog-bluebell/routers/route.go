@@ -102,6 +102,12 @@ func SetupRouter(mode string) *gin.Engine {
 
 		// // 帖子投票
 		postsAuthRoute.POST("/vote", controller.PostVoteHandler())
+		// 帖子审核相关接口
+		postsRoute.POST("/review", controller.SubmitPostForReviewHandler())
+		postsRoute.GET("/review/:post_id", controller.GetReviewStatusHandler())
+		postsRoute.POST("/review/callback", controller.N8nReviewCallbackHandler())
+		postsRoute.GET("/review/statistics", controller.GetReviewStatisticsHandler())
+		postsRoute.GET("/review/list", controller.GetPostsByReviewStatusHandler())
 	}
 
 	// GitHub热点数据路由

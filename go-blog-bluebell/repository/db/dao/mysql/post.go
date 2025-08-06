@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"strings"
+	"time"
 
 	"github.com/LucienLSA/go-blog/repository/db/models"
 	"go.uber.org/zap"
@@ -91,4 +92,61 @@ func (dao *PostDao) SearchPostListByIDs(ids []string) (postList []*models.Post, 
 		Order(gorm.Expr("FIND_IN_SET(post_id, ?)", idsStr)).
 		Find(&postList).Error
 	return
+}
+
+// CreatePostWithReview 创建帖子并设置为待审核状态
+func (dao *PostDao) CreatePostWithReview(post *models.Post) error {
+	// 设置初始审核状态
+	post.ReviewStatus = "pending"
+	post.ReviewScore = 0.0
+	
+	return dao.DB.Model(&models.Post{}).Create(post).Error
+}
+
+// UpdatePostReviewStatus 更新帖子审核状态
+func (dao *PostDao) UpdatePostReviewStatus(postID int64, reviewStatus string, reviewResult string) error {
+	updates := map[string]interface{}{
+		"review_status": reviewStatus,
+		"review_result": reviewResult,
+	}
+	
+	if reviewStatus == "approved" || reviewStatus == "rejected" {
+		now := time.Now().Format("2006-01-02 15:04:05")
+		updates["reviewed_at"] = &now
+	}
+	
+	return dao.DB.Model(&models.Post{}).Where("post_id = ?", postID).Updates(updates).Error
+}
+
+// GetPostsByReviewStatus 根据审核状态获取帖子列表
+func (dao *PostDao) GetPostsByReviewStatus(status string, pageNum, pageSize int64) ([]*models.Post, error) {
+	var posts []*models.Post
+	offset := (pageNum - 1) * pageSize
+	
+	err := dao.DB.Model(&models.Post{}).
+		Where("review_status = ?", status).
+		Order("created_at DESC").
+		Offset(int(offset)).
+		Limit(int(pageSize)).
+		Find(&posts).Error
+	
+	if err == sql.ErrNoRows {
+		zap.L().Warn("no posts found with review status", zap.String("status", status))
+		return nil, nil
+	}
+	
+	return posts, err
+}
+
+// GetPostWithReviewStatus 获取帖子详情（包含审核状态）
+func (dao *PostDao) GetPostWithReviewStatus(postID int64) (*models.Post, error) {
+	var post models.Post
+	err := dao.DB.Model(&models.Post{}).Where("post_id = ?", postID).First(&post).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &post, nil
 }

@@ -12,6 +12,14 @@ type Post struct {
 	AuthorID    int64  ` gorm:"author_id"`   // 帖子作者id
 	Title       string ` gorm:"title"`       // 帖子标题
 	Content     string ` gorm:"content"`     // 帖子内容
+	// 审核相关字段
+	ReviewStatus      string  `gorm:"review_status"`       // 审核状态: pending, approved, rejected
+	ReviewResult      string  `gorm:"review_result"`       // 审核结果详情
+	ReviewedAt        *string `gorm:"reviewed_at"`         // 审核时间
+	ReviewScore       float64 `gorm:"review_score"`        // 审核评分
+	ReviewReason      string  `gorm:"review_reason"`       // 拒绝原因
+	ReviewSuggestions string  `gorm:"review_suggestions"`  // 修改建议
+	ReviewTags        string  `gorm:"review_tags"`         // 内容标签(JSON格式)
 }
 
 // type ApiPostDetail struct {

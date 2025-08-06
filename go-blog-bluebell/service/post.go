@@ -79,6 +79,19 @@ func (s *PostSrv) CreatePost(ctx context.Context, req *types.PostCreateReq) (err
 	return err
 }
 
+// CreatePostWithReview 创建帖子并提交审核
+func (s *PostSrv) CreatePostWithReview(ctx context.Context, req *types.PostCreateReq) (*types.PostReviewResponse, error) {
+	// 使用审核服务创建帖子
+	reviewSrv := GetReviewSrv()
+	reviewReq := &types.PostReviewRequest{
+		Title:       req.Title,
+		Content:     req.Content,
+		CommunityID: req.CommunityID,
+	}
+
+	return reviewSrv.SubmitPostForReview(ctx, reviewReq)
+}
+
 // 查询帖子列表业务
 func (s *PostSrv) GetPostList(ctx context.Context, pageNum, pageSize int64) (postList []*types.PostListResp, err error) {
 	postDao := mysql.NewPostDao(ctx)
