@@ -68,6 +68,7 @@ func InitMysql(cfg *settings.MySQLConfig) (err error) {
 		zap.L().Error("migrate failed, err:%v\n", zap.Error(err))
 		return
 	}
+
 	return
 }
 

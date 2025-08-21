@@ -112,7 +112,9 @@ func (s *UserSrv) UserSignUp(ctx context.Context, req *types.UserSignUpReq) (err
 }
 
 // 登录业务
-func (s *UserSrv) UserLogin(ctx context.Context, ip string, req *types.UserLoginReq) (resp interface{}, err error) {
+func (s *UserSrv) UserLogin(ctx context.Context, ip, ua string, req *types.UserLoginReq) (resp interface{}, err error) {
+	// 登录限流逻辑暂时移除，如需启用请补齐 Redis 限流实现
+	// 登录逻辑
 	userDao := mysql.NewUserDao(ctx)
 	user, exist, err := userDao.CheckUserExist(req.UserName)
 	if err != nil {
@@ -120,20 +122,16 @@ func (s *UserSrv) UserLogin(ctx context.Context, ip string, req *types.UserLogin
 		return nil, err
 	}
 	if !exist {
+		// 登录失败
 		zap.L().Error("userDao CheckUserExist failed", zap.Error(err))
 		return nil, e.ErrorUserNotExist
 	}
-	
-	// 检查用户是否已经通过邮箱登录
-	existingToken, err := redisCache.CheckUserLoginByUsername(user.UserName, ip)
-	if err == nil && existingToken != "" {
-		// 用户已登录，返回已登录错误
-		zap.L().Info("用户已登录", zap.String("用户名", user.UserName), zap.String("IP", ip))
-		return nil, e.ErrorUserAlreadyLogin
-	}
-	
+
+	// 单会话策略：允许新登录覆盖旧会话，不拦截已登录状态
+
 	zap.L().Info("登录校验", zap.String("输入密码", req.Password), zap.String("数据库摘要", user.PasswordDigest))
 	if err = user.CheckPassword(req.Password); err != nil {
+		// 密码错误
 		zap.L().Error("mysql Login failed", zap.String("输入密码", req.Password), zap.String("数据库摘要", user.PasswordDigest), zap.Error(err))
 		return nil, err
 	}
@@ -144,9 +142,10 @@ func (s *UserSrv) UserLogin(ctx context.Context, ip string, req *types.UserLogin
 	}
 	user.Token = token
 	// 保存到redis中
-	if err = redisCache.StorgeUserIdToken(token, user.UserName, ip); err != nil {
+	if err = redisCache.StorgeUserToken(token, user.UserName); err != nil {
 		zap.L().Error("redisCache.StorgeUserIdToken failed", zap.Error(err))
 	}
+	// 登录成功
 	resp = &types.UserLoginResp{
 		UserID:   user.UserID,
 		UserName: user.UserName,
@@ -157,13 +156,20 @@ func (s *UserSrv) UserLogin(ctx context.Context, ip string, req *types.UserLogin
 
 // UserLogout 用户登出
 func (s *UserSrv) UserLogout(ctx context.Context, ip string, req *types.UserLogoutReq) (resp interface{}, err error) {
-	// 从redis中删除用户token
-	if err = redisCache.DeleteUserToken(req.UserName, ip); err != nil {
+	// 从上下文获取当前登录用户，避免越权登出
+	u, getErr := ctl.GetUserInfo(ctx)
+	if getErr != nil || u == nil {
+		zap.L().Error("GetUserInfo failed", zap.Error(getErr))
+		return nil, e.ErrorNeedLogin
+	}
+	username := u.UserName
+	// 从redis中删除当前用户token
+	if err = redisCache.DeleteUserToken(username); err != nil {
 		zap.L().Error("redisCache.DeleteUserToken failed", zap.Error(err))
 		return nil, err
 	}
 
-	zap.L().Info("用户登出成功", zap.String("用户名", req.UserName), zap.String("IP", ip))
+	zap.L().Info("用户登出成功", zap.String("用户名", username), zap.String("IP", ip))
 	return nil, nil
 }
 
@@ -228,15 +234,9 @@ func (s *UserSrv) LoginEmail(ctx context.Context, ip string, req *types.UserLogi
 		fmt.Printf("mysql.NotExistUserEmail failed, err:%v", err)
 		return nil, err
 	}
-	
-	// 检查用户是否已经通过用户名登录
-	existingToken, err := redisCache.CheckUserLoginByUsername(user.UserName, ip)
-	if err == nil && existingToken != "" {
-		// 用户已登录，返回已登录错误
-		zap.L().Info("用户已登录", zap.String("用户名", user.UserName), zap.String("IP", ip))
-		return nil, e.ErrorUserAlreadyLogin
-	}
-	
+
+	// 单会话策略：允许新登录覆盖旧会话，不拦截已登录状态
+
 	userInfo := &models.User{
 		UserID:   user.UserID,
 		Email:    req.UserEmail,
@@ -257,7 +257,7 @@ func (s *UserSrv) LoginEmail(ctx context.Context, ip string, req *types.UserLogi
 	}
 	user.Token = token
 	// 保存到redis中
-	if err = redisCache.StorgeUserIdToken(token, userInfo.UserName, ip); err != nil {
+	if err = redisCache.StorgeUserToken(token, userInfo.UserName); err != nil {
 		zap.L().Error("redisCache.StorgeUserIdToken failed", zap.Error(err))
 	}
 	return

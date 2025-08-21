@@ -50,33 +50,34 @@ func GetPostAgreeByIDs(ids []string) (data []int64, err error) {
 
 // 根据社区id参数查询redis中ids
 func CommunityPostIDsByOrder(req *types.PostListReq) ([]string, error) {
+	// 1. 确定排序依据的ZSet（时间或分数）
 	orderKey := GetRedisKey(KeyPostTimeZSet)
 	if req.Order == types.OrderScore {
 		orderKey = GetRedisKey(KeyPostScoreZSet)
 	}
 
-	// 使用Zinterstore 将分区的帖子与按帖子分数的Zset生成一个新的Zset
-	// 针对新的zset按之前的逻辑获取ids数据
+	// 2. 定义社区帖子集合的Key和临时合并结果的Key
+	cKey := GetRedisKey(KeyCommunitySetPrefix + strconv.Itoa(int(req.CommunityID))) // 社区下的帖子ID集合（Set）
+	key := orderKey + strconv.Itoa(int(req.CommunityID))                            // 临时合并结果的ZSet Key
 
-	// 社区的key
-	cKey := GetRedisKey(KeyCommunitySetPrefix + strconv.Itoa(int(req.CommunityID)))
-	// 利用缓存key减少zinterstore执行的次数
-	key := orderKey + strconv.Itoa(int(req.CommunityID))
-	keys := []string{cKey, orderKey}
+	// 3. 检查临时ZSet是否存在，不存在则通过ZInterStore生成
 	if rdb.Exists(rctx, key).Val() < 1 {
-		// 不存在，需要计算
+		// 使用管道批量执行命令
 		pipeline := rdb.Pipeline()
+		// ZInterStore合并社区帖子集合和排序ZSet，取MAX分数作为合并后分数
 		pipeline.ZInterStore(rctx, key, &redis.ZStore{
-			Keys:      keys,
-			Aggregate: "MAX",
+			Keys:      []string{cKey, orderKey}, // 参与合并的两个集合：社区帖子Set + 排序ZSet
+			Aggregate: "MAX",                    // 合并策略：取两个集合中相同元素的最大分数（保留排序权重）
 		})
+		// 设置临时ZSet的过期时间为60秒，减少重复计算
 		pipeline.Expire(rctx, key, 60*time.Second)
+		// 执行管道命令
 		_, err := pipeline.Exec(rctx)
 		if err != nil {
 			return nil, err
 		}
 	}
-	// 从redis获取id
-	// 存在就直接根据key查询ids
+
+	// 4. 从临时ZSet中分页查询帖子ID
 	return getIDsFromKey(key, req.PageNum, req.PageSize)
 }

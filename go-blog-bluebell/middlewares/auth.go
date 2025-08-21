@@ -3,6 +3,7 @@ package middlewares
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/LucienLSA/go-blog/pkg/ctl"
@@ -57,20 +58,17 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			return
 		}
 		// 从redis中获取token 并判断当前登录解析得到的token
-		token, err := redisCache.GetJwtToken(mc.Username, c.RemoteIP())
-		// key不存在说明未登录 或者header中的token和redis中的token不一样 说明存在同一ip下同一用户有多次登录
-		if err != nil || parts[1] != token {
-			if err != nil {
-				zap.L().Error("GetJwtToken failed", zap.Error(errors.New("无效的Token")))
-				e.ResponseError(c, e.CodeNeedLogin)
-				c.Abort()
-				return
-			} else {
-				zap.L().Info(fmt.Sprintf("用户:[%d] IP:[%s] 同一时间登录多次", mc.UserID, c.RemoteIP()))
-				e.ResponseError(c, e.CodeLimitLogin)
-				c.Abort()
-				return
-			}
+		token, err := redisCache.GetJwtToken(mc.Username)
+		// key不存在说明未登录 或者header中的token和redis中的token不一样（被新会话顶下线）
+		if err != nil {
+			zap.L().Error("GetJwtToken failed", zap.Error(errors.New("无效的Token")))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, &e.ResponseData{Code: e.CodeNeedLogin, Msg: e.ErrorNeedLogin})
+			return
+		}
+		if parts[1] != token {
+			zap.L().Info(fmt.Sprintf("用户:[%d] IP:[%s] token失效，可能被新会话顶下线", mc.UserID, c.ClientIP()))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, &e.ResponseData{Code: e.CodeLimitLogin, Msg: e.ErrorLimitLogin})
+			return
 		}
 		// // token不存在 需要重新登录
 		// if err == redisCache.ErrNotExistToken {

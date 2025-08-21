@@ -15,12 +15,13 @@ var (
 )
 
 // Tokens存入redis
-func StorgeUserIdToken(token, username, ip string) (err error) {
+func StorgeUserToken(token, username string) (err error) {
 	// 获取token的存活时间
-	duration := time.Duration(settings.Conf.AppConfig.JwtExpireTime * time.Hour)
-	key := GetRedisKey(KeyUserIDTokenSetPrefix) + ip
+	duration := time.Duration(settings.Conf.AppConfig.JwtExpireTime * time.Minute)
+	key := GetRedisKey(KeyUserIDTokenSetPrefix) + username
+
 	// 存入redis
-	if err = rdb.Set(rctx, key+username, token, duration).Err(); err != nil {
+	if err = rdb.Set(rctx, key, token, duration).Err(); err != nil {
 		zap.L().Error("Insert username, token into redis failed, err:%v", zap.Error(err))
 		// zap.L().Debug("Insert username, token into redis failed, err:%v", zap.Error(err))
 		fmt.Printf("Insert username, token into redis failed, err:%v", zap.Error(err))
@@ -30,8 +31,8 @@ func StorgeUserIdToken(token, username, ip string) (err error) {
 }
 
 // 从redis取token
-func GetJwtToken(username string, ip string) (token string, err error) {
-	key := GetRedisKey(KeyUserIDTokenSetPrefix) + ip
+func GetJwtToken(username string) (token string, err error) {
+	key := GetRedisKey(KeyUserIDTokenSetPrefix)
 	token, err = rdb.Get(rctx, key+username).Result()
 	if err == redis.Nil {
 		return "", ErrNotExistToken
@@ -45,8 +46,8 @@ func GetJwtToken(username string, ip string) (token string, err error) {
 }
 
 // 删除用户token（登出功能）
-func DeleteUserToken(username string, ip string) (err error) {
-	key := GetRedisKey(KeyUserIDTokenSetPrefix) + ip
+func DeleteUserToken(username string) (err error) {
+	key := GetRedisKey(KeyUserIDTokenSetPrefix)
 	if err = rdb.Del(rctx, key+username).Err(); err != nil {
 		zap.L().Error("Delete user token from redis failed, err:%v", zap.Error(err))
 		fmt.Printf("Delete user token from redis failed, err:%v", zap.Error(err))
@@ -56,6 +57,6 @@ func DeleteUserToken(username string, ip string) (err error) {
 }
 
 // 检查用户是否已登录（通过用户名）
-func CheckUserLoginByUsername(username string, ip string) (token string, err error) {
-	return GetJwtToken(username, ip)
-}
+// func CheckUserLoginByUsername(username string, ip string) (token string, err error) {
+// 	return GetJwtToken(username)
+// }

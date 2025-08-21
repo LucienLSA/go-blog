@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/LucienLSA/go-blog/repository/db/models"
+	"github.com/LucienLSA/go-blog/types"
 	"go.uber.org/zap"
 )
 
@@ -95,7 +96,7 @@ func UpdateReviewTask(task *models.PostReviewTask) error {
 }
 
 // SaveReviewStatus 保存审核状态到Redis
-func SaveReviewStatus(postID int64, status string, result *models.ReviewResult) error {
+func SaveReviewStatus(postID int64, status string, result *types.ReviewResult) error {
 	key := fmt.Sprintf("%s%d", KeyReviewStatusPrefix, postID)
 
 	statusData := map[string]interface{}{
@@ -126,7 +127,7 @@ func SaveReviewStatus(postID int64, status string, result *models.ReviewResult) 
 }
 
 // GetReviewStatus 从Redis获取审核状态
-func GetReviewStatus(postID int64) (string, *models.ReviewResult, error) {
+func GetReviewStatus(postID int64) (string, *types.ReviewResult, error) {
 	key := fmt.Sprintf("%s%d", KeyReviewStatusPrefix, postID)
 
 	// 从Redis获取数据
@@ -145,7 +146,7 @@ func GetReviewStatus(postID int64) (string, *models.ReviewResult, error) {
 	}
 
 	status := statusData["status"].(string)
-	var result *models.ReviewResult
+	var result *types.ReviewResult
 	if resultData, ok := statusData["result"]; ok {
 		resultBytes, _ := json.Marshal(resultData)
 		json.Unmarshal(resultBytes, &result)

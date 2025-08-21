@@ -70,7 +70,7 @@ func (s *ReviewSrv) SubmitPostForReview(ctx context.Context, req *types.PostRevi
 		return nil, err
 	}
 
-	// 创建审核任务
+	// 创建帖子审核任务
 	reviewDao := mysql.NewPostReviewDao(ctx)
 	task := &models.PostReviewTask{
 		PostID:  postID,
@@ -147,7 +147,7 @@ func (s *ReviewSrv) GetReviewStatus(ctx context.Context, postID int64) (*types.R
 	}
 
 	// 解析审核结果
-	var reviewResult *models.ReviewResult
+	var reviewResult *types.ReviewResult
 	if post.ReviewResult != "" {
 		err = json.Unmarshal([]byte(post.ReviewResult), &reviewResult)
 		if err != nil {
@@ -159,7 +159,7 @@ func (s *ReviewSrv) GetReviewStatus(ctx context.Context, postID int64) (*types.R
 }
 
 // buildReviewStatusResponse 构建审核状态响应
-func (s *ReviewSrv) buildReviewStatusResponse(postID int64, status string, result *models.ReviewResult) (*types.ReviewStatusResponse, error) {
+func (s *ReviewSrv) buildReviewStatusResponse(postID int64, status string, result *types.ReviewResult) (*types.ReviewStatusResponse, error) {
 	response := &types.ReviewStatusResponse{
 		PostID:       postID,
 		ReviewStatus: status,
@@ -193,7 +193,7 @@ func (s *ReviewSrv) ProcessN8nCallback(ctx context.Context, callback *types.Revi
 		zap.String("status", callback.Status))
 
 	// 构建审核结果
-	reviewResult := &models.ReviewResult{
+	reviewResult := &types.ReviewResult{
 		Status:      callback.Status,
 		Score:       callback.Score,
 		Reason:      callback.Reason,
@@ -265,7 +265,7 @@ func (s *ReviewSrv) ProcessN8nCallback(ctx context.Context, callback *types.Revi
 // sendToN8nForReview 发送审核请求到n8n
 func (s *ReviewSrv) sendToN8nForReview(task *models.PostReviewTask) {
 	// 构建发送给n8n的请求
-	request := &models.ReviewRequest{
+	request := &types.ReviewRequest{
 		PostID:    task.PostID,
 		UserID:    task.UserID,
 		Content:   task.Content,

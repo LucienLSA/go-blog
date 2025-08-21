@@ -102,11 +102,17 @@ func SetupRouter(mode string) *gin.Engine {
 
 		// // 帖子投票
 		postsAuthRoute.POST("/vote", controller.PostVoteHandler())
-		// 帖子审核相关接口
+
+		// 帖子审核
+		// 提交帖子审核
 		postsRoute.POST("/review", controller.SubmitPostForReviewHandler())
+		// 查询帖子审核状态
 		postsRoute.GET("/review/:post_id", controller.GetReviewStatusHandler())
+		// n8n回调
 		postsRoute.POST("/review/callback", controller.N8nReviewCallbackHandler())
+		// 获取审核统计
 		postsRoute.GET("/review/statistics", controller.GetReviewStatisticsHandler())
+		// 获取审核列表
 		postsRoute.GET("/review/list", controller.GetPostsByReviewStatusHandler())
 	}
 

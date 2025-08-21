@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/LucienLSA/go-blog/repository/db/models"
+	"github.com/LucienLSA/go-blog/types"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -60,19 +61,19 @@ func (dao *PostReviewDao) GetPendingReviewTasks(limit int) ([]*models.PostReview
 // UpdateReviewTaskStatus 更新审核任务状态
 func (dao *PostReviewDao) UpdateReviewTaskStatus(taskID int64, status string, errorMsg string) error {
 	updates := map[string]interface{}{
-		"status": status,
+		"status":     status,
 		"updated_at": time.Now(),
 	}
-	
+
 	if status == "completed" || status == "failed" {
 		now := time.Now()
 		updates["completed_at"] = &now
 	}
-	
+
 	if errorMsg != "" {
 		updates["error_message"] = errorMsg
 	}
-	
+
 	return dao.DB.Model(&models.PostReviewTask{}).Where("id = ?", taskID).Updates(updates).Error
 }
 
@@ -92,23 +93,23 @@ func (dao *PostReviewDao) GetReviewLogsByPostID(postID int64) ([]*models.PostRev
 }
 
 // UpdatePostReviewStatus 更新帖子审核状态
-func (dao *PostReviewDao) UpdatePostReviewStatus(postID int64, reviewResult *models.ReviewResult) error {
+func (dao *PostReviewDao) UpdatePostReviewStatus(postID int64, reviewResult *types.ReviewResult) error {
 	// 将审核结果序列化为JSON
 	resultJSON, err := json.Marshal(reviewResult)
 	if err != nil {
 		zap.L().Error("marshal review result failed", zap.Error(err))
 		return err
 	}
-	
+
 	// 将标签序列化为JSON
 	tagsJSON, err := json.Marshal(reviewResult.Tags)
 	if err != nil {
 		zap.L().Error("marshal review tags failed", zap.Error(err))
 		return err
 	}
-	
+
 	now := time.Now().Format("2006-01-02 15:04:05")
-	
+
 	updates := map[string]interface{}{
 		"review_status":      reviewResult.Status,
 		"review_result":      string(resultJSON),
@@ -118,7 +119,7 @@ func (dao *PostReviewDao) UpdatePostReviewStatus(postID int64, reviewResult *mod
 		"review_suggestions": reviewResult.Suggestions,
 		"review_tags":        string(tagsJSON),
 	}
-	
+
 	return dao.DB.Model(&models.Post{}).Where("post_id = ?", postID).Updates(updates).Error
 }
 
@@ -139,19 +140,19 @@ func (dao *PostReviewDao) GetPostReviewStatus(postID int64) (*models.Post, error
 func (dao *PostReviewDao) GetPostsByReviewStatus(status string, pageNum, pageSize int64) ([]*models.Post, error) {
 	var posts []*models.Post
 	offset := (pageNum - 1) * pageSize
-	
+
 	err := dao.DB.Model(&models.Post{}).
 		Where("review_status = ?", status).
 		Order("created_at DESC").
 		Offset(int(offset)).
 		Limit(int(pageSize)).
 		Find(&posts).Error
-	
+
 	if err == sql.ErrNoRows {
 		zap.L().Warn("no posts found with review status", zap.String("status", status))
 		return nil, nil
 	}
-	
+
 	return posts, err
 }
 
@@ -161,21 +162,21 @@ func (dao *PostReviewDao) GetReviewStatistics() (map[string]int64, error) {
 		Status string `json:"status"`
 		Count  int64  `json:"count"`
 	}
-	
+
 	err := dao.DB.Model(&models.Post{}).
 		Select("review_status as status, count(*) as count").
 		Group("review_status").
 		Find(&stats).Error
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	result := make(map[string]int64)
 	for _, stat := range stats {
 		result[stat.Status] = stat.Count
 	}
-	
+
 	return result, nil
 }
 
@@ -193,11 +194,11 @@ func (dao *PostReviewDao) GetFailedReviewTasks(limit int) ([]*models.PostReviewT
 // RetryFailedReviewTask 重试失败的审核任务
 func (dao *PostReviewDao) RetryFailedReviewTask(taskID int64) error {
 	updates := map[string]interface{}{
-		"status":       "pending",
-		"updated_at":   time.Now(),
-		"completed_at": nil,
+		"status":        "pending",
+		"updated_at":    time.Now(),
+		"completed_at":  nil,
 		"error_message": "",
 	}
-	
+
 	return dao.DB.Model(&models.PostReviewTask{}).Where("id = ?", taskID).Updates(updates).Error
-} 
+}

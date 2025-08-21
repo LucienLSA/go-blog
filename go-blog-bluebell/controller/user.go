@@ -119,7 +119,8 @@ func LoginHandler() gin.HandlerFunc {
 		// 2. 业务处理
 		ip := c.RemoteIP()
 		l := service.GetUserSrv()
-		user, err := l.UserLogin(c.Request.Context(), ip, &req)
+		user, err := l.UserLogin(c.Request.Context(), ip, c.Request.UserAgent(), &req)
+
 		if err != nil {
 			zap.L().Error("service login failed", zap.String("username", req.UserName), zap.Error(err))
 			if errors.Is(err, e.ErrorUserNotExist) {
@@ -459,26 +460,12 @@ func ValidEmailHandler() gin.HandlerFunc {
 // @Router /user/logout [post]
 func LogoutHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// 1. 获取请求参数和参数校验
-		var req types.UserLogoutReq
-		if err := c.ShouldBind(&req); err != nil {
-			zap.L().Error("Logout with invalid param", zap.Error(err))
-			errs, ok := err.(validator.ValidationErrors)
-			if !ok {
-				e.ResponseError(c, e.CodeInvalidParam)
-				return
-			}
-			e.ResponseErrorMsg(c, e.CodeInvalidParam,
-				translator.RemoveTopStruct(errs.Translate(translator.Trans)))
-			return
-		}
-
 		// 2. 获取客户端IP
 		ip := c.ClientIP()
 
 		// 3. 业务处理
 		l := service.GetUserSrv()
-		if _, err := l.UserLogout(c.Request.Context(), ip, &req); err != nil {
+		if _, err := l.UserLogout(c.Request.Context(), ip, &types.UserLogoutReq{}); err != nil {
 			zap.L().Error("service logout failed", zap.Error(err))
 			e.ResponseError(c, e.CodeServerBusy)
 			return

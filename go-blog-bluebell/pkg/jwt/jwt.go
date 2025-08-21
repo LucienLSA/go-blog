@@ -28,7 +28,7 @@ type MyClaims struct {
 // GenToken 生成JWT
 func GenToken(userID int64, username string) (string, error) {
 	nowTime := time.Now()
-	expireTime := nowTime.Add(settings.Conf.AppConfig.JwtExpireTime * time.Hour)
+	expireTime := nowTime.Add(settings.Conf.AppConfig.JwtExpireTime * time.Minute)
 	// 创建一个自己的声明数据
 	claims := MyClaims{
 		UserID:   userID,
