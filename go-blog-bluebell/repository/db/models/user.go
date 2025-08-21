@@ -16,6 +16,10 @@ type User struct {
 	Gender         string `gorm:"gender"`
 	Token          string `gorm:"token"`
 	Avatar         string `gorm:"avatar"`
+	GitHubID       int64  `gorm:"index"`
+	GitHubLogin    string `gorm:"index"`
+	GitHubAvatar   string
+	OAuthProvider  string `gorm:"index"`
 }
 
 // 实现TableName方法可以修改表名

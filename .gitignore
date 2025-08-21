@@ -25,3 +25,5 @@ docs/swagger.yaml
 *.out
 
 *.zip
+
+.toml

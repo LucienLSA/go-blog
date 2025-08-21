@@ -55,3 +55,14 @@ oss:
   accessKeySecret: 8jNWfIsLL58lhf1tgqDE4y0tGD3mM1mmQm1lNkl7
   bucketName: bluebelldemo2
   qiNiuServer: t0elomjvk.hd-bkt.clouddn.com # 测试域名
+
+github:
+  clientID: "Ov23li94rG8Lr38HxmQr"
+  clientSecret: "eb5ed08ddcbaa5f3e221c6bf3426f6584c33643b"
+  redirectURL: "http://localhost:8081/api/v2/oauth/github/callback"
+  scopes:
+    - "read:user"
+    - "user:email"
+oauth:
+  successRedirect: "http://localhost:8081/oauth/github/callback"
+  errorRedirect: "http://localhost:8081/oauth/github/error"

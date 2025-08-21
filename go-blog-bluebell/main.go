@@ -10,7 +10,6 @@ import (
 	"time"
 
 	logging "github.com/LucienLSA/go-blog/logger"
-	"github.com/LucienLSA/go-blog/pkg/scheduler"
 	"github.com/LucienLSA/go-blog/pkg/snowflake"
 	"github.com/LucienLSA/go-blog/pkg/translator"
 	"github.com/LucienLSA/go-blog/repository/db/dao/mysql"
@@ -112,8 +111,8 @@ func main() {
 	zap.L().Info("Shutdown Server ...")
 
 	// 停止GitHub热点数据定时任务
-	scheduler.StopGitHubTrendingScheduler()
-	zap.L().Info("github trending data scheduler stopped")
+	// scheduler.StopGitHubTrendingScheduler()
+	// zap.L().Info("github trending data scheduler stopped")
 
 	// 创建一个5秒超时的context
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

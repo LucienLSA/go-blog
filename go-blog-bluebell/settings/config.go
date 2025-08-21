@@ -12,12 +12,14 @@ import (
 var Conf = new(multipleConfig)
 
 type multipleConfig struct {
-	*AppConfig   `mapstructure:"app"`
-	*LogConfig   `mapstructure:"log"`
-	*MySQLConfig `mapstructure:"mysql"`
-	*RedisConfig `mapstructure:"redis"`
-	*OssConfig   `mapstructure:"oss"`
-	*EmailConfig `mapstructure:"email"`
+	*AppConfig           `mapstructure:"app"`
+	*LogConfig           `mapstructure:"log"`
+	*MySQLConfig         `mapstructure:"mysql"`
+	*RedisConfig         `mapstructure:"redis"`
+	*OssConfig           `mapstructure:"oss"`
+	*EmailConfig         `mapstructure:"email"`
+	*GitHubConfig        `mapstructure:"github"`
+	*OAuthRedirectConfig `mapstructure:"oauth"`
 }
 
 type AppConfig struct {
@@ -81,6 +83,20 @@ type OssConfig struct {
 	AccessKeySecret string `mapstructure:"accessKeySecret"`
 	BucketName      string `mapstructure:"bucketName"`
 	QiNiuServer     string `mapstructure:"qiNiuServer"`
+}
+
+// GitHubConfig holds GitHub OAuth application credentials
+type GitHubConfig struct {
+	ClientID     string   `mapstructure:"clientID"`
+	ClientSecret string   `mapstructure:"clientSecret"`
+	RedirectURL  string   `mapstructure:"redirectURL"`
+	Scopes       []string `mapstructure:"scopes"`
+}
+
+// OAuthRedirectConfig defines where to redirect after OAuth flow
+type OAuthRedirectConfig struct {
+	SuccessRedirect string `mapstructure:"successRedirect"`
+	ErrorRedirect   string `mapstructure:"errorRedirect"`
 }
 
 // func InitSettings() (err error) {

@@ -35,12 +35,19 @@ func SetupRouter(mode string) *gin.Engine {
 	r.Use(middlewares.Cors())
 
 	// 加载静态文件和html
-	r.LoadHTMLFiles("./templates/index.html")
+	r.LoadHTMLFiles("./templates/index.html", "./templates/oauth_success.html", "./templates/oauth_error.html")
 	r.Static("/static", "./static")
 
 	// 代入根目录的html
 	r.GET("/", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", nil)
+	})
+	// Static test pages for OAuth
+	r.GET("/oauth/github/callback", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "oauth_success.html", nil)
+	})
+	r.GET("/oauth/github/error", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "oauth_error.html", nil)
 	})
 
 	// 导入swag接口文档
@@ -125,6 +132,13 @@ func SetupRouter(mode string) *gin.Engine {
 		githubRoute.GET("/trending/all", controller.GetAllGitHubTrendingHandler())
 		// 手动刷新GitHub热点数据
 		githubRoute.POST("/trending/refresh", controller.RefreshGitHubTrendingHandler())
+	}
+
+	// OAuth GitHub 登录路由
+	oauthGitHub := v2.Group("/oauth/github")
+	{
+		oauthGitHub.GET("/login", controller.GitHubLoginHandler())
+		oauthGitHub.GET("/callback", controller.GitHubCallbackHandler())
 	}
 
 	// 注册pprof路由 服务型性能分析
