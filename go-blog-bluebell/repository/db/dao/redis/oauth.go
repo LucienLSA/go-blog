@@ -12,6 +12,7 @@ const (
 )
 
 // SaveOAuthState stores a short-lived OAuth state to prevent CSRF
+// 生成授权请求时，将随机生成的state值存入 Redis，设置短期过期时间（ttl，通常 5-10 分钟）。
 func SaveOAuthState(state string, ttl time.Duration) error {
 	key := KeyOAuthStatePrefix + state
 	if err := rdb.Set(rctx, key, "1", ttl).Err(); err != nil {
@@ -22,6 +23,8 @@ func SaveOAuthState(state string, ttl time.Duration) error {
 }
 
 // ConsumeOAuthState validates and deletes a state value. Returns true if valid.
+// 第三方服务（如 GitHub）回调时，验证传入的state是否有效（存在于 Redis 且未过期），
+// 验证通过后立即删除该state（防止重复使用）
 func ConsumeOAuthState(state string) (bool, error) {
 	key := KeyOAuthStatePrefix + state
 	// Use Lua script for atomic GET + DEL to support older Redis without GETDEL

@@ -63,7 +63,7 @@ func (s *ReviewSrv) SubmitPostForReview(ctx context.Context, req *types.PostRevi
 		ReviewStatus: "pending",
 		ReviewScore:  0.0,
 	}
-
+	// 创建帖子并设置为待审核状态
 	err = postDao.CreatePostWithReview(post)
 	if err != nil {
 		zap.L().Error("create post with review failed", zap.Error(err))
@@ -78,7 +78,6 @@ func (s *ReviewSrv) SubmitPostForReview(ctx context.Context, req *types.PostRevi
 		Content: req.Content,
 		Status:  "pending",
 	}
-
 	err = reviewDao.CreateReviewTask(task)
 	if err != nil {
 		zap.L().Error("create review task failed", zap.Error(err))
@@ -202,7 +201,7 @@ func (s *ReviewSrv) ProcessN8nCallback(ctx context.Context, callback *types.Revi
 		Details:     callback.Details,
 	}
 
-	// 更新数据库
+	// 更新数据库 帖子审核状态
 	reviewDao := mysql.NewPostReviewDao(ctx)
 	err := reviewDao.UpdatePostReviewStatus(callback.PostID, reviewResult)
 	if err != nil {

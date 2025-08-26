@@ -24,7 +24,7 @@ type ReviewConfig struct {
 // DefaultReviewConfig 默认审核配置
 func DefaultReviewConfig() *ReviewConfig {
 	return &ReviewConfig{
-		N8nURL:             "http://localhost:5678/webhook/post-review",
+		N8nURL:             "http://8e0740914f7a.ngrok-free.app/webhook-test/post-review",
 		N8nTimeout:         30,
 		AutoReview:         true,
 		ReviewTimeout:      300, // 5分钟

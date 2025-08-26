@@ -75,19 +75,19 @@ func main() {
 	}
 	zap.L().Info("init snowflake success")
 
-	// 6. 注册路由
 	// 初始化gin框架内置的校验器 翻译校验错误信息
 	if err := translator.InitTrans("zh"); err != nil {
 		fmt.Printf("init validator translator failed, err:%v\n", err)
 		return
 	}
+	// 6. 注册路由
 	r := routers.SetupRouter(sConf.Mode)
 
 	// 7. 启动GitHub热点数据定时任务
 	// scheduler.StartGitHubTrendingScheduler()
 	// zap.L().Info("github trending data scheduler started")
 
-	// 8. 启动服务（优雅关机）
+	// 8. 启动服务
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", viper.GetInt("app.port")),
 		Handler: r,

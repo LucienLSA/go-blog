@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -88,12 +89,24 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 		// }
 		// c.Set(CtxUserKey, user)
 
-		// // 设置用户信息到请求上下文
+		// 		// 设置用户信息到请求上下文
 		c.Request = c.Request.WithContext(ctl.NewContext(c.Request.Context(), &ctl.UserInfo{
 			UserId:   mc.UserID,
 			UserName: mc.Username,
 		}))
-		// ctl.InitUserInfo(c.Request.Context())
+
+		// 设置用户信息到Gin上下文，供日志中间件使用
+		c.Set("user_info", &ctl.UserInfo{
+			UserId:   mc.UserID,
+			UserName: mc.Username,
+		})
+
+		// 设置TraceID到请求上下文
+		if traceID := c.GetHeader("X-Trace-ID"); traceID != "" {
+			ctx := context.WithValue(c.Request.Context(), "trace_id", traceID)
+			c.Request = c.Request.WithContext(ctx)
+		}
+
 		c.Next()
 	}
 }

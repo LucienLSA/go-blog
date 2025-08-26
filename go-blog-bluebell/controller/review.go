@@ -27,6 +27,7 @@ func SubmitPostForReviewHandler() gin.HandlerFunc {
 			e.ResponseErrorMsg(c, e.CodeInvalidParam, "参数错误")
 			return
 		}
+		// 提交帖子进行审核
 		resp, err := service.GetReviewSrv().SubmitPostForReview(c.Request.Context(), &req)
 		if err != nil {
 			zap.L().Error("SubmitPostForReview failed", zap.Error(err))
@@ -55,6 +56,7 @@ func GetReviewStatusHandler() gin.HandlerFunc {
 			e.ResponseErrorMsg(c, e.CodeInvalidParam, "post_id参数错误")
 			return
 		}
+		//  获取帖子审核状态
 		resp, err := service.GetReviewSrv().GetReviewStatus(c.Request.Context(), postID)
 		if err != nil {
 			zap.L().Error("GetReviewStatus failed", zap.Error(err))
@@ -82,6 +84,7 @@ func N8nReviewCallbackHandler() gin.HandlerFunc {
 			e.ResponseErrorMsg(c, e.CodeInvalidParam, "参数错误")
 			return
 		}
+		// 处理n8n回调
 		resp, err := service.GetReviewSrv().ProcessN8nCallback(c.Request.Context(), &req)
 		if err != nil {
 			zap.L().Error("N8nReviewCallback failed", zap.Error(err))

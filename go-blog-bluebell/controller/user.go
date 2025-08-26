@@ -246,7 +246,14 @@ func LoginEmailHandler() gin.HandlerFunc {
 // @Router /user/update [put]
 func UpdateHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// 1. 获取参数和参数校验
+		// 1. 验证用户身份（JWT中间件应该已经设置）
+		if _, exists := c.Get("user_info"); !exists {
+			zap.L().Error("UpdateHandler: user_info not found in context")
+			e.ResponseError(c, e.CodeNeedLogin)
+			return
+		}
+
+		// 2. 获取参数和参数校验
 		var req types.UserUpdateReq
 		if err := c.ShouldBindJSON(&req); err != nil {
 			// 请求参数有误 直接返回响应
@@ -262,7 +269,7 @@ func UpdateHandler() gin.HandlerFunc {
 			return
 		}
 
-		// 2. 业务处理
+		// 3. 业务处理
 		l := service.GetUserSrv()
 		if err := l.Update(c.Request.Context(), &req); err != nil {
 			zap.L().Error("service update failed", zap.Error(err))
@@ -286,7 +293,7 @@ func UpdateHandler() gin.HandlerFunc {
 			return
 		}
 
-		// 3. 返回响应
+		// 4. 返回响应
 		e.ResponseSuccessData(c, nil)
 	}
 }
